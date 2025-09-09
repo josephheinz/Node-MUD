@@ -2,13 +2,14 @@
 	import { page } from '$app/state';
 	import LoginModal from '$lib/components/auth/loginModal.svelte';
 	import LoginButton from '$lib/components/auth/loginButton.svelte';
+	import ProfileDropdown from '$lib/components/auth/profileDropdown.svelte';
 
 	let loginModalOpen = $state(false);
 	let user = $state(page.data.user);
 </script>
 
 {#if user}
-	<p>hello {user?.email}</p>
+	<ProfileDropdown {user} />
 {:else}
 	<LoginButton onclick={() => (loginModalOpen = true)} />
 	<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
