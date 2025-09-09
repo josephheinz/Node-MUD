@@ -1,5 +1,4 @@
-import { json, type RequestHandler, type RequestEvent } from "@sveltejs/kit";
-import { supabase } from "$lib/supabaseClient";
+import { supabase } from "$lib/auth/supabaseClient";
 
 export async function POST({ request }) {
     const { email, password } = await request.json();

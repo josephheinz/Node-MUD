@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { supabase } from '$lib/supabaseClient';
+	import { supabase } from '$lib/auth/supabaseClient';
 	import Fa from 'svelte-fa';
 	import { faXmark } from '@fortawesome/free-solid-svg-icons';
 	import { error } from '@sveltejs/kit';
@@ -67,7 +67,7 @@
                     errorText = responseJson.msg;
 					throw new Error(JSON.stringify(response));
 				}
-				return response.json();
+				return responseJson;
 			})
 			.then((data) => {
 				console.log('Success:', data);
