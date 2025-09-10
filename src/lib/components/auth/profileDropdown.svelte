@@ -30,7 +30,7 @@
 <button
 	class="flex items-start justify-around gap-2 {opened == true
 		? 'rounded-t-md'
-		: 'rounded-md'} w-48 bg-zinc-700 p-2"
+		: 'rounded-md'} w-48 cursor-pointer bg-zinc-700 p-2"
 	aria-haspopup="menu"
 	aria-expanded={opened}
 	onclick={() => (opened = !opened)}
@@ -67,45 +67,3 @@
 		</button>
 	</div>
 {/if}
-
-<!--
-{#if opened}
-	<a
-		href="#"
-		onclick={() => (opened = false)}
-		class="inline-flex cursor-pointer flex-col gap-2 rounded-md bg-zinc-700 p-2"
-	>
-		<div class="flex gap-2">
-			<img
-				class="h-12"
-				src={user.user_metadata?.avatar_url ?? 'https://avatar.iran.liara.run/public/30'}
-				alt="User's avatar"
-			/>
-			<div class="flex h-full flex-col items-start justify-between">
-				<b class="text-lg">{displayName}</b>
-				<span class="text-sm">{user.email}</span>
-			</div>
-		</div>
-		<button
-			class="m-auto inline-flex w-9/10 cursor-pointer items-center justify-center gap-2 rounded-md bg-zinc-300 p-2 text-black"
-			><Fa icon={faRightFromBracket} /> Sign Out</button
-		>
-	</a>
-    
-{:else}
-	<a
-		href="#"
-		onclick={() => (opened = true)}
-		class="inline-flex cursor-pointer gap-2 rounded-md bg-zinc-700 p-2"
-	>
-		<img
-			class="h-12"
-			src={user.user_metadata?.avatar_url ?? 'https://avatar.iran.liara.run/public/30'}
-			alt="User's avatar"
-		/>
-		<div class="flex h-full flex-col items-start justify-between">
-			<b class="text-lg">{displayName}</b>
-			--><!--<span class="text-sm">{user.email}</span>
-		</div>
-	</a>
-{/if}-->
