@@ -1,4 +1,5 @@
 import { parse } from "yaml";
+import * as path from "path";
 import { type ITooltipData } from "./components/tooltip";
 import { instantiateModifier } from "./modifiers/modifiersRegistry";
 
@@ -36,8 +37,6 @@ export function ParseYAMLToItem(yamlString: string): Item {
     let item = parse(yamlString)[0];
     const modifiers: IItemModifier[] = (item.modifiers || []).map(instantiateModifier)
 
-    console.log(item);
-
     return {
         id: item.id,
         name: item.name,
@@ -73,3 +72,40 @@ export function getDisplayName(item: Item): string {
         item.name
     ) ?? item.name;
 }
+
+export async function getItem(id: string): Promise<Item> {
+    let item: Item | undefined;
+    const res = await fetch(`/api/item/${id}`)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            item = data.item;
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+    if (item) return item;
+
+    throw new Error(`Item not found: ${id}`);
+}
+
+// Load all the items for api
+
+const items = import.meta.glob("./items/*", { eager: true, as: "raw" });
+
+export const itemRegistry: Record<string, Item> = {};
+
+// cant lie i dont know precisely how this works
+async function loadAllItems() {
+    for (const item in items) {
+        const id = item.split("/").pop()!.replace(/\.[^/.]+$/, '');
+        let _item = (items[item] as any).default ?? items[item];
+        itemRegistry[id] = ParseYAMLToItem(_item);
+    }
+}
+
+await loadAllItems();

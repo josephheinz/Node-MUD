@@ -1,4 +1,10 @@
+import { itemRegistry } from '$lib/items.js';
+
 export async function GET({ params }) {
     const { id } = params;
-    return new Response(`Id is: ${id}`);
+
+    const item = itemRegistry[id];
+    if (!item) throw new Error("Item not found");
+
+    return Response.json({ item: item }, { status: 200 });
 }

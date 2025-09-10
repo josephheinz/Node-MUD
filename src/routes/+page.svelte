@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { ParseYAMLToItem, type Item } from '$lib/items';
-	import fs from 'fs';
+	import { type Item, getItem } from '$lib/items';
 
 	import LoginModal from '$lib/components/auth/loginModal.svelte';
 	import LoginButton from '$lib/components/auth/loginButton.svelte';
@@ -11,16 +10,10 @@
 
 	let loginModalOpen = $state(false);
 	let user = $state(page.data.user);
-	let sword: Item | undefined = $state(undefined);
+	let item: Item | undefined = $state(undefined);
 
 	onMount(async () => {
-		async function loadSword() {
-			const res = await fetch('/items/iron_sword.yaml');
-			const text = await res.text();
-			sword = ParseYAMLToItem(text);
-		}
-
-		loadSword();
+		item = await getItem('gold_sword');
 	});
 </script>
 
@@ -30,6 +23,6 @@
 	<LoginButton onclick={() => (loginModalOpen = true)} />
 	<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
 {/if}
-{#if sword != undefined}
-	<ItemRenderer item={sword} mode={'ascii'} />
+{#if item != undefined}
+	<ItemRenderer {item} mode={'ascii'} />
 {/if}

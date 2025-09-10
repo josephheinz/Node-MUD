@@ -1,0 +1,6 @@
+- id: gold_sword
+  name: Gold Sword
+  icon:
+    ascii: "ߙ"
+    image: "/images/items/sword.png"
+  rarity: Legendary
