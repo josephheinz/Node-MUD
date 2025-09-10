@@ -15,7 +15,7 @@
 
 	onMount(async () => {
 		async function loadSword() {
-			const res = await fetch('/items/sword.yaml');
+			const res = await fetch('/items/iron_sword.yaml');
 			const text = await res.text();
 			sword = ParseYAMLToItem(text);
 		}
@@ -30,4 +30,6 @@
 	<LoginButton onclick={() => (loginModalOpen = true)} />
 	<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
 {/if}
-<ItemRenderer item={sword} mode={'ascii'} />
+{#if sword != undefined}
+	<ItemRenderer item={sword} mode={'ascii'} />
+{/if}
