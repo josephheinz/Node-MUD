@@ -32,6 +32,7 @@
 			})
 			.then((data) => {
 				console.log('Success:', data);
+				window.location.reload();
 			})
 			.catch((error) => {
 				console.error(error);
@@ -62,15 +63,16 @@
 			body: JSON.stringify(loginData)
 		})
 			.then(async (response) => {
-                let responseJson = await response.json();
+				let responseJson = await response.json();
 				if (!response.ok) {
-                    errorText = responseJson.msg;
+					errorText = responseJson.msg;
 					throw new Error(JSON.stringify(response));
 				}
 				return responseJson;
 			})
 			.then((data) => {
 				console.log('Success:', data);
+				window.location.reload();
 			})
 			.catch((error) => {
 				console.error(error);
