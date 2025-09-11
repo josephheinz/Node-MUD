@@ -47,7 +47,7 @@
 {#if opened}
 	<div role="menu" class="w-48 rounded-b-md bg-zinc-600 shadow-lg">
 		<a
-			href="#"
+			href="/profile/{user.user_metadata?.full_name}"
 			role="menuitem"
 			class="flex w-full cursor-pointer items-center justify-start gap-2 px-4 py-2 text-left hover:bg-zinc-500"
 			><Fa icon={faUser} /> Profile

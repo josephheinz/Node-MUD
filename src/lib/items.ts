@@ -22,6 +22,11 @@ export interface IItemModifier {
     modifyName?(baseName: string): string;
 }
 
+export interface DBItem {
+    id: string;
+    modifiers?: IItemModifier[];
+}
+
 export interface Item {
     id: string;
     name: string;
@@ -33,7 +38,7 @@ export interface Item {
     modifiers?: IItemModifier[];
 }
 
-export function ParseYAMLToItem(yamlString: string): Item {
+export function parseYAMLToItem(yamlString: string): Item {
     let item = parse(yamlString)[0];
     const modifiers: IItemModifier[] = (item.modifiers || []).map(instantiateModifier)
 
@@ -49,8 +54,8 @@ export function ParseYAMLToItem(yamlString: string): Item {
     };
 }
 
-export function GetItemData(item: Item): ITooltipData {
-    let rarityName: string = GetRarity(item.rarity);
+export function getItemData(item: Item): ITooltipData {
+    let rarityName: string = getRarity(item.rarity);
     let descriptor: string = `<b style="color:${item.rarity}">${rarityName} Item</b>`;
 
     let itemName: string = getDisplayName(item);
@@ -61,7 +66,7 @@ export function GetItemData(item: Item): ITooltipData {
     }
 }
 
-export function GetRarity(color: string): string {
+export function getRarity(color: string): string {
     const rarity = Object.keys(Rarity).find(k => Rarity[k as keyof typeof Rarity] === color) ?? Rarity.Common;
     return rarity;
 }
@@ -93,6 +98,15 @@ export async function getItem(id: string): Promise<Item> {
     throw new Error(`Item not found: ${id}`);
 }
 
+export async function loadDbItem(item: DBItem): Promise<Item> {
+    const end_item = await getItem(item.id);
+    if (!end_item) throw new Error("Item not found in registry");
+
+    end_item.modifiers = [...(end_item.modifiers ?? []), ...(item.modifiers ?? [])];
+
+    return end_item;
+}
+
 // Load all the items for api
 
 const items = import.meta.glob("./items/*", { eager: true, as: "raw" });
@@ -104,7 +118,7 @@ async function loadAllItems() {
     for (const item in items) {
         const id = item.split("/").pop()!.replace(/\.[^/.]+$/, '');
         let _item = (items[item] as any).default ?? items[item];
-        itemRegistry[id] = ParseYAMLToItem(_item);
+        itemRegistry[id] = parseYAMLToItem(_item);
     }
 }
 

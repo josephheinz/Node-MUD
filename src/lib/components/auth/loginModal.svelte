@@ -24,11 +24,13 @@
 			},
 			body: JSON.stringify(loginData)
 		})
-			.then((response) => {
+			.then(async (response) => {
+				let responseJson = await response.json();
 				if (!response.ok) {
+					errorText = responseJson.msg;
 					throw new Error(`HTTP error! status: ${response.status}`);
 				}
-				return response.json();
+				return responseJson;
 			})
 			.then((data) => {
 				console.log('Success:', data);
