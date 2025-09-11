@@ -4,7 +4,8 @@
 	import LoginModal from '$lib/components/auth/loginModal.svelte';
 	import LoginButton from '$lib/components/auth/loginButton.svelte';
 	import ProfileDropdown from '$lib/components/auth/profileDropdown.svelte';
-	import type { Item } from '$lib/items';
+	import Inventory from '$lib/components/inventory.svelte';
+	import { loadDbItem, type DBItem, type Item } from '$lib/items';
 	import { onMount } from 'svelte';
 
 	let loginModalOpen = $state(false);
@@ -12,7 +13,8 @@
 	let inventory: Item[] = $state([]);
 
 	onMount(async () => {
-		const res = await fetch(`/api/inventory/${user.id}`, {
+		console.log(user?.id);
+		const res = await fetch(`/api/inventory/${user?.id}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
@@ -25,9 +27,12 @@
 				}
 				return responseJson;
 			})
-			.then((data) => {
+			.then(async (data) => {
 				console.log('Success:', data);
-				window.location.reload();
+				data.inventory.forEach(async (item: DBItem) => {
+					let loadedItem = await loadDbItem(item);
+					inventory.push(loadedItem);
+				});
 			})
 			.catch((error) => {
 				console.error(error);
@@ -41,3 +46,5 @@
 	<LoginButton onclick={() => (loginModalOpen = true)} />
 	<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
 {/if}
+<br>
+<Inventory {inventory} />
