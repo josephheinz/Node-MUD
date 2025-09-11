@@ -89,15 +89,15 @@
 		class="absolute top-0 left-0 flex h-full w-full items-center justify-center backdrop-blur-xs"
 	>
 		<div
-			class="h-fit w-1/4 flex-col items-stretch justify-stretch rounded-md border-4 border-white p-2 text-white"
+			class="h-fit w-1/4 flex-col items-stretch justify-stretch rounded-md border-2 border-zinc-700 bg-zinc-800 p-3 text-white"
 		>
 			<nav class="relative flex w-full items-center justify-around">
 				<button
-					class="cursor-pointer border-b-2 border-black transition-all hover:border-white"
+					class="cursor-pointer border-b-2 border-zinc-900 transition-all hover:border-white"
 					onclick={() => (signupVisible = true)}>Sign Up</button
 				>
 				<button
-					class="cursor-pointer border-b-2 border-black transition-all hover:border-white"
+					class="cursor-pointer border-b-2 border-zinc-900 transition-all hover:border-white"
 					onclick={() => (signupVisible = false)}>Login</button
 				>
 				<button onclick={onClose} class="absolute right-2 cursor-pointer">
@@ -111,7 +111,7 @@
 					type="email"
 					name="Email"
 					id="email"
-					class="h-8 w-full rounded-sm border-2 border-white bg-black p-1 text-white outline-none"
+					class="mb-2 h-8 w-full rounded-sm border-2 border-white bg-black p-1 text-white outline-none"
 					placeholder="example@example.com"
 				/>
 				<br />
@@ -120,23 +120,22 @@
 					type="password"
 					name="Password"
 					id="password"
-					class="h-8 w-full rounded-sm border-2 border-white bg-black p-1 text-white outline-none"
+					class="mb-2 h-8 w-full rounded-sm border-2 border-white bg-black p-1 text-white outline-none"
 					placeholder="Abc123!"
 				/>
 				{#if signupVisible}
-					<br />
 					<label for="Password-repeat">Password (Repeat):</label>
 					<input
 						type="password"
 						name="Password-repeat"
 						id="password-repeat"
-						class="h-8 w-full rounded-sm border-2 border-white bg-black p-1 text-white outline-none"
+						class="mb-2 h-8 w-full rounded-sm border-2 border-white bg-black p-1 text-white outline-none"
 						placeholder="Abc123!"
 					/>
 					<p id="error-text" class="text-red-500">{errorText}</p>
 					<button
 						onclick={signup}
-						class="my-2 cursor-pointer rounded-md border-4 border-white px-4 py-2 text-white"
+						class="my-2 cursor-pointer rounded-md border-2 border-white px-4 py-2 text-white"
 						>Sign Up</button
 					>
 				{:else}

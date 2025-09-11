@@ -30,7 +30,7 @@
 <button
 	class="flex items-start justify-around gap-2 {opened == true
 		? 'rounded-t-md'
-		: 'rounded-md'} w-48 cursor-pointer bg-zinc-700 p-2"
+		: 'rounded-md'} w-48 cursor-pointer border-2 border-zinc-700 bg-zinc-800 p-2"
 	aria-haspopup="menu"
 	aria-expanded={opened}
 	onclick={() => (opened = !opened)}
@@ -45,7 +45,7 @@
 
 <!-- Dropdown menu -->
 {#if opened}
-	<div role="menu" class="w-48 rounded-b-md bg-zinc-600 shadow-lg">
+	<div role="menu" class="w-48 rounded-b-md border-2 border-zinc-700 bg-zinc-800 border-t-0 shadow-lg">
 		<a
 			href="/profile/{user.user_metadata?.full_name}"
 			role="menuitem"
