@@ -4,3 +4,7 @@
     ascii: "ߙ"
     image: "/images/items/sword.png"
   rarity: Epic
+  modifiers:
+    - type: Attack
+      attack: 10
+    - type: Sharp

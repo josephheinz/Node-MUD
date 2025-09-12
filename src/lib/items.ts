@@ -10,7 +10,7 @@ export enum Rarity {
     Uncommon = "#32a852",
     Rare = "#3258a8",
     Epic = "#b34ec7",
-    Legendary = "#c9b216",
+    Legendary = "#dbd82b",
     Mythic = "#fc6ae2",
     Divine = "#3ad4e8"
 };
@@ -20,6 +20,7 @@ export interface IItemModifier {
     value?: number | string | boolean;
     displayName?: string;
     modifyName?(baseName: string): string;
+    modifyDescription?(baseDesc: string): string;
 }
 
 export interface DBItem {
@@ -31,11 +32,12 @@ export interface Item {
     id: string;
     name: string;
     rarity: Rarity;
+    desc?: string;
     icon: {
         ascii: string;
         image?: string;
     };
-    modifiers?: IItemModifier[];
+    modifiers: IItemModifier[];
 }
 
 export function parseYAMLToItem(yamlString: string): Item {
@@ -59,10 +61,11 @@ export function getItemData(item: Item): ITooltipData {
     let descriptor: string = `<b style="color:${item.rarity}">${rarityName} Item</b>`;
 
     let itemName: string = getDisplayName(item);
+    let itemDesc: string = getDisplayDescription(item);
 
     return {
         title: itemName,
-        body: `${item.id}<br>${descriptor}`
+        body: `${itemDesc}<br>${descriptor}`
     }
 }
 
@@ -73,10 +76,19 @@ export function getRarity(color: string): string {
 
 export function getDisplayName(item: Item): string {
     return item.modifiers?.reduce(
-        (name, mod) => mod.modifyName ? mod.modifyName(name) : name,
+        (name, mod) => mod.modifyName ? mod.modifyName(name) : item.name,
         item.name
     ) ?? item.name;
 }
+
+export function getDisplayDescription(item: Item): string {
+    const base = item.desc ?? "";
+    return item.modifiers?.reduce(
+        (desc, mod) => mod.modifyDescription ? mod.modifyDescription(desc) : desc,
+        base
+    ) ?? base;
+}
+
 
 export async function getItem(id: string): Promise<Item> {
     let item: Item | undefined;
@@ -99,12 +111,16 @@ export async function getItem(id: string): Promise<Item> {
 }
 
 export async function loadDbItem(item: DBItem): Promise<Item> {
-    const end_item = await getItem(item.id);
-    if (!end_item) throw new Error("Item not found in registry");
+    const base = itemRegistry[item.id];
+    if (!base) throw new Error(`Unknown item id: ${item.id}`);
 
-    end_item.modifiers = [...(end_item.modifiers ?? []), ...(item.modifiers ?? [])];
+    const playerModifiers = item.modifiers?.map(instantiateModifier) ?? [];
 
-    return end_item;
+    return {
+        ...base,
+        // merge modifiers: base first, then player ones
+        modifiers: [...base.modifiers, ...playerModifiers]
+    };
 }
 
 // Load all the items for api
