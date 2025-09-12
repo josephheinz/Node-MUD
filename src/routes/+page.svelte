@@ -7,10 +7,13 @@
 	import Inventory from '$lib/components/inventory.svelte';
 	import { loadDbItem, type DBItem, type Item } from '$lib/items';
 	import { onMount } from 'svelte';
+	import Equipment from '$lib/components/equipment.svelte';
+	import { EmptyEquipment, type EquipmentSlot } from '$lib/types';
 
 	let loginModalOpen = $state(false);
 	let user = $state(page.data.user);
 	let inventory: Item[] = $state([]);
+	let equipment = $state(new EmptyEquipment());
 
 	onMount(async () => {
 		console.log(user?.id);
@@ -37,6 +40,35 @@
 			.catch((error) => {
 				console.error(error);
 			});
+
+		const resEquip = await fetch(`/api/equipment/${user?.id}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+			.then(async (response) => {
+				let responseJson = await response.json();
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				return responseJson;
+			})
+			.then(async (data) => {
+				console.log(`Success: ${JSON.stringify(data)}`);
+				for (const [slotKey, item] of Object.entries(data.equipment) as [
+					EquipmentSlot,
+					Item | undefined
+				][]) {
+					if (!item) continue;
+					let loadedItem = await loadDbItem(item);
+					data.equipment[slotKey] = loadedItem;
+				}
+				equipment = data.equipment;
+			})
+			.catch((error) => {
+				console.error(error);
+			});
 	});
 </script>
 
@@ -46,5 +78,6 @@
 	<LoginButton onclick={() => (loginModalOpen = true)} />
 	<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
 {/if}
-<br>
+<br />
 <Inventory {inventory} />
+<Equipment {equipment} />

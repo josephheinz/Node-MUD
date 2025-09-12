@@ -3,12 +3,14 @@ import { SharpModifier } from './reforges';
 import { StarsModifier } from './stars';
 import { CaduceusModifier } from './special';
 import { AttackModifier } from './statModifiers';
+import { EquippableModifier } from './basicModifiers';
 
 export const modifierRegistry: Record<string, { new(...args: any[]): IItemModifier; type?: string }> = {
     Sharp: SharpModifier,
     Stars: StarsModifier,
     Caduceus: CaduceusModifier,
-    Attack: AttackModifier
+    Attack: AttackModifier,
+    Equippable: EquippableModifier
 };
 
 export function instantiateModifier(modYaml: any): IItemModifier {

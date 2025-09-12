@@ -3,4 +3,7 @@
   icon:
     ascii: "ߙ"
     image: "/images/items/sword.png"
-  rarity: Legendary
+  rarity: Uncommon
+  modifiers:
+    - type: Attack
+      attack: 10
