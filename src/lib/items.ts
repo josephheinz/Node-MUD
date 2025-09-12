@@ -2,6 +2,7 @@ import { parse } from "yaml";
 import * as path from "path";
 import { type ITooltipData } from "./components/tooltip";
 import { instantiateModifier } from "./modifiers/modifiersRegistry";
+import { type Equipment, EmptyEquipment, type EquipmentSlot } from "./types";
 
 export type RarityKey = keyof typeof Rarity;
 
@@ -121,6 +122,32 @@ export async function loadDbItem(item: DBItem): Promise<Item> {
         // merge modifiers: base first, then player ones
         modifiers: [...base.modifiers, ...playerModifiers]
     };
+}
+
+export async function hydrateEquipment(equipment: Object): Promise<Equipment> {
+    const hydratedEquipment: Equipment = EmptyEquipment;
+
+    for (const [slotKey, item] of Object.entries(equipment) as [
+        EquipmentSlot,
+        Item | undefined
+    ][]) {
+        if (!item) continue;
+        let loadedItem = await loadDbItem(item);
+        hydratedEquipment[slotKey] = loadedItem;
+    }
+
+    return hydratedEquipment;
+}
+
+export async function hydrateInventory(inventory: DBItem[]): Promise<Item[]> {
+    let hydratedInventory: Item[] = [];
+
+    inventory.forEach(async (item: DBItem) => {
+        let loadedItem = await loadDbItem(item);
+        hydratedInventory.push(loadedItem);
+    });
+
+    return hydratedInventory;
 }
 
 // Load all the items for api

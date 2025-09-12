@@ -1,7 +1,6 @@
 import { supabase } from '$lib/auth/supabaseClient.js';
-import type Equipment from '$lib/components/equipment.svelte';
-import { loadDbItem, type DBItem, type Item } from '$lib/items.js';
-import { EmptyEquipment, type EquipmentSlot } from '$lib/types.js';
+import { type Item } from '$lib/items.js';
+import { EmptyEquipment } from '$lib/types.js';
 
 export async function load({ cookies, fetch }) {
     // Load supabase session
@@ -18,6 +17,8 @@ export async function load({ cookies, fetch }) {
     }
 
     const { session, user } = data;
+
+    if (!user) return { user, inventory: [], equipment: EmptyEquipment };
 
     // Load inventory
     const userId = user?.id;
@@ -38,18 +39,14 @@ export async function load({ cookies, fetch }) {
             return responseJson;
         })
         .then(async (data) => {
-            console.log('Success:', data);
-            data.inventory.forEach(async (item: DBItem) => {
-                let loadedItem = await loadDbItem(item);
-                inventory.push(loadedItem);
-            });
+            inventory = data.inventory;
         })
         .catch((error) => {
             console.error(error);
         });
 
     // Load equipment
-    let equipment = new EmptyEquipment();
+    let equipment = EmptyEquipment;
 
     const loadEquipment = await fetch(`/api/equipment/${userId}`, {
         method: 'GET',
@@ -65,15 +62,6 @@ export async function load({ cookies, fetch }) {
             return responseJson;
         })
         .then(async (data) => {
-            console.log(`Success: ${JSON.stringify(data)}`);
-            for (const [slotKey, item] of Object.entries(data.equipment) as [
-                EquipmentSlot,
-                Item | undefined
-            ][]) {
-                if (!item) continue;
-                let loadedItem = await loadDbItem(item);
-                data.equipment[slotKey] = loadedItem;
-            }
             equipment = data.equipment;
         })
         .catch((error) => {

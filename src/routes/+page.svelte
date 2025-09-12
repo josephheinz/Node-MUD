@@ -5,15 +5,27 @@
 	import LoginButton from '$lib/components/auth/loginButton.svelte';
 	import ProfileDropdown from '$lib/components/auth/profileDropdown.svelte';
 	import Inventory from '$lib/components/inventory.svelte';
-	import { loadDbItem, type DBItem, type Item } from '$lib/items';
-	import { onMount } from 'svelte';
-	import Equipment from '$lib/components/equipment.svelte';
-	import { EmptyEquipment, type EquipmentSlot } from '$lib/types';
+	import { hydrateEquipment, hydrateInventory, type Item } from '$lib/items';
+	import { type Equipment, EmptyEquipment } from '$lib/types';
+	import EquipmentDisplay from '$lib/components/equipmentDisplay.svelte';
 
 	let loginModalOpen = $state(false);
 	let user = $state(page.data.user);
-	let inventory: Item[] = $state(page.data.inventory);
-	let equipment = $state(page.data.equipment);
+	let inventory = $state<Item[]>([]);
+	let equipment = $state<Equipment>(EmptyEquipment);
+
+	$effect(() => {
+		hydrateFromPageData();
+	});
+
+	async function hydrateFromPageData() {
+		const eq: Equipment = page.data.equipment;
+		const inv: Item[] = page.data.inventory;
+
+		console.log(eq, inv);
+		if (eq) equipment = await hydrateEquipment(eq);
+		if (inv) inventory = await hydrateInventory(inv);
+	}
 </script>
 
 {#if user}
@@ -24,4 +36,4 @@
 {/if}
 <br />
 <Inventory {inventory} />
-<Equipment {equipment} />
+<EquipmentDisplay {equipment} />
