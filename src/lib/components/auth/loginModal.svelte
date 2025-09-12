@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { supabase } from '$lib/auth/supabaseClient';
 	import Fa from 'svelte-fa';
 	import { faXmark } from '@fortawesome/free-solid-svg-icons';
-	import { error } from '@sveltejs/kit';
 
 	let { open = $bindable(true), onClose } = $props();
 	let signupVisible = $state(true);
@@ -111,7 +109,7 @@
 					type="email"
 					name="Email"
 					id="email"
-					class="mb-2 h-8 w-full rounded-sm border-2 border-white bg-black p-1 text-white outline-none"
+					class="mb-2 h-8 w-full rounded-sm border-2 border-zinc-700 bg-zinc-900 p-1 text-white focus:outline-zinc-500"
 					placeholder="example@example.com"
 				/>
 				<br />
@@ -120,7 +118,7 @@
 					type="password"
 					name="Password"
 					id="password"
-					class="mb-2 h-8 w-full rounded-sm border-2 border-white bg-black p-1 text-white outline-none"
+					class="mb-2 h-8 w-full rounded-sm border-2 border-zinc-700 bg-zinc-900 p-1 text-white focus:outline-zinc-500"
 					placeholder="Abc123!"
 				/>
 				{#if signupVisible}
@@ -129,20 +127,20 @@
 						type="password"
 						name="Password-repeat"
 						id="password-repeat"
-						class="mb-2 h-8 w-full rounded-sm border-2 border-white bg-black p-1 text-white outline-none"
+						class="mb-2 h-8 w-full rounded-sm border-2 border-zinc-700 bg-zinc-900 p-1 text-white focus:outline-zinc-500"
 						placeholder="Abc123!"
 					/>
 					<p id="error-text" class="text-red-500">{errorText}</p>
 					<button
 						onclick={signup}
-						class="my-2 cursor-pointer rounded-md border-2 border-white px-4 py-2 text-white"
+						class="my-2 cursor-pointer rounded-md border-2 border-zinc-700 bg-zinc-900 hover:border-zinc-300 px-4 py-2 text-white"
 						>Sign Up</button
 					>
 				{:else}
 					<p id="error-text" class="text-red-500">{errorText}</p>
 					<button
 						onclick={login}
-						class="my-2 cursor-pointer rounded-md border-4 border-white px-4 py-2 text-white"
+						class="my-2 cursor-pointer rounded-md border-2 border-zinc-700 bg-zinc-900 hover:border-zinc-300 px-4 py-2 text-white"
 						>Login</button
 					>
 				{/if}

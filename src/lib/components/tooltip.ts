@@ -41,7 +41,7 @@ export function tooltip(element: HTMLElement, data: ITooltipData) {
             div.remove();
             div = null;
         }
-        element.setAttribute('title', title);
+        //element.setAttribute('title', title);
 
         document.querySelectorAll("[data-svelte-tooltip]").forEach(el => el.remove());
     }
