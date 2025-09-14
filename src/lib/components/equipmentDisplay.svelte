@@ -23,9 +23,9 @@
 	</div>
 </div>
 
-{#snippet equipmentSlot(slotname: EquipmentSlot, item: Item | undefined)}
+{#snippet equipmentSlot(slotname: EquipmentSlot, item: Item | null)}
 	{#if item}
-		<ItemRenderer {item} mode={'ascii'} pclass={slotGridSpots[slotname]} />
+		<ItemRenderer {item} mode={'ascii'} pclass={slotGridSpots[slotname]} equippedSlot={slotname} />
 	{:else}
 		<div
 			class="flex h-16 w-16 items-center justify-center rounded-lg border-2 border-zinc-500 bg-zinc-600 select-none {slotGridSpots[

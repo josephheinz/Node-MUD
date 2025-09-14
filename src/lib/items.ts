@@ -1,8 +1,10 @@
 import { parse } from "yaml";
 import * as path from "path";
+import * as store from "$lib/store";
 import { type ITooltipData } from "./components/tooltip";
 import { instantiateModifier } from "./modifiers/modifiersRegistry";
 import { type Equipment, EmptyEquipment, type EquipmentSlot } from "./types";
+import { get } from "svelte/store";
 
 export type RarityKey = keyof typeof Rarity;
 
@@ -111,7 +113,7 @@ export async function getItem(id: string): Promise<Item> {
     throw new Error(`Item not found: ${id}`);
 }
 
-export async function loadDbItem(item: DBItem): Promise<Item> {
+export function loadDbItem(item: DBItem): Item {
     const base = itemRegistry[item.id];
     if (!base) throw new Error(`Unknown item id: ${item.id}`);
 
@@ -124,15 +126,49 @@ export async function loadDbItem(item: DBItem): Promise<Item> {
     };
 }
 
+export function encodeDbItem(item: Item): DBItem {
+    const base = itemRegistry[item.id];
+
+    // Use both type + value (or the whole object) to compare
+    const baseMods = new Set(
+        (base.modifiers ?? []).map(m => JSON.stringify(m))
+    );
+
+    return {
+        id: item.id,
+        modifiers: (item.modifiers ?? []).filter(
+            mod => !baseMods.has(JSON.stringify(mod))
+        )
+    };
+}
+
+
+export function determineSlot(item: Item, equipment: Equipment = get(store.equipment)): EquipmentSlot | undefined {
+    let slot: EquipmentSlot | undefined = undefined;
+
+    item.modifiers.forEach((mod: IItemModifier) => {
+        if (mod.type !== "Equippable" || !mod.value || typeof mod.value !== "string") return;
+        if (equipment[mod.value as keyof Equipment] != undefined) return;
+        try {
+            slot = mod.value as EquipmentSlot;
+            return;
+        } catch (err) {
+            throw new Error(`${err}`);
+        }
+    });
+
+    return slot;
+}
+
 export async function hydrateEquipment(equipment: Object): Promise<Equipment> {
-    const hydratedEquipment: Equipment = EmptyEquipment;
+    const hydratedEquipment: Equipment = { ...EmptyEquipment };
 
     for (const [slotKey, item] of Object.entries(equipment) as [
         EquipmentSlot,
-        Item | undefined
+        Item | null
     ][]) {
         if (!item) continue;
-        let loadedItem = await loadDbItem(item);
+        let loadedItem = loadDbItem(item);
         hydratedEquipment[slotKey] = loadedItem;
     }
 
@@ -143,7 +179,7 @@ export async function hydrateInventory(inventory: DBItem[]): Promise<Item[]> {
     let hydratedInventory: Item[] = [];
 
     inventory.forEach(async (item: DBItem) => {
-        let loadedItem = await loadDbItem(item);
+        let loadedItem = loadDbItem(item);
         hydratedInventory.push(loadedItem);
     });
 

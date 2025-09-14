@@ -8,4 +8,4 @@
     - type: Attack
       attack: 5
     - type: Equippable
-      slot: mainhand
+      value: mainhand

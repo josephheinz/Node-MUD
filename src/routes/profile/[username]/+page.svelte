@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/state';
+	import { page } from '$app/stores';
 
 	type Profile = {
 		id: string;
@@ -7,7 +7,7 @@
 		joined_at: Date;
 	};
 
-	let profile: Profile | undefined = page.data.profile;
+	let profile: Profile | undefined = $page.data.profile;
 </script>
 
 {#if profile}

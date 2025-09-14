@@ -1,8 +1,7 @@
+import { writable } from "svelte/store";
 import type { Item } from "./items";
-import { type Equipment, EmptyEquipment } from "./types";
+import { type Equipment, type User } from "./types";
 
-export const user = $state(undefined);
-
-export const inventory: Item[] = $state([]);
-
-export const equipment: Equipment = $state(EmptyEquipment);
+export const user = writable<User>();
+export const inventory = writable<Item[]>();
+export const equipment = writable<Equipment>();

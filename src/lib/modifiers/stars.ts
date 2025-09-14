@@ -1,7 +1,7 @@
 import { type IItemModifier } from "$lib/items";
 
 export class StarsModifier implements IItemModifier {
-    type = "Stars Modifier";
+    type = "Stars";
 
     constructor(private stars: number) { }
 

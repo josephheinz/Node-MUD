@@ -1,35 +1,87 @@
-import type { Item } from "./items";
+import { encodeDbItem, hydrateEquipment, hydrateInventory, type DBItem, type Item } from "./items";
+import * as store from "$lib/store";
+import { get } from "svelte/store";
 
 export type EquipmentSlot = keyof Equipment;
 
 export type Equipment = {
-    head: Item | undefined;
-    body: Item | undefined;
-    legs: Item | undefined;
-    offhand: Item | undefined;
-    mainhand: Item | undefined;
+    head: Item | null;
+    body: Item | null;
+    legs: Item | null;
+    offhand: Item | null;
+    mainhand: Item | null;
 };
 
 export const EmptyEquipment: Equipment = {
-    head: undefined,
-    body: undefined,
-    legs: undefined,
-    offhand: undefined,
-    mainhand: undefined
+    head: null,
+    body: null,
+    legs: null,
+    offhand: null,
+    mainhand: null
 };
 
-export function Equip(equipment: Equipment, item: Item): boolean {
-    item.modifiers.forEach((mod) => {
-        if (mod.type !== "Equip Modifier" || !mod.value || typeof mod.value !== "string") return;
-        if (equipment[mod.value as keyof Equipment] != undefined) return;
+export interface User {
+    id: string;
+};
 
-        try {
-            equipment[mod.value as EquipmentSlot] = item;
-            return;
-        } catch (err) {
-            throw new Error(`${err}`);
-        }
+export type InventoryRow = {
+    inventory_data: DBItem[];
+    equipment_data: Equipment;
+};
+
+export async function Equip(item: Item) {
+    const userId = get(store.user)?.id;
+    if (!userId) return console.error('No user logged in');
+
+    const res = await fetch(`/api/equipment/${userId}/equip`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dbItem: encodeDbItem(item) })
     });
 
-    return true;
+    if (!res.ok) {
+        console.error('Failed to equip');
+        return;
+    }
+
+    const data = await res.json();
+
+    // Update client state with server response
+    let newEq = await hydrateEquipment(data.serializedEquipment);
+    let newInv = await hydrateInventory(data.inventory);
+    store.equipment.set(newEq);
+    store.inventory.set(newInv);
+}
+
+export async function Unequip(slot: keyof Equipment) {
+    const currentItem = get(store.equipment)[slot];
+    if (!currentItem) return;
+
+    try {
+        const response = await fetch(`/api/equipment/${get(store.user)?.id}/unequip`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slot })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data?.error || 'Unequip failed');
+
+        // Update client state with server response
+        let newEq = await hydrateEquipment(data.equipment);
+        let newInv = await hydrateInventory(data.inventory);
+        store.equipment.set(newEq);
+        store.inventory.set(newInv);
+    } catch (err) {
+        console.error('Unequip error:', err);
+    }
+}
+
+export function serializeEquipment(equipment: Record<string, Item | null>): Record<string, DBItem | null> {
+    const result: Record<string, DBItem | null> = {};
+    for (const slot in equipment) {
+        const item = equipment[slot];
+        result[slot] = item != null ? encodeDbItem(item) : null;
+    }
+    return result;
 }

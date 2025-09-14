@@ -31,7 +31,6 @@
 				return responseJson;
 			})
 			.then((data) => {
-				console.log('Success:', data);
 				window.location.reload();
 			})
 			.catch((error) => {
@@ -71,7 +70,6 @@
 				return responseJson;
 			})
 			.then((data) => {
-				console.log('Success:', data);
 				window.location.reload();
 			})
 			.catch((error) => {

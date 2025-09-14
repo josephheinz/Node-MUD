@@ -2,7 +2,6 @@ import { supabase } from "$lib/auth/supabaseClient";
 
 export async function load({ params }) {
     const { username } = params;
-    console.log(username)
 
     const { data, error } = await supabase
         .from("profiles")

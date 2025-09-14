@@ -7,3 +7,5 @@
   modifiers:
     - type: Attack
       attack: 10
+    - type: Equippable
+      slot: mainhand

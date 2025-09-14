@@ -18,7 +18,6 @@
 				return response.json();
 			})
 			.then((data) => {
-				console.log('Success');
 				window.location.reload();
 			})
 			.catch((error) => {

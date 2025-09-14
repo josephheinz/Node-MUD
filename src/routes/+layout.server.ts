@@ -5,7 +5,13 @@ import { EmptyEquipment } from '$lib/types.js';
 export async function load({ cookies, fetch }) {
     // Load supabase session
     const sessionCookie = cookies.get("supabase.session");
-    if (!sessionCookie) return { user: null };
+    if (!sessionCookie) {
+        return {
+            user: null,
+            inventory: [],
+            equipment: EmptyEquipment
+        };
+    }
 
     let sessionParsed = JSON.parse(sessionCookie);
 
@@ -13,7 +19,7 @@ export async function load({ cookies, fetch }) {
     const { data, error } = await supabase.auth.refreshSession({ refresh_token });
 
     if (error) {
-        throw new Error(error.message);
+        console.log(error.message);
     }
 
     const { session, user } = data;

@@ -1,11 +1,34 @@
 <script lang="ts">
-	import { type Item, getItemData } from '$lib/items';
-	import { tooltip, type ITooltipData } from './tooltip';
+	import { type Item, determineSlot, getItemData } from '$lib/items';
+	import { tooltip } from './tooltip';
+	import { Equip, Unequip, type EquipmentSlot } from '$lib/types';
+	import { onMount } from 'svelte';
 	const {
 		item,
 		mode = 'ascii',
-		pclass
-	}: { item: Item; mode: 'ascii' | 'sprite'; pclass: string } = $props();
+		pclass = '',
+		equippedSlot = undefined
+	}: {
+		item: Item;
+		mode: 'ascii' | 'sprite';
+		pclass: string;
+		equippedSlot: EquipmentSlot | undefined;
+	} = $props();
+
+	function handleClick() {
+		if (equippedSlot) {
+			Unequip(equippedSlot);
+		} else {
+			const slot = determineSlot(item);
+			if (slot) {
+				Equip(item);
+			} else {
+				console.warn('Item is not equippable:', item);
+			}
+		}
+	}
+
+	$inspect(item);
 </script>
 
 <div
@@ -13,6 +36,9 @@
 	style="border:2px solid {item?.rarity};"
 	title=""
 	use:tooltip={getItemData(item)}
+	ondblclick={handleClick}
+	role="button"
+	tabindex="0"
 >
 	{#if mode == 'ascii'}
 		<span class="ascii-item text-4xl select-none" style="color:{item?.rarity};"

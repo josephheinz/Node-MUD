@@ -1,7 +1,7 @@
 import { type IItemModifier } from "$lib/items";
 
 export class AttackModifier implements IItemModifier {
-    type = "Attack Modifier";
+    type = "Attack";
 
     constructor(private attack: number) { }
 

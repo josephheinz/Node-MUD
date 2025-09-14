@@ -16,5 +16,5 @@ export async function GET({ params }) {
         return Response.json({ equipment: data[0].equipment_data }, { status: 200 });
     }
 
-    return Response.json({ inventory: undefined }, { status: 404 });
+    return Response.json({ equipment: undefined }, { status: 404 });
 }

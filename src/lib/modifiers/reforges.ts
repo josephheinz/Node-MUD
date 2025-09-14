@@ -1,7 +1,7 @@
 import { type IItemModifier } from "$lib/items";
 
 export class SharpModifier implements IItemModifier {
-    type = "Sharp Reforge";
+    type = "Sharp";
     displayName = "Sharp";
 
     modifyName(baseName: string): string {
