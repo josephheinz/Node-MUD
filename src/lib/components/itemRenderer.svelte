@@ -2,7 +2,7 @@
 	import { type Item, determineSlot, getItemData } from '$lib/items';
 	import { tooltip } from './tooltip';
 	import { Equip, Unequip, type EquipmentSlot } from '$lib/types';
-	import { onMount } from 'svelte';
+	
 	const {
 		item,
 		mode = 'ascii',
@@ -27,8 +27,6 @@
 			}
 		}
 	}
-
-	$inspect(item);
 </script>
 
 <div

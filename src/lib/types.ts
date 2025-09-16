@@ -1,6 +1,7 @@
-import { encodeDbItem, hydrateEquipment, hydrateInventory, type DBItem, type Item } from "./items";
+import { determineSlot, encodeDbItem, hydrateEquipment, hydrateInventory, type DBItem, type Item } from "./items";
 import * as store from "$lib/store";
 import { get } from "svelte/store";
+import ItemRenderer from "./components/itemRenderer.svelte";
 
 export type EquipmentSlot = keyof Equipment;
 
@@ -31,7 +32,41 @@ export type InventoryRow = {
 
 export async function Equip(item: Item) {
     const userId = get(store.user)?.id;
+
     if (!userId) return console.error('No user logged in');
+
+    const startInventory = get(store.inventory);
+    const startEquipment = get(store.equipment);
+
+    let changeInventory = startInventory;
+    let changeEquipment = startEquipment;
+
+    try {
+        let slot: EquipmentSlot | undefined = determineSlot(item);
+        if (slot && !startEquipment[slot]) {
+            changeEquipment[slot] = item;
+            const index = startInventory.findIndex(i => i.uid === item.uid);
+            if (index === -1) {
+                throw new Error("Item not in inventory");
+            }
+            changeInventory.slice(index, 1);
+        } else if (slot && startEquipment[slot]) {
+            let eqItem = changeEquipment[slot];
+            if (!eqItem) throw new Error("slot item is null for some reason");
+            changeInventory.push(eqItem);
+            changeEquipment[slot] = item;
+            const index = startInventory.findIndex(i => i.uid === item.uid);
+            if (index === -1) {
+                throw new Error("Item not in inventory");
+            }
+            changeInventory.slice(index, 1);
+        }
+
+        store.inventory.set(changeInventory);
+        store.equipment.set(changeEquipment);
+    } catch (err) {
+        console.log(err);
+    }
 
     const res = await fetch(`/api/equipment/${userId}/equip`, {
         method: 'POST',
@@ -40,6 +75,8 @@ export async function Equip(item: Item) {
     });
 
     if (!res.ok) {
+        store.inventory.set(startInventory);
+        store.equipment.set(startEquipment);
         console.error('Failed to equip');
         return;
     }
@@ -57,15 +94,35 @@ export async function Unequip(slot: keyof Equipment) {
     const currentItem = get(store.equipment)[slot];
     if (!currentItem) return;
 
+    const startInventory = get(store.inventory);
+    const startEquipment = get(store.equipment);
+
+    let changeInventory = startInventory;
+    let changeEquipment = startEquipment;
+
     try {
-        const response = await fetch(`/api/equipment/${get(store.user)?.id}/unequip`, {
+        changeInventory.push(currentItem);
+        changeEquipment[slot] = null;
+
+        store.inventory.set(changeInventory);
+        store.equipment.set(changeEquipment);
+    } catch (err) {
+        console.log(err);
+    }
+
+    try {
+        const res = await fetch(`/api/equipment/${get(store.user)?.id}/unequip`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ slot })
         });
 
-        const data = await response.json();
-        if (!response.ok) throw new Error(data?.error || 'Unequip failed');
+        const data = await res.json();
+        if (!res.ok) {
+            store.inventory.set(startInventory);
+            store.equipment.set(startEquipment);
+            throw new Error(data?.error || 'Unequip failed');
+        }
 
         // Update client state with server response
         let newEq = await hydrateEquipment(data.equipment);

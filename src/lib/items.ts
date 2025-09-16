@@ -1,5 +1,4 @@
 import { parse } from "yaml";
-import * as path from "path";
 import * as store from "$lib/store";
 import { type ITooltipData } from "./components/tooltip";
 import { instantiateModifier } from "./modifiers/modifiersRegistry";
@@ -32,6 +31,7 @@ export interface DBItem {
 }
 
 export interface Item {
+    uid: string;
     id: string;
     name: string;
     rarity: Rarity;
@@ -48,6 +48,7 @@ export function parseYAMLToItem(yamlString: string): Item {
     const modifiers: IItemModifier[] = (item.modifiers || []).map(instantiateModifier)
 
     return {
+        uid: crypto.randomUUID(),
         id: item.id,
         name: item.name,
         rarity: Rarity[item.rarity as RarityKey],
@@ -66,9 +67,13 @@ export function getItemData(item: Item): ITooltipData {
     let itemName: string = getDisplayName(item);
     let itemDesc: string = getDisplayDescription(item);
 
+    let slot: EquipmentSlot | undefined = determineSlot(item);
+    let equipMsg: string = "";
+    if (slot) equipMsg = `[Equip - Double-click]<br/>Slot: ${slot}<br/>`;
+
     return {
         title: itemName,
-        body: `${itemDesc}<br>${descriptor}`
+        body: `${equipMsg}${itemDesc}<br/>${descriptor}`
     }
 }
 
