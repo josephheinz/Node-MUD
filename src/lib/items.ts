@@ -153,7 +153,7 @@ export function determineSlot(item: Item, equipment: Equipment = get(store.equip
 
     item.modifiers.forEach((mod: IItemModifier) => {
         if (mod.type !== "Equippable" || !mod.value || typeof mod.value !== "string") return;
-        if (equipment[mod.value as keyof Equipment] != undefined) return;
+        //if (equipment[mod.value as keyof Equipment] != undefined) return;
         try {
             slot = mod.value as EquipmentSlot;
             return;

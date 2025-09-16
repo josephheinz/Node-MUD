@@ -3,13 +3,18 @@
 	import ItemRenderer from './itemRenderer.svelte';
 
 	const { inventory }: { inventory: Item[] } = $props();
+
+	const baseSlots = 25; // minimum visible slots
+	const totalSlots = Math.max(inventory.length, baseSlots);
 </script>
 
-<div class="m-2 w-max rounded-lg border-2 border-zinc-700 bg-zinc-800 p-2">
-	<h1 class="text-xl font-bold">Your Inventory:</h1>
-	<div class="my-2 inline-grid h-full w-full grid-cols-5 gap-2">
-		{#each inventory as item, index (item.id + '-' + index)}
+<div class="m-2 inline-grid h-full min-h-16 w-full max-w-80 min-w-80 grid-cols-5 gap-2">
+	{#each Array(totalSlots) as _, index (inventory[index]?.uid ?? `empty-${index}`)}
+		{@const item = inventory[index]}
+		{#if item}
 			<ItemRenderer {item} mode={'ascii'} pclass="" equippedSlot={undefined} />
-		{/each}
-	</div>
+		{:else}
+			<div class=" h-16 w-16 rounded-lg"></div>
+		{/if}
+	{/each}
 </div>

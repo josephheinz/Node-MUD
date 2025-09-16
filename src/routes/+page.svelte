@@ -9,6 +9,7 @@
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
 	import type { Item } from '$lib/items';
+	import CharacterMenu from '$lib/components/characterMenu.svelte';
 
 	let loginModalOpen = $state(false);
 
@@ -37,6 +38,5 @@
 {/if}
 <br />
 {#if inventory && equipment}
-	<Inventory {inventory} />
-	<EquipmentDisplay {equipment} />
+	<CharacterMenu {inventory} {equipment} />
 {/if}

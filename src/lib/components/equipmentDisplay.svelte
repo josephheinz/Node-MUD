@@ -14,13 +14,10 @@
 	};
 </script>
 
-<div class="m-2 w-max rounded-lg border-2 border-zinc-700 bg-zinc-800 p-2">
-	<h1 class="text-xl font-bold">Your Equipment:</h1>
-	<div class="my-2 inline-grid h-full w-full grid-cols-3 grid-rows-3 gap-2">
-		{#each Object.entries(equipment) as [slot, item]}
-			{@render equipmentSlot(slot as EquipmentSlot, item)}
-		{/each}
-	</div>
+<div class="my-2 inline-grid h-full w-full grid-cols-3 grid-rows-3 gap-2">
+	{#each Object.entries(equipment) as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
+		{@render equipmentSlot(slot as EquipmentSlot, item)}
+	{/each}
 </div>
 
 {#snippet equipmentSlot(slotname: EquipmentSlot, item: Item | null)}

@@ -43,23 +43,14 @@ export async function Equip(item: Item) {
 
     try {
         let slot: EquipmentSlot | undefined = determineSlot(item);
-        if (slot && !startEquipment[slot]) {
+        const index = startInventory.findIndex(i => i.uid === item.uid);
+        if (index === -1) {
+            throw new Error("Item not in inventory");
+        }
+        if (slot) {
+            if (startEquipment[slot]) changeInventory.push(startEquipment[slot]);
             changeEquipment[slot] = item;
-            const index = startInventory.findIndex(i => i.uid === item.uid);
-            if (index === -1) {
-                throw new Error("Item not in inventory");
-            }
-            changeInventory.slice(index, 1);
-        } else if (slot && startEquipment[slot]) {
-            let eqItem = changeEquipment[slot];
-            if (!eqItem) throw new Error("slot item is null for some reason");
-            changeInventory.push(eqItem);
-            changeEquipment[slot] = item;
-            const index = startInventory.findIndex(i => i.uid === item.uid);
-            if (index === -1) {
-                throw new Error("Item not in inventory");
-            }
-            changeInventory.slice(index, 1);
+            changeInventory.splice(index, 1);
         }
 
         store.inventory.set(changeInventory);
