@@ -1,5 +1,6 @@
 import { supabase } from '$lib/auth/supabaseClient.js';
 import { type Item } from '$lib/items.js';
+import { Stats } from '$lib/stats.js';
 import { EmptyEquipment } from '$lib/types.js';
 
 export async function load({ cookies, fetch }) {
@@ -9,7 +10,8 @@ export async function load({ cookies, fetch }) {
         return {
             user: null,
             inventory: [],
-            equipment: EmptyEquipment
+            equipment: EmptyEquipment,
+            stats: Stats
         };
     }
 
@@ -74,6 +76,28 @@ export async function load({ cookies, fetch }) {
             console.error(error);
         });
 
+    let stats = Stats;
 
-    return { user, inventory, equipment };
+    const loadStats = await fetch(`api/stats/${userId}`, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(async (response) => {
+            let responseJson = await response.json();
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return responseJson;
+        })
+        .then(async (data) => {
+            stats = data.stats;
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+
+
+    return { user, inventory, equipment, stats };
 };

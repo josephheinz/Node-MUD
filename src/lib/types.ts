@@ -1,7 +1,6 @@
 import { determineSlot, encodeDbItem, hydrateEquipment, hydrateInventory, type DBItem, type Item } from "./items";
 import * as store from "$lib/store";
 import { get } from "svelte/store";
-import ItemRenderer from "./components/itemRenderer.svelte";
 
 export type EquipmentSlot = keyof Equipment;
 

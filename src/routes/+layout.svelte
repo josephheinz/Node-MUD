@@ -6,6 +6,8 @@
 	import { type Equipment } from '$lib/types';
 	import { hydrateEquipment, hydrateInventory, type Item } from '$lib/items';
 	import { onMount } from 'svelte';
+	import { getModifiedStats, Stats } from '$lib/stats';
+	import { get } from 'svelte/store';
 
 	let { children } = $props();
 
@@ -16,6 +18,8 @@
 		store.inventory.set(inv);
 		store.equipment.set(eq);
 		store.user.set($page.data.user ?? null);
+		store.baseStats.set($page.data.stats ?? Stats);
+		store.modifiedStats.set(getModifiedStats(get(store.baseStats), get(store.equipment)));
 	})();
 </script>
 

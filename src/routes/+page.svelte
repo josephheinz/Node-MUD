@@ -7,12 +7,14 @@
 	import * as store from '$lib/store';
 	import type { Item } from '$lib/items';
 	import CharacterMenu from '$lib/components/character/characterMenu.svelte';
+	import { getModifiedStats, type StatList, Stats } from '$lib/stats';
 
 	let loginModalOpen = $state(false);
 
 	let user = $state(get(store.user));
 	let inventory = $state<Item[]>(get(store.inventory));
 	let equipment = $state<Equipment>(get(store.equipment));
+	let stats = $state<StatList>(get(store.modifiedStats)); // not base because base only gets updated when character upgrades are made
 
 	store.inventory.subscribe((value) => {
 		inventory = value;
@@ -24,6 +26,7 @@
 
 	store.equipment.subscribe((value) => {
 		equipment = value;
+		store.modifiedStats.set(getModifiedStats(Stats, value));
 	});
 </script>
 
@@ -35,5 +38,5 @@
 {/if}
 <br />
 {#if inventory && equipment}
-	<CharacterMenu {inventory} {equipment} />
+	<CharacterMenu {inventory} {equipment} {stats} />
 {/if}
