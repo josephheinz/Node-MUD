@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Item } from '$lib/items';
-	import ItemRenderer from './itemRenderer.svelte';
+	import ItemRenderer from '../itemRenderer.svelte';
 
 	const { inventory }: { inventory: Item[] } = $props();
 
@@ -8,13 +8,13 @@
 	const totalSlots = Math.max(inventory.length, baseSlots);
 </script>
 
-<div class="m-2 inline-grid h-full min-h-16 w-full max-w-80 min-w-80 grid-cols-5 gap-2">
+<div class="m-2 inline-grid h-full w-full max-w-96 grid-cols-5 gap-2">
 	{#each Array(totalSlots) as _, index (inventory[index]?.uid ?? `empty-${index}`)}
 		{@const item = inventory[index]}
 		{#if item}
 			<ItemRenderer {item} mode={'ascii'} pclass="" equippedSlot={undefined} />
 		{:else}
-			<div class=" h-16 w-16 rounded-lg"></div>
+			<div class="h-16 w-16 rounded-lg"></div>
 		{/if}
 	{/each}
 </div>

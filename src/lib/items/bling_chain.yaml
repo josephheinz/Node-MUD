@@ -1,0 +1,8 @@
+- id: bling_chain
+  name: Bling Chain
+  icon:
+    ascii: "𓋩"
+  rarity: Legendary
+  modifiers:
+    - type: Equippable
+      slot: necklace

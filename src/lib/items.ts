@@ -10,11 +10,12 @@ export type RarityKey = keyof typeof Rarity;
 export enum Rarity {
     Common = "#bdbdbd",
     Uncommon = "#32a852",
-    Rare = "#3258a8",
+    Rare = "#577dcf",
     Epic = "#b34ec7",
     Legendary = "#dbd82b",
     Mythic = "#fc6ae2",
-    Divine = "#3ad4e8"
+    Divine = "#3fe9ff",
+    Special = "#eb3838"
 };
 
 export interface IItemModifier {

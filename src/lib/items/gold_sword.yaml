@@ -1,7 +1,7 @@
 - id: gold_sword
   name: Gold Sword
   icon:
-    ascii: "ߙ"
+    ascii: "𐕣"
     image: "/images/items/sword.png"
   rarity: Uncommon
   modifiers:

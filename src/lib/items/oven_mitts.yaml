@@ -1,0 +1,8 @@
+- id: oven_mitts
+  name: Oven Mitts
+  icon:
+    ascii: "𓂧"
+  rarity: Special
+  modifiers:
+    - type: Equippable
+      slot: hands

@@ -1,0 +1,8 @@
+- id: classy_ring_of_love
+  name: Classy Ring of Love
+  icon:
+    ascii: "𓋪"
+  rarity: Rare
+  modifiers:
+    - type: Equippable
+      slot: ring

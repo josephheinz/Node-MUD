@@ -1,7 +1,7 @@
 - id: iron_sword
   name: Iron Sword
   icon:
-    ascii: "ߙ"
+    ascii: "𐕣"
     image: "/images/items/sword.png"
   rarity: Common
   modifiers:

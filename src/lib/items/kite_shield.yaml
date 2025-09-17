@@ -1,0 +1,8 @@
+- id: kite_shield
+  name: Kite Shield
+  icon:
+    ascii: "⛨"
+  rarity: Common
+  modifiers:
+    - type: Equippable
+      slot: offhand

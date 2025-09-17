@@ -11,6 +11,10 @@ export type Equipment = {
     legs: Item | null;
     offhand: Item | null;
     mainhand: Item | null;
+    necklace: Item | null;
+    ring: Item | null;
+    hands: Item | null;
+
 };
 
 export const EmptyEquipment: Equipment = {
@@ -18,7 +22,10 @@ export const EmptyEquipment: Equipment = {
     body: null,
     legs: null,
     offhand: null,
-    mainhand: null
+    mainhand: null,
+    necklace: null,
+    ring: null,
+    hands: null
 };
 
 export interface User {

@@ -2,14 +2,11 @@
 	import LoginModal from '$lib/components/auth/loginModal.svelte';
 	import LoginButton from '$lib/components/auth/loginButton.svelte';
 	import ProfileDropdown from '$lib/components/auth/profileDropdown.svelte';
-	import Inventory from '$lib/components/inventory.svelte';
-	import { EmptyEquipment, type Equipment } from '$lib/types';
-	import EquipmentDisplay from '$lib/components/equipmentDisplay.svelte';
-	import { contextmenu } from '$lib/components/contextmenu';
+	import { type Equipment } from '$lib/types';
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
 	import type { Item } from '$lib/items';
-	import CharacterMenu from '$lib/components/characterMenu.svelte';
+	import CharacterMenu from '$lib/components/character/characterMenu.svelte';
 
 	let loginModalOpen = $state(false);
 

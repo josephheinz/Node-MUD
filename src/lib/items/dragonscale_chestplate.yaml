@@ -1,0 +1,8 @@
+- id: dragonscale_chestplate
+  name: Dragonscale Chestplate
+  icon:
+    ascii: "⬓"
+  rarity: Epic
+  modifiers:
+    - type: Equippable
+      slot: body

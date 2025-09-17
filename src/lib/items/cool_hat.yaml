@@ -1,0 +1,8 @@
+- id: cool_hat
+  name: Cool Hat
+  icon:
+    ascii: "⌓"
+  rarity: Divine
+  modifiers:
+    - type: Equippable
+      slot: head
