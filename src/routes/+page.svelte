@@ -26,7 +26,7 @@
 
 	store.equipment.subscribe((value) => {
 		equipment = value;
-		store.modifiedStats.set(getModifiedStats(Stats, value));
+		store.modifiedStats.set(getModifiedStats(stats, value));
 	});
 </script>
 
