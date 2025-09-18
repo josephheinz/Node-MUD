@@ -7,7 +7,7 @@
 	import * as store from '$lib/store';
 	import type { Item } from '$lib/items';
 	import CharacterMenu from '$lib/components/character/characterMenu.svelte';
-	import { getModifiedStats, type StatList, Stats } from '$lib/stats';
+	import { type StatList } from '$lib/stats';
 
 	let loginModalOpen = $state(false);
 
@@ -26,7 +26,10 @@
 
 	store.equipment.subscribe((value) => {
 		equipment = value;
-		store.modifiedStats.set(getModifiedStats(stats, value));
+	});
+
+	store.modifiedStats.subscribe((value) => {
+		stats = value;
 	});
 </script>
 

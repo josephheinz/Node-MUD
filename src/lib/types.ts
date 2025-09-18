@@ -1,6 +1,7 @@
 import { determineSlot, encodeDbItem, hydrateEquipment, hydrateInventory, type DBItem, type Item } from "./items";
 import * as store from "$lib/store";
 import { get } from "svelte/store";
+import { getModifiedStats } from "./stats";
 
 export type EquipmentSlot = keyof Equipment;
 
@@ -85,6 +86,7 @@ export async function Equip(item: Item) {
     let newInv = await hydrateInventory(data.inventory);
     store.equipment.set(newEq);
     store.inventory.set(newInv);
+    store.modifiedStats.set(getModifiedStats(get(store.baseStats), newEq));
 }
 
 export async function Unequip(slot: keyof Equipment) {
@@ -126,6 +128,7 @@ export async function Unequip(slot: keyof Equipment) {
         let newInv = await hydrateInventory(data.inventory);
         store.equipment.set(newEq);
         store.inventory.set(newInv);
+        store.modifiedStats.set(getModifiedStats(get(store.baseStats), newEq));
     } catch (err) {
         console.error('Unequip error:', err);
     }
@@ -138,4 +141,8 @@ export function serializeEquipment(equipment: Record<string, Item | null>): Reco
         result[slot] = item != null ? encodeDbItem(item) : null;
     }
     return result;
+}
+
+export function deepClone<T>(item: T): T {
+    return JSON.parse(JSON.stringify(item));
 }

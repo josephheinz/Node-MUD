@@ -6,3 +6,5 @@
   modifiers:
     - type: Equippable
       slot: body
+    - type: Defense
+      defense: 50 

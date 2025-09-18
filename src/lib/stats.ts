@@ -1,5 +1,5 @@
 import type { Item } from "./items";
-import type { Equipment, EquipmentSlot } from "./types";
+import { deepClone, type Equipment, type EquipmentSlot } from "./types";
 
 export type Stat = {
     name: string;
@@ -23,12 +23,13 @@ export const StatIcons: Record<string, string> = {
     strength: "δ",
     defense: "℧",
     "crit chance": "✧",
-    "crit damage": "Ψ",
+    "crit damage": "🕱",
     speed: "λ"
 };
 
 
 export function getModifiedStats(stats: StatList, equipment: Equipment): StatList {
+    const result: StatList = deepClone<StatList>(Stats); // copy so references to an original Stats store doesn't get changed
     let itemStatMods: { name: string; amount: number }[] = [];
     for (const key in equipment) {
         const slot = key as EquipmentSlot;
@@ -36,7 +37,7 @@ export function getModifiedStats(stats: StatList, equipment: Equipment): StatLis
         if (!item) continue;
 
         item.modifiers.forEach((mod) => {
-            if (mod.type.toLowerCase() in Object.keys(Stats)) {
+            if (Object.keys(stats).includes(mod.type.toLowerCase())) {
                 let amount = typeof mod.value === "number" ? mod.value : 0;
                 itemStatMods.push({ name: mod.type.toLowerCase(), amount });
             }
@@ -44,8 +45,8 @@ export function getModifiedStats(stats: StatList, equipment: Equipment): StatLis
     }
 
     itemStatMods.forEach((mod) => {
-        stats[mod.name].amount += mod.amount;
+        result[mod.name].amount += mod.amount;
     });
 
-    return stats;
+    return result;
 }
