@@ -2,14 +2,11 @@ import type { IItemModifier } from '$lib/items';
 import { ReforgeModifier } from './reforges';
 import { StarsModifier } from './stars';
 import { CaduceusModifier } from './special';
-import { AttackModifier, DefenseModifier } from './statModifiers';
 import { EquippableModifier } from './basicModifiers';
 
 export const modifierRegistry: Record<string, { new(...args: any[]): IItemModifier; type?: string }> = {
     Stars: StarsModifier,
     Caduceus: CaduceusModifier,
-    Attack: AttackModifier,
-    Defense: DefenseModifier,
     Equippable: EquippableModifier,
     Reforge: ReforgeModifier,
 };
