@@ -3,8 +3,8 @@
   icon:
     ascii: "⛨"
   rarity: Common
+  stats:
+    defense: 10
   modifiers:
     - type: Equippable
       slot: offhand
-    - type: Defense
-      defense: 10 
