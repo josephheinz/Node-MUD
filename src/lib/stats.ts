@@ -7,15 +7,15 @@ export type Stat = {
     amount: number;
 };
 
-export type StatList = Record<string, { amount: number }>;
+export type StatList = Record<string, number>;
 
 export const Stats: StatList = {
-    health: { amount: 100 },
-    strength: { amount: 0 },
-    defense: { amount: 0 },
-    "crit chance": { amount: 1 },
-    "crit damage": { amount: 50 },
-    speed: { amount: 100 }
+    health: 100,
+    strength: 0,
+    defense: 0,
+    "crit chance": 1,
+    "crit damage": 50,
+    speed: 100
 };
 
 export const StatIcons: Record<string, string> = {
@@ -45,7 +45,7 @@ export function getModifiedStats(stats: StatList, equipment: Equipment): StatLis
     }
 
     itemStatMods.forEach((mod) => {
-        result[mod.name].amount += mod.amount;
+        result[mod.name] += mod.amount;
     });
 
     return result;

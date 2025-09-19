@@ -2,8 +2,9 @@ import { parse } from "yaml";
 import * as store from "$lib/store";
 import { type ITooltipData } from "./components/tooltip";
 import { instantiateModifier } from "./modifiers/modifiersRegistry";
-import { type Equipment, EmptyEquipment, type EquipmentSlot } from "./types";
+import { type Equipment, EmptyEquipment, type EquipmentSlot, capitalizeFirstLetter } from "./types";
 import { get } from "svelte/store";
+import type { Stat, StatList } from "./stats";
 
 export type RarityKey = keyof typeof Rarity;
 
@@ -24,6 +25,7 @@ export interface IItemModifier {
     displayName?: string;
     modifyName?(baseName: string): string;
     modifyDescription?(baseDesc: string): string;
+    statChanges?: StatList;
 }
 
 export interface DBItem {
@@ -42,6 +44,7 @@ export interface Item {
         image?: string;
     };
     modifiers: IItemModifier[];
+    baseStats: StatList;
 }
 
 export function parseYAMLToItem(yamlString: string): Item {
@@ -57,8 +60,32 @@ export function parseYAMLToItem(yamlString: string): Item {
             ascii: item.icon.ascii,
             image: item.icon.image
         },
-        modifiers
+        modifiers,
+        baseStats: item.stats
     };
+}
+
+export function computeItemStats(item: Item): Record<string, { base: number; modifiers: number; reforges: number; }> {
+    const stats: Record<string, { base: number; modifiers: number; reforges: number; }> = {};
+
+    for (const key in item.baseStats) {
+        const statKey = key;
+        const base = item.baseStats[statKey] ?? 0;
+
+        let modTotal = 0;
+        let reforgeTotal = 0;
+
+        for (const mod of item.modifiers) {
+            if (!mod.statChanges) continue;
+            const val = mod.statChanges?.[statKey] ?? 0;
+            if (mod.type === "Reforge") reforgeTotal += val;
+            else modTotal += val;
+        }
+
+        stats[statKey] = { base, modifiers: modTotal, reforges: reforgeTotal };
+    }
+
+    return stats;
 }
 
 export function getItemData(item: Item): ITooltipData {
@@ -72,9 +99,19 @@ export function getItemData(item: Item): ITooltipData {
     let equipMsg: string = "";
     if (slot) equipMsg = `[Equip - Double-click]<br/>Slot: ${slot}<br/>`;
 
+    let stats = computeItemStats(item);
+    let statsString = "";
+
+    for (const key in stats) {
+        const s = stats[key];
+        if (s.base) {
+            statsString += `${capitalizeFirstLetter(key)}: ${s.base}${s.modifiers > 0 ? ` (+${s.modifiers})` : ""}${s.reforges > 0 ? ` (+${s.reforges})` : ""}<br/>`;
+        }
+    }
+
     return {
         title: itemName,
-        body: `${equipMsg}${itemDesc}<br/>${descriptor}`
+        body: `${equipMsg}${statsString}${itemDesc}<br/>${descriptor}`
     }
 }
 

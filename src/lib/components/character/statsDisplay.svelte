@@ -10,6 +10,6 @@
 
 <div class="m-2 h-full w-96 gap-2">
 	{#each Object.entries(stats) as [name, value] (name)}
-		<p class="text-lg">{StatIcons[name]} {capitalizeAfterSpaces(name)}: {value.amount}</p>
+		<p class="text-lg">{StatIcons[name]} {capitalizeAfterSpaces(name)}: {value}</p>
 	{/each}
 </div>

@@ -4,8 +4,12 @@
     ascii: "𐕣"
     image: "/images/items/sword.png"
   rarity: Uncommon
+  stats:
+    attack: 10
   modifiers:
     - type: Attack
       attack: 10
     - type: Equippable
       slot: mainhand
+    - type: Reforge
+      reforge: "Sharp"
