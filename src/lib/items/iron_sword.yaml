@@ -5,7 +5,5 @@
     image: "/images/items/sword.png"
   rarity: Common
   modifiers:
-    - type: Attack
-      attack: 5
     - type: Equippable
       value: mainhand

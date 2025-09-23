@@ -1,4 +1,4 @@
-import type { Item } from "./items";
+import { computeItemStats, type Item } from "./items";
 import { deepClone, type Equipment, type EquipmentSlot } from "./types";
 
 export type Stat = {
@@ -29,23 +29,25 @@ export const StatIcons: Record<string, string> = {
 
 
 export function getModifiedStats(stats: StatList, equipment: Equipment): StatList {
-    const result: StatList = deepClone<StatList>(Stats); // copy so references to an original Stats store doesn't get changed
-    let itemStatMods: { name: string; amount: number }[] = [];
+    const result: StatList = deepClone<StatList>(stats); // copy so references to an original Stats store doesn't get changed
+
+    let itemStats: Record<string, Record<string, { base: number; modifiers: number; reforges: number; }>> = {};
+
     for (const key in equipment) {
         const slot = key as EquipmentSlot;
         const item: Item | null = equipment[slot];
         if (!item) continue;
 
-        item.modifiers.forEach((mod) => {
-            if (Object.keys(stats).includes(mod.type.toLowerCase())) {
-                let amount = typeof mod.value === "number" ? mod.value : 0;
-                itemStatMods.push({ name: mod.type.toLowerCase(), amount });
-            }
-        });
+        let equipmentItemStats = computeItemStats(item);
+        itemStats[slot] = equipmentItemStats;
     }
 
-    itemStatMods.forEach((mod) => {
-        result[mod.name] += mod.amount;
+    Object.values(itemStats).forEach((itemStats: Record<string, { base: number; modifiers: number; reforges: number; }>) => {
+        Object.entries(itemStats).forEach(([stat, amounts]) => {
+            Object.values(amounts).forEach((val) => {
+                result[stat] += Number(val);
+            });
+        });
     });
 
     return result;
