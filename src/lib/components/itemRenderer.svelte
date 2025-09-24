@@ -2,18 +2,15 @@
 	import { type Item, determineSlot, getItemData } from '$lib/items';
 	import { tooltip } from './tooltip';
 	import { Equip, Unequip, type EquipmentSlot } from '$lib/types';
-	
-	const {
-		item,
-		mode = 'ascii',
-		pclass = '',
-		equippedSlot = undefined
-	}: {
+
+	interface Props {
 		item: Item;
-		mode: 'ascii' | 'sprite';
-		pclass: string;
-		equippedSlot: EquipmentSlot | undefined;
-	} = $props();
+		mode?: 'ascii' | 'sprite';
+		pclass?: string;
+		equippedSlot?: EquipmentSlot;
+	}
+
+	const { item, mode = 'ascii', pclass = '', equippedSlot = undefined }: Props = $props();
 
 	function handleClick() {
 		if (equippedSlot) {

@@ -8,6 +8,7 @@
 	import type { Item } from '$lib/items';
 	import CharacterMenu from '$lib/components/character/characterMenu.svelte';
 	import { type StatList } from '$lib/stats';
+	import Reforger from '$lib/components/reforger.svelte';
 
 	let loginModalOpen = $state(false);
 
@@ -43,3 +44,5 @@
 {#if inventory && equipment}
 	<CharacterMenu {inventory} {equipment} {stats} />
 {/if}
+<br />
+<Reforger selectedItem={undefined} {equipment} {inventory} />

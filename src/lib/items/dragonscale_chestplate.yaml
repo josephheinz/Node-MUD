@@ -8,3 +8,5 @@
   modifiers:
     - type: Equippable
       slot: body
+    - type: Reforgeable
+      group: Sword

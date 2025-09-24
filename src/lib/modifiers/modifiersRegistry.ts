@@ -1,5 +1,5 @@
 import type { IItemModifier } from '$lib/items';
-import { ReforgeModifier } from './reforges';
+import { ReforgeModifier, ReforgeableModifier } from './reforges';
 import { StarsModifier } from './stars';
 import { CaduceusModifier } from './special';
 import { EquippableModifier } from './basicModifiers';
@@ -9,6 +9,7 @@ export const modifierRegistry: Record<string, { new(...args: any[]): IItemModifi
     Caduceus: CaduceusModifier,
     Equippable: EquippableModifier,
     Reforge: ReforgeModifier,
+    Reforgeable: ReforgeableModifier
 };
 
 export function instantiateModifier(modYaml: any): IItemModifier {

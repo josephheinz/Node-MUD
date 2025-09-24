@@ -45,7 +45,7 @@ export function getModifiedStats(stats: StatList, equipment: Equipment): StatLis
     Object.values(itemStats).forEach((itemStats: Record<string, { base: number; modifiers: number; reforges: number; }>) => {
         Object.entries(itemStats).forEach(([stat, amounts]) => {
             Object.values(amounts).forEach((val) => {
-                result[stat] += Number(val);
+                if(result[val]) result[stat] += Number(val);
             });
         });
     });

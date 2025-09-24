@@ -4,7 +4,7 @@ import type { StatList } from "$lib/stats";
 export interface IReforge {
     name: string;
     stats?: StatList;
-}
+};
 
 export class ReforgeModifier implements IItemModifier {
     type = "Reforge";
@@ -20,8 +20,21 @@ export class ReforgeModifier implements IItemModifier {
     modifyName(baseName: string): string {
         return `${this.reforge.name} ${baseName}`;
     }
-}
+};
+
+export class ReforgeableModifier implements IItemModifier {
+    type = "Reforgeable";
+
+    constructor(public group: ReforgeGroup) { }
+};
 
 export const Reforges: Record<string, IReforge> = {
     Sharp: { name: "Sharp", stats: { "attack": 10 } }
-}
+};
+
+
+export const ReforgeGroups: Record<string, IReforge[]> = {
+    Sword: [Reforges.Sharp]
+};
+
+export type ReforgeGroup = keyof typeof ReforgeGroups;

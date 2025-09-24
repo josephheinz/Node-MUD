@@ -2,7 +2,7 @@ import { parse } from "yaml";
 import * as store from "$lib/store";
 import { type ITooltipData } from "./components/tooltip";
 import { instantiateModifier } from "./modifiers/modifiersRegistry";
-import { type Equipment, EmptyEquipment, type EquipmentSlot, capitalizeFirstLetter } from "./types";
+import { type Equipment, EmptyEquipment, type EquipmentSlot, capitalizeFirstLetter, deepClone } from "./types";
 import { get } from "svelte/store";
 import type { Stat, StatList } from "./stats";
 
@@ -227,6 +227,16 @@ export async function hydrateInventory(inventory: DBItem[]): Promise<Item[]> {
     });
 
     return hydratedInventory;
+}
+
+export function ConglomerateItems(inventory: Item[], equipment: Equipment): Item[] {
+    let result: Item[] = deepClone<Item[]>(inventory);
+
+    Object.values(equipment).forEach((item: Item | null) => {
+        if (item) result.push(item);
+    });
+
+    return result;
 }
 
 // Load all the items for api

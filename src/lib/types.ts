@@ -144,7 +144,6 @@ export function serializeEquipment(equipment: Record<string, Item | null>): Reco
 }
 
 export function deepClone<T>(item: T): T {
-    console.log(JSON.stringify(item));
     return JSON.parse(JSON.stringify(item));
 }
 
