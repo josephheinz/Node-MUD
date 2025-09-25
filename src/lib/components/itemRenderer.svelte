@@ -8,12 +8,13 @@
 		mode?: 'ascii' | 'sprite';
 		pclass?: string;
 		equippedSlot?: EquipmentSlot;
+		equippable?: boolean;
 	}
 
-	const { item, mode = 'ascii', pclass = '', equippedSlot = undefined }: Props = $props();
+	const { item, mode = 'ascii', pclass = '', equippedSlot = undefined, equippable = true }: Props = $props();
 
 	function handleClick() {
-		if (equippedSlot) {
+		if (equippedSlot && equippable) {
 			Unequip(equippedSlot);
 		} else {
 			const slot = determineSlot(item);

@@ -1,16 +1,30 @@
 <script lang="ts">
 	import { ConglomerateItems, type Item } from '$lib/items';
-	import type { Equipment } from '$lib/types';
+	import { EmptyEquipment, type Equipment } from '$lib/types';
 	import ItemRenderer from './itemRenderer.svelte';
 	import ItemSelectMenu from './itemSelectMenu.svelte';
 
 	const {
-		selectedItem,
+		item,
 		equipment,
 		inventory
-	}: { selectedItem: Item | undefined; equipment: Equipment; inventory: Item[] } = $props();
+	}: { item: Item | undefined; equipment: Equipment; inventory: Item[] } = $props();
 
+	let selectedItem: Item | undefined = $state<Item | undefined>(item);
 	let selectMenuOpened: boolean = $state(false);
+	let selectMenu: ItemSelectMenu;
+	let mouseX: number = $state(0);
+	let mouseY: number = $state(0);
+
+	function toggleItem(item: Item | undefined) {
+		selectedItem = item;
+	}
+
+	function toggleSelectMenu(e: MouseEvent) {
+		selectMenuOpened = !selectMenuOpened;
+		mouseX = e.clientX;
+		mouseY = e.clientY;
+	}
 </script>
 
 <!--Menu to reforge an item-->
@@ -19,11 +33,18 @@
 >
 	<h1 class="text-2xl font-bold">Reforge Items</h1>
 	{#if selectedItem}
-		<ItemRenderer item={selectedItem} mode={'ascii'} pclass={''} equippedSlot={undefined} />
+		<button
+			onclick={(e) => {
+				toggleItem(undefined);
+				toggleSelectMenu(e);
+			}}
+		>
+			<ItemRenderer item={selectedItem} mode={'ascii'} pclass={''} equippedSlot={undefined} />
+		</button>
 	{:else}
 		<button
 			class="flex aspect-square h-16 w-16 flex-col items-center justify-center rounded-lg border-2 border-zinc-500 bg-zinc-600 text-sm select-none"
-			onclick={() => (selectMenuOpened = !selectMenuOpened)}
+			onclick={(e) => toggleSelectMenu(e)}
 		>
 			<span>Select</span>
 			<span>Item</span>
@@ -37,4 +58,16 @@
 	>
 </div>
 
-<ItemSelectMenu open={selectMenuOpened} allItems={ConglomerateItems(inventory, equipment)} />
+{#if selectMenuOpened}
+	<ItemSelectMenu
+		open={selectMenuOpened}
+		allItems={ConglomerateItems(inventory ?? [], equipment ?? EmptyEquipment)}
+		x={mouseX}
+		y={mouseY}
+		bind:this={selectMenu}
+		on:select={(item) => {
+			toggleItem(item.detail);
+			selectMenuOpened = false;
+		}}
+	/>
+{/if}

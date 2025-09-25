@@ -28,9 +28,9 @@
 >
 	<div class="inline-grid grid-cols-5 gap-2">
 		{#each allItems as item}
-			<div on:dblclick={() => selectItem(item)}>
-				<ItemRenderer {item} mode="ascii" pclass="ring-border" />
-			</div>
+			<button onclick={() => selectItem(item)}>
+				<ItemRenderer {item} mode="ascii" pclass="ring-border" equippable={false} />
+			</button>
 		{/each}
 	</div>
 </div>
