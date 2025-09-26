@@ -45,4 +45,4 @@
 	<CharacterMenu {inventory} {equipment} {stats} />
 {/if}
 <br />
-<Reforger selectedItem={undefined} {equipment} {inventory} />
+<Reforger item={undefined} {equipment} {inventory} />

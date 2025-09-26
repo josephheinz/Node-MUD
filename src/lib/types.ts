@@ -1,4 +1,4 @@
-import { determineSlot, encodeDbItem, hydrateEquipment, hydrateInventory, type DBItem, type Item } from "./items";
+import { determineSlot, encodeDbItem, hydrateEquipment, hydrateInventory, loadDbItem, type DBItem, type Item } from "./items";
 import * as store from "$lib/store";
 import { get } from "svelte/store";
 import { getModifiedStats } from "./stats";
@@ -82,8 +82,8 @@ export async function Equip(item: Item) {
     const data = await res.json();
 
     // Update client state with server response
-    let newEq = await hydrateEquipment(data.serializedEquipment);
-    let newInv = await hydrateInventory(data.inventory);
+    let newEq = hydrateEquipment(data.serializedEquipment);
+    let newInv = hydrateInventory(data.inventory);
     store.equipment.set(newEq);
     store.inventory.set(newInv);
     store.modifiedStats.set(getModifiedStats(get(store.baseStats), newEq));
@@ -124,14 +124,43 @@ export async function Unequip(slot: keyof Equipment) {
         }
 
         // Update client state with server response
-        let newEq = await hydrateEquipment(data.equipment);
-        let newInv = await hydrateInventory(data.inventory);
+        let newEq = hydrateEquipment(data.equipment);
+        let newInv = hydrateInventory(data.inventory);
         store.equipment.set(newEq);
         store.inventory.set(newInv);
         store.modifiedStats.set(getModifiedStats(get(store.baseStats), newEq));
     } catch (err) {
         console.error('Unequip error:', err);
     }
+}
+
+export async function Reforge(item: Item): Promise<Item | null> {
+    const userId = get(store.user)?.id;
+
+    if (!userId) console.error('No user logged in');
+
+    const res = await fetch(`/api/item/${userId}/reforge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dbItem: encodeDbItem(item) })
+    });
+
+    if (!res.ok) {
+        console.error('Failed to reforge');
+        return null;
+    }
+
+    const data = await res.json();
+
+    // Update client state with server response
+    let newEq = hydrateEquipment(data.serializedEquipment);
+    let newInv = hydrateInventory(data.inventory);
+
+    store.equipment.set(newEq);
+    store.inventory.set(newInv);
+    store.modifiedStats.set(getModifiedStats(get(store.baseStats), newEq));
+    
+    return loadDbItem(data.updatedItem);
 }
 
 export function serializeEquipment(equipment: Record<string, Item | null>): Record<string, DBItem | null> {

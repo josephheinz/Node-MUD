@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ConglomerateItems, type Item } from '$lib/items';
-	import { EmptyEquipment, type Equipment } from '$lib/types';
+	import { deepClone, EmptyEquipment, Reforge, type Equipment } from '$lib/types';
 	import ItemRenderer from './itemRenderer.svelte';
 	import ItemSelectMenu from './itemSelectMenu.svelte';
 
@@ -11,6 +11,9 @@
 	}: { item: Item | undefined; equipment: Equipment; inventory: Item[] } = $props();
 
 	let selectedItem: Item | undefined = $state<Item | undefined>(item);
+	let selectedItemInventoryId: number = inventory.findIndex(
+		(item) => item.uid === selectedItem?.uid
+	);
 	let selectMenuOpened: boolean = $state(false);
 	let selectMenu: ItemSelectMenu;
 	let mouseX: number = $state(0);
@@ -22,8 +25,22 @@
 
 	function toggleSelectMenu(e: MouseEvent) {
 		selectMenuOpened = !selectMenuOpened;
-		mouseX = e.clientX;
-		mouseY = e.clientY;
+		mouseX = e.clientX + 10;
+		mouseY = e.clientY - 10;
+	}
+
+	function reforgeableFilter(item: Item): boolean {
+		return item.modifiers.some((mod) => mod.type === 'Reforgeable');
+	}
+
+	async function reforge(item: Item) {
+		try {
+			const newItem: Item | null = await Reforge(item);
+			console.log(selectedItem, newItem);
+			if (newItem) selectedItem = deepClone<Item>(newItem);
+		} catch (err) {
+			console.error(err);
+		}
 	}
 </script>
 
@@ -36,10 +53,9 @@
 		<button
 			onclick={(e) => {
 				toggleItem(undefined);
-				toggleSelectMenu(e);
 			}}
 		>
-			<ItemRenderer item={selectedItem} mode={'ascii'} pclass={''} equippedSlot={undefined} />
+			<ItemRenderer item={selectedItem} />
 		</button>
 	{:else}
 		<button
@@ -52,6 +68,9 @@
 	{/if}
 	<button
 		disabled={selectedItem == undefined}
+		onclick={async () => {
+			if (selectedItem) await reforge(selectedItem);
+		}}
 		class="m-2 rounded-md border-2 border-zinc-500 bg-zinc-600 px-4 py-2 {selectedItem != undefined
 			? 'cursor-pointer hover:border-zinc-300 hover:bg-zinc-400 hover:text-zinc-900'
 			: 'cursor-not-allowed'}">Reforge</button
@@ -60,7 +79,6 @@
 
 {#if selectMenuOpened}
 	<ItemSelectMenu
-		open={selectMenuOpened}
 		allItems={ConglomerateItems(inventory ?? [], equipment ?? EmptyEquipment)}
 		x={mouseX}
 		y={mouseY}
@@ -69,5 +87,6 @@
 			toggleItem(item.detail);
 			selectMenuOpened = false;
 		}}
+		filter={reforgeableFilter}
 	/>
 {/if}

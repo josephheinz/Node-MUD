@@ -8,8 +8,8 @@ export interface IReforge {
 
 export class ReforgeModifier implements IItemModifier {
     type = "Reforge";
-    statChanges?: StatList | undefined;
     private reforge: IReforge;
+    statChanges?: StatList | undefined;
 
     constructor(reforge: IReforge | string) {
         if (typeof reforge === "string") this.reforge = Reforges[reforge];
@@ -29,12 +29,19 @@ export class ReforgeableModifier implements IItemModifier {
 };
 
 export const Reforges: Record<string, IReforge> = {
-    Sharp: { name: "Sharp", stats: { "attack": 10 } }
+    Sharp: { name: "Sharp", stats: { "damage": 10 } },
+    Heroic: { name: "Heroic", stats: { "damage": 20 } }
 };
 
 
 export const ReforgeGroups: Record<string, IReforge[]> = {
-    Sword: [Reforges.Sharp]
+    Sword: [Reforges.Sharp, Reforges.Heroic]
 };
+
+export function rollReforge(group: ReforgeGroup): IReforge {
+    const reforges = ReforgeGroups[group];
+    const reforge = reforges[Math.floor(Math.random() * reforges.length)];
+    return reforge
+}
 
 export type ReforgeGroup = keyof typeof ReforgeGroups;

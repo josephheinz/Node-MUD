@@ -10,8 +10,8 @@
 	let { children } = $props();
 
 	(async () => {
-		const inv = await hydrateInventory($page.data.inventory);
-		const eq = await hydrateEquipment($page.data.equipment);
+		const inv = hydrateInventory($page.data.inventory);
+		const eq = hydrateEquipment($page.data.equipment);
 
 		store.inventory.set(inv);
 		store.equipment.set(eq);

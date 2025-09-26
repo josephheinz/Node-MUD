@@ -7,3 +7,5 @@
   modifiers:
     - type: Equippable
       value: mainhand
+    - type: Reforgeable
+      group: Sword

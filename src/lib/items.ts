@@ -65,28 +65,37 @@ export function parseYAMLToItem(yamlString: string): Item {
     };
 }
 
-export function computeItemStats(item: Item): Record<string, { base: number; modifiers: number; reforges: number; }> {
-    const stats: Record<string, { base: number; modifiers: number; reforges: number; }> = {};
+export function computeItemStats(item: Item): Record<string, { base: number; modifiers: number; reforges: number }> {
+    const stats: Record<string, { base: number; modifiers: number; reforges: number }> = {};
 
-    for (const key in item.baseStats) {
-        const statKey = key;
-        const base = item.baseStats[statKey] ?? 0;
+    const baseStats = item.baseStats ?? {};
+    const modifiers = item.modifiers ?? [];
+
+    // collect all stat keys from baseStats and all modifiers/reforges
+    const statKeys = new Set<string>([
+        ...Object.keys(baseStats),
+        ...modifiers.flatMap(mod => mod.statChanges ? Object.keys(mod.statChanges) : [])
+    ]);
+
+    for (const key of statKeys) {
+        const base = baseStats[key] ?? 0;
 
         let modTotal = 0;
         let reforgeTotal = 0;
 
-        for (const mod of item.modifiers) {
+        for (const mod of modifiers) {
             if (!mod.statChanges) continue;
-            const val = mod.statChanges?.[statKey] ?? 0;
+            const val = mod.statChanges[key] ?? 0;
             if (mod.type === "Reforge") reforgeTotal += val;
             else modTotal += val;
         }
 
-        stats[statKey] = { base, modifiers: modTotal, reforges: reforgeTotal };
+        stats[key] = { base, modifiers: modTotal, reforges: reforgeTotal };
     }
 
     return stats;
 }
+
 
 export function getItemData(item: Item): ITooltipData {
     let rarityName: string = getRarity(item.rarity);
@@ -104,10 +113,11 @@ export function getItemData(item: Item): ITooltipData {
 
     for (const key in stats) {
         const s = stats[key];
-        if (s.base) {
-            statsString += `${capitalizeFirstLetter(key)}: ${s.base}${s.modifiers > 0 ? ` (+${s.modifiers})` : ""}${s.reforges > 0 ? ` (+${s.reforges})` : ""}<br/>`;
+        if (s.base || s.modifiers > 0 || s.reforges > 0) {
+            statsString += `${capitalizeFirstLetter(key)}: ${s.base}<span style="color:oklch(74.6% 0.16 232.661);">${s.modifiers > 0 ? ` (+${s.modifiers})` : ""}</span><span style="color:oklch(90.5% 0.182 98.111);">${s.reforges > 0 ? ` (+${s.reforges})` : ""}</span><br/>`;
         }
     }
+
 
     return {
         title: itemName,
@@ -121,11 +131,14 @@ export function getRarity(color: string): string {
 }
 
 export function getDisplayName(item: Item): string {
-    return item.modifiers?.reduce(
-        (name, mod) => mod.modifyName ? mod.modifyName(name) : item.name,
-        item.name
-    ) ?? item.name;
+    let name = item.name;
+    for (const mod of item.modifiers ?? []) {
+        if (mod.modifyName) name = mod.modifyName(name);
+    }
+    return name;
 }
+
+
 
 export function getDisplayDescription(item: Item): string {
     const base = item.desc ?? "";
@@ -158,6 +171,7 @@ export async function getItem(id: string): Promise<Item> {
 
 export function loadDbItem(item: DBItem): Item {
     const base = itemRegistry[item.id];
+    base.uid = crypto.randomUUID();
     if (!base) throw new Error(`Unknown item id: ${item.id}`);
 
     const playerModifiers = item.modifiers?.map(instantiateModifier) ?? [];
@@ -203,7 +217,7 @@ export function determineSlot(item: Item, equipment: Equipment = get(store.equip
     return slot;
 }
 
-export async function hydrateEquipment(equipment: Object): Promise<Equipment> {
+export function hydrateEquipment(equipment: Object): Equipment {
     const hydratedEquipment: Equipment = { ...EmptyEquipment };
 
     for (const [slotKey, item] of Object.entries(equipment) as [
@@ -218,10 +232,10 @@ export async function hydrateEquipment(equipment: Object): Promise<Equipment> {
     return hydratedEquipment;
 }
 
-export async function hydrateInventory(inventory: DBItem[]): Promise<Item[]> {
+export function hydrateInventory(inventory: DBItem[]): Item[] {
     let hydratedInventory: Item[] = [];
 
-    inventory.forEach(async (item: DBItem) => {
+    inventory.forEach((item: DBItem) => {
         let loadedItem = loadDbItem(item);
         hydratedInventory.push(loadedItem);
     });
@@ -232,7 +246,7 @@ export async function hydrateInventory(inventory: DBItem[]): Promise<Item[]> {
 export function ConglomerateItems(inventory: Item[], equipment: Equipment): Item[] {
     let result: Item[] = deepClone<Item[]>(inventory);
 
-    Object.values(equipment).forEach((item: Item | null) => {
+    Object.values(deepClone<Equipment>(equipment)).forEach((item: Item | null) => {
         if (item) result.push(item);
     });
 
