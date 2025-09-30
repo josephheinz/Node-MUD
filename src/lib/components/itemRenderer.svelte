@@ -11,7 +11,13 @@
 		equippable?: boolean;
 	}
 
-	const { item, mode = 'ascii', pclass = '', equippedSlot = undefined, equippable = true }: Props = $props();
+	const {
+		item,
+		mode = 'ascii',
+		pclass = '',
+		equippedSlot = undefined,
+		equippable = true
+	}: Props = $props();
 
 	function handleClick() {
 		if (equippedSlot && equippable) {
@@ -31,7 +37,7 @@
 	class="flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-600 p-2 {pclass}"
 	style="border:2px solid {item?.rarity};"
 	title=""
-	use:tooltip={getItemData(item)}
+	use:tooltip={getItemData(item as Item, equippable)}
 	ondblclick={handleClick}
 	role="button"
 	tabindex="0"
@@ -41,6 +47,6 @@
 			>{item?.icon?.ascii}</span
 		>
 	{:else if mode == 'sprite'}
-		<img src={item?.icon?.image} alt="Item sprite" />
+		<img src={item?.icon?.image ?? item?.icon?.ascii} alt="Item sprite" />
 	{/if}
 </div>

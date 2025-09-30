@@ -1,7 +1,7 @@
 import { parse } from "yaml";
 import * as store from "$lib/store";
 import { type ITooltipData } from "./components/tooltip";
-import { instantiateModifier } from "./modifiers/modifiersRegistry";
+import { instantiateModifier, instantiateModifierFromClass } from "./modifiers/modifiersRegistry";
 import { type Equipment, EmptyEquipment, type EquipmentSlot, capitalizeFirstLetter, deepClone } from "./types";
 import { get } from "svelte/store";
 import type { Stat, StatList } from "./stats";
@@ -97,7 +97,8 @@ export function computeItemStats(item: Item): Record<string, { base: number; mod
 }
 
 
-export function getItemData(item: Item): ITooltipData {
+export function getItemData(item: Item, equippable: boolean = true): ITooltipData {
+    console.log(item)
     let rarityName: string = getRarity(item.rarity);
     let descriptor: string = `<b style="color:${item.rarity}">${rarityName} Item</b>`;
 
@@ -106,7 +107,7 @@ export function getItemData(item: Item): ITooltipData {
 
     let slot: EquipmentSlot | undefined = determineSlot(item);
     let equipMsg: string = "";
-    if (slot) equipMsg = `[Equip - Double-click]<br/>Slot: ${slot}<br/>`;
+    if (slot && equippable) equipMsg = `[Equip - Double-click]<br/>Slot: ${slot}<br/>`;
 
     let stats = computeItemStats(item);
     let statsString = "";
@@ -243,11 +244,26 @@ export function hydrateInventory(inventory: DBItem[]): Item[] {
     return hydratedInventory;
 }
 
+export function reviveModifiers(mods: IItemModifier[]): IItemModifier[] {
+    return mods.map(mod => instantiateModifierFromClass(mod));
+}
+
+
 export function ConglomerateItems(inventory: Item[], equipment: Equipment): Item[] {
-    let result: Item[] = deepClone<Item[]>(inventory);
+    let inventoryCopy: Item[] = deepClone<Item[]>(inventory);
+    let result: Item[] = [];
+
+    inventoryCopy.forEach((item: Item) => {
+        item.modifiers = reviveModifiers(item.modifiers);
+        result.push(item as Item);
+    })
 
     Object.values(deepClone<Equipment>(equipment)).forEach((item: Item | null) => {
-        if (item) result.push(item);
+        if (item) {
+            // re-instantiate all modifiers so methods exist
+            item.modifiers = reviveModifiers(item.modifiers);
+            result.push(item as Item);
+        }
     });
 
     return result;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ConglomerateItems, type Item } from '$lib/items';
+	import { ConglomerateItems, reviveModifiers, type Item } from '$lib/items';
 	import { deepClone, EmptyEquipment, Reforge, type Equipment } from '$lib/types';
 	import ItemRenderer from './itemRenderer.svelte';
 	import ItemSelectMenu from './itemSelectMenu.svelte';
@@ -37,7 +37,10 @@
 		try {
 			const newItem: Item | null = await Reforge(item);
 			console.log(selectedItem, newItem);
-			if (newItem) selectedItem = deepClone<Item>(newItem);
+			if (newItem) {
+				selectedItem = deepClone<Item>(newItem);
+				selectedItem.modifiers = reviveModifiers(selectedItem.modifiers);
+			}
 		} catch (err) {
 			console.error(err);
 		}
@@ -50,13 +53,15 @@
 >
 	<h1 class="text-2xl font-bold">Reforge Items</h1>
 	{#if selectedItem}
-		<button
-			onclick={(e) => {
-				toggleItem(undefined);
-			}}
-		>
-			<ItemRenderer item={selectedItem} />
-		</button>
+		{#key selectedItem}
+			<button
+				onclick={(e) => {
+					toggleItem(undefined);
+				}}
+			>
+				<ItemRenderer item={selectedItem} equippable={false} />
+			</button>
+		{/key}
 	{:else}
 		<button
 			class="flex aspect-square h-16 w-16 flex-col items-center justify-center rounded-lg border-2 border-zinc-500 bg-zinc-600 text-sm select-none"

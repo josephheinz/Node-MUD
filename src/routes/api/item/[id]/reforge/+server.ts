@@ -118,7 +118,8 @@ export async function POST({ request, params, cookies }) {
         return new Response(JSON.stringify({
             message: "Item reforged and equipped",
             serializedEquipment: updateData.equipment_data,
-            inventory: inventory_data
+            inventory: inventory_data,
+            updatedItem: newDbItem
         }), {
             status: 200,
             headers: { "Content-Type": "application/json" }

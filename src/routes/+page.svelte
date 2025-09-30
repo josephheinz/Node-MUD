@@ -5,10 +5,13 @@
 	import { type Equipment } from '$lib/types';
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
-	import type { Item } from '$lib/items';
+	import { getDisplayName, Rarity, type IItemModifier, type Item } from '$lib/items';
 	import CharacterMenu from '$lib/components/character/characterMenu.svelte';
 	import { type StatList } from '$lib/stats';
 	import Reforger from '$lib/components/reforger.svelte';
+	import { onMount } from 'svelte';
+	import type { ReforgeModifier } from '$lib/modifiers/reforges';
+	import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
 
 	let loginModalOpen = $state(false);
 
