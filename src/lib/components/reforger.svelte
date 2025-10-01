@@ -36,7 +36,6 @@
 	async function reforge(item: Item) {
 		try {
 			const newItem: Item | null = await Reforge(item);
-			console.log(selectedItem, newItem);
 			if (newItem) {
 				selectedItem = deepClone<Item>(newItem);
 				selectedItem.modifiers = reviveModifiers(selectedItem.modifiers);

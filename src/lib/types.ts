@@ -28,6 +28,12 @@ export const EmptyEquipment: Equipment = {
     hands: null
 };
 
+export interface Action {
+    max: number;
+    value: number;
+    name: string;
+}
+
 export interface User {
     id: string;
 };
@@ -159,7 +165,7 @@ export async function Reforge(item: Item): Promise<Item | null> {
     store.equipment.set(newEq);
     store.inventory.set(newInv);
     store.modifiedStats.set(getModifiedStats(get(store.baseStats), newEq));
-    
+
     return loadDbItem(data.updatedItem);
 }
 

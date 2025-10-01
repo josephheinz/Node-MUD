@@ -5,13 +5,13 @@
 	import { type Equipment } from '$lib/types';
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
-	import { getDisplayName, Rarity, type IItemModifier, type Item } from '$lib/items';
+	import { type Item } from '$lib/items';
 	import CharacterMenu from '$lib/components/character/characterMenu.svelte';
-	import { type StatList } from '$lib/stats';
+	import { getModifiedStats, type StatList } from '$lib/stats';
 	import Reforger from '$lib/components/reforger.svelte';
-	import { onMount } from 'svelte';
-	import type { ReforgeModifier } from '$lib/modifiers/reforges';
-	import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
+	import ProgressBar from '$lib/components/actions/progressBar.svelte';
+	import Action from '$lib/components/actions/action.svelte';
+	import type { Action as IAction } from '$lib/types';
 
 	let loginModalOpen = $state(false);
 
@@ -22,6 +22,7 @@
 
 	store.inventory.subscribe((value) => {
 		inventory = value;
+		store.modifiedStats.set(getModifiedStats(get(store.baseStats), get(store.equipment)));
 	});
 
 	store.user.subscribe((value) => {
@@ -30,11 +31,19 @@
 
 	store.equipment.subscribe((value) => {
 		equipment = value;
+		store.modifiedStats.set(getModifiedStats(get(store.baseStats), equipment));
 	});
 
 	store.modifiedStats.subscribe((value) => {
 		stats = value;
 	});
+
+	let testAction: IAction = $state({ value: 10, max: 100, name: 'test action' });
+
+	setInterval(() => {
+		if (testAction.value < testAction.max) testAction.value += Math.random();
+		else testAction.value = 0;
+	}, 50);
 </script>
 
 {#if user}
@@ -49,3 +58,6 @@
 {/if}
 <br />
 <Reforger item={undefined} {equipment} {inventory} />
+<div class="absolute top-30 right-10 z-0">
+	<Action action={testAction} />
+</div>

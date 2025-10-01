@@ -30,12 +30,14 @@ export class ReforgeableModifier implements IItemModifier {
 
 export const Reforges: Record<string, IReforge> = {
     Sharp: { name: "Sharp", stats: { "damage": 10 } },
-    Heroic: { name: "Heroic", stats: { "damage": 20 } }
+    Heroic: { name: "Heroic", stats: { "damage": 20 } },
+    Hardened: { name: "Hardened", stats: { "defense": 10 } }
 };
 
 
 export const ReforgeGroups: Record<string, IReforge[]> = {
-    Sword: [Reforges.Sharp, Reforges.Heroic]
+    Sword: [Reforges.Sharp, Reforges.Heroic],
+    Armor: [Reforges.Hardened]
 };
 
 export function rollReforge(group: ReforgeGroup): IReforge {

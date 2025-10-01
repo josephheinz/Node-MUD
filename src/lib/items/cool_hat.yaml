@@ -6,3 +6,5 @@
   modifiers:
     - type: Equippable
       slot: head
+    - type: Reforgeable
+      group: Armor

@@ -6,3 +6,5 @@
   modifiers:
     - type: Equippable
       slot: legs
+    - type: Reforgeable
+      group: Armor

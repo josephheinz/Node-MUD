@@ -9,5 +9,5 @@
   modifiers:
     - type: Equippable
       slot: mainhand
-    - type: Reforge
-      reforge: "Sharp"
+    - type: Reforgeable
+      group: Sword

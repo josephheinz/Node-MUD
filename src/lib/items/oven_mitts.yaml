@@ -6,3 +6,5 @@
   modifiers:
     - type: Equippable
       slot: hands
+    - type: Reforgeable
+      group: Armor

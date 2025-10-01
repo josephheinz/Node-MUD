@@ -31,11 +31,13 @@
 		>
 	</div>
 	<br />
-	{#if tab === 'inventory'}
-		<Inventory {inventory} />
-	{:else if tab === 'equipment'}
-		<EquipmentDisplay {equipment} />
-	{:else if tab === 'stats'}
-		<StatsDisplay {stats} />
-	{/if}
+	<div class="flex h-max w-full items-center justify-center">
+		{#if tab === 'inventory'}
+			<Inventory {inventory} />
+		{:else if tab === 'equipment'}
+			<EquipmentDisplay {equipment} />
+		{:else if tab === 'stats'}
+			<StatsDisplay {stats} />
+		{/if}
+	</div>
 </div>

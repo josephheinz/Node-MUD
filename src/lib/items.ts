@@ -98,7 +98,6 @@ export function computeItemStats(item: Item): Record<string, { base: number; mod
 
 
 export function getItemData(item: Item, equippable: boolean = true): ITooltipData {
-    console.log(item)
     let rarityName: string = getRarity(item.rarity);
     let descriptor: string = `<b style="color:${item.rarity}">${rarityName} Item</b>`;
 
