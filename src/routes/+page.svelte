@@ -12,7 +12,7 @@
 	import ProgressBar from '$lib/components/actions/progressBar.svelte';
 	import Action from '$lib/components/actions/action.svelte';
 	import type { Action as IAction } from '$lib/types';
-	import Chat from '$lib/components/chat.svelte';
+	import Chat from '$lib/components/chat/chat.svelte';
 	import { type User } from '@supabase/supabase-js';
 
 	let loginModalOpen = $state(false);

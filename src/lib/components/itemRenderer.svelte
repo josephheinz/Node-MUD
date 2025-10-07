@@ -20,6 +20,7 @@
 	}: Props = $props();
 
 	function handleClick() {
+		console.log(item);
 		if (equippedSlot && equippable) {
 			Unequip(equippedSlot);
 		} else {

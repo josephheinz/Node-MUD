@@ -3,6 +3,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import type { ChatMessage } from '$lib/types';
 	import type { User } from '@supabase/supabase-js';
+	import ChatMessageComp from './chatMessage.svelte';
 
 	let { user }: { user: User } = $props();
 
@@ -80,9 +81,9 @@
 	class="absolute bottom-0 flex h-1/4 w-full flex-col items-center justify-stretch border-2 border-zinc-700 bg-zinc-800 p-2"
 >
 	<!-- Message history -->
-	<ul class="wrap-pretty w-full grow overflow-y-scroll">
-		{#each messages as m}
-			{@render chatMessage(m)}
+	<ul class="wrap-pretty w-full grow overflow-y-scroll gap-1 flex flex-col">
+		{#each messages as msg}
+			<ChatMessageComp {msg} />
 		{/each}
 	</ul>
 	<!-- Chat bar -->
@@ -100,13 +101,3 @@
 		>
 	</div>
 </div>
-
-{#snippet chatMessage(msg: ChatMessage)}
-	{@const msgTimestamp: Date = new Date(msg.timestamp)}
-	<li class="text-sm">
-		<span class="text-zinc-400">
-			[{msgTimestamp.toLocaleTimeString()}]
-		</span>
-		<b>@{msg.author}</b>: {msg.content}
-	</li>
-{/snippet}
