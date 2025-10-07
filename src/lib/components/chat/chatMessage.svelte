@@ -11,14 +11,14 @@
 	let parts: (string | Item)[] = $derived.by(() => extractItemsFromMessage(msg.content));
 </script>
 
-<li class="text-sm">
+<li class="inline-flex items-center justify-start gap-1 text-sm">
 	<span class="text-zinc-400">[{new Date(msg.timestamp).toLocaleTimeString()}]</span>
-	<b>@{msg.author}</b>:
+	<b>@{msg.author}:</b>
 	{#each parts as part}
 		{#if typeof part === 'string'}
 			<span>{part}</span>
 		{:else}
-			<ItemHover item={part} mode={"sprite"} />
+			<ItemHover item={part} mode={'icon'} />
 		{/if}
 	{/each}
 </li>

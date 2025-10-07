@@ -12,7 +12,7 @@
 	{#each Array(totalSlots) as _, index (inventory[index]?.uid ?? `empty-${index}`)}
 		{@const item = inventory[index]}
 		{#if item}
-			<ItemRenderer {item} mode={'ascii'} pclass="" equippedSlot={undefined} />
+			<ItemRenderer {item} pclass="" equippedSlot={undefined} />
 		{:else}
 			<div class="h-16 w-16 rounded-lg"></div>
 		{/if}

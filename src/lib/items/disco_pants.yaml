@@ -2,6 +2,7 @@
   name: Disco Pants
   icon:
     ascii: "𓂻"
+    image: "/images/items/trousers.svg"
   rarity: Mythic
   modifiers:
     - type: Equippable

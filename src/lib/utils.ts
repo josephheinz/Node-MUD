@@ -47,3 +47,14 @@ export function extractItemsFromMessage(message: string): (string | Item)[] {
 
     return result;
 }
+
+export function linkToChat(
+    itemLinkTable: Record<number, Item>,
+    message: string,
+    item: Item
+): { message: string, itemLinkTable: Record<number, Item> } {
+    const nextIndex = Object.keys(itemLinkTable).length + 1;
+    message += `[ItemLink#${nextIndex}]`;
+    itemLinkTable[nextIndex] = item;
+    return { message, itemLinkTable };
+}

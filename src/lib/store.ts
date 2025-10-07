@@ -9,3 +9,6 @@ export const inventory = writable<Item[]>();
 export const equipment = writable<Equipment>();
 export const baseStats = writable<StatList>(deepClone<StatList>(Stats));
 export const modifiedStats = writable<StatList>(deepClone<StatList>(Stats));
+
+export const chatMessage = writable<string>("");
+export const chatItemLinkTable = writable<Record<number, Item>>({});

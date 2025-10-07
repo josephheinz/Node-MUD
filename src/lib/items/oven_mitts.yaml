@@ -2,6 +2,7 @@
   name: Oven Mitts
   icon:
     ascii: "𓂧"
+    image: "/images/items/winterGloves.svg"
   rarity: Special
   modifiers:
     - type: Equippable
