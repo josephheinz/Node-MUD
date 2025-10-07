@@ -12,10 +12,12 @@
 	import ProgressBar from '$lib/components/actions/progressBar.svelte';
 	import Action from '$lib/components/actions/action.svelte';
 	import type { Action as IAction } from '$lib/types';
+	import Chat from '$lib/components/chat.svelte';
+	import { type User } from '@supabase/supabase-js';
 
 	let loginModalOpen = $state(false);
 
-	let user = $state(get(store.user));
+	let user = $state<User>(get(store.user));
 	let inventory = $state<Item[]>(get(store.inventory));
 	let equipment = $state<Equipment>(get(store.equipment));
 	let stats = $state<StatList>(get(store.modifiedStats)); // not base because base only gets updated when character upgrades are made
@@ -48,6 +50,7 @@
 
 {#if user}
 	<ProfileDropdown {user} />
+	<Chat {user}/>
 {:else}
 	<LoginButton onclick={() => (loginModalOpen = true)} />
 	<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
@@ -56,8 +59,7 @@
 {#if inventory && equipment}
 	<CharacterMenu {inventory} {equipment} {stats} />
 {/if}
-<br />
-<Reforger item={undefined} {equipment} {inventory} />
-<div class="absolute top-30 right-10 z-0">
+<div class="absolute top-30 right-10 z-0 flex">
+	<Reforger item={undefined} {equipment} {inventory} />
 	<Action action={testAction} />
 </div>

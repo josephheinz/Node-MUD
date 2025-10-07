@@ -34,8 +34,10 @@ export interface Action {
     name: string;
 }
 
-export interface User {
-    id: string;
+export interface ChatMessage {
+    timestamp: Date;
+    author: string;
+    content: string;
 };
 
 export type InventoryRow = {

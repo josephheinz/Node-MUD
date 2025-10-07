@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
@@ -32,7 +32,10 @@
 	"dependencies": {
 		"@fortawesome/free-solid-svg-icons": "^7.0.1",
 		"@supabase/supabase-js": "^2.57.2",
+		"socket.io": "^4.8.1",
+		"socket.io-client": "^4.8.1",
 		"svelte-fa": "^4.0.4",
+		"ws": "^8.18.3",
 		"yaml": "^2.8.1"
 	}
 }
