@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ItemRenderer from './itemRenderer.svelte';
-	import type { Item } from '$lib/items';
+	import type { Item } from '$lib/types/item';
 	import { createEventDispatcher } from 'svelte';
 
 	const {

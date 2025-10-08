@@ -1,12 +1,10 @@
 <script lang="ts">
-	import type { Item } from '$lib/items';
+	import type { Item } from '$lib/types/item';
 	import { tooltip } from '../tooltip';
-	import { getItemData, reviveModifiers } from '$lib/items';
-	import { capitalizeFirstLetter, deepClone } from '$lib/types';
-	import Fa from 'svelte-fa';
-	import * as icons from '@fortawesome/free-solid-svg-icons';
+	import { getItemData } from '$lib/types/item';
+	import { deepClone, reviveModifiers } from '$lib/utils';
 
-	let { item, mode }: { item: Item; mode: 'ascii' | 'sprite' | 'icon' } = $props();
+	let { item }: { item: Item } = $props();
 
 	let hoverItem: Item = $derived.by(() => {
 		let _ = deepClone<Item>(item);
@@ -20,11 +18,11 @@
 	style="color:{hoverItem.rarity};"
 	use:tooltip={getItemData(hoverItem, false)}
 >
-	{@render icon(mode)}
+	{@render icon()}
 	{hoverItem.name}
 </span>
 
-{#snippet icon(m: 'ascii' | 'sprite' | 'icon')}
+{#snippet icon()}
 	{#if item.icon.image}
 		<div
 			class="inline-block h-4 w-4 bg-current"

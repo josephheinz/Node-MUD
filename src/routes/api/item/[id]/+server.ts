@@ -1,4 +1,4 @@
-import { itemRegistry } from '$lib/items.js';
+import { itemRegistry } from '$lib/types/item.js';
 
 export async function GET({ params }) {
     const { id } = params;

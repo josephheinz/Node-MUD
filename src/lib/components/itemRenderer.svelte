@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { type Item, determineSlot, getItemData } from '$lib/items';
+	import { type Item, getItemData } from '$lib/types/item';
 	import { tooltip } from './tooltip';
-	import { Equip, Unequip, type EquipmentSlot } from '$lib/types';
+	import { Equip, Unequip, type EquipmentSlot } from '$lib/types/equipment';
 	import { contextMenu, type ContextMenuItem } from './contextmenu';
-	import { type EventDispatcher } from 'svelte';
-	import { linkToChat } from '$lib/utils';
+	import { determineSlot, linkToChat } from '$lib/utils';
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
 
@@ -41,7 +40,6 @@
 				const chatLink = linkToChat(get(store.chatItemLinkTable), get(store.chatMessage), item);
 				store.chatItemLinkTable.set(chatLink.itemLinkTable);
 				store.chatMessage.set(chatLink.message);
-				console.log(get(store.chatItemLinkTable), get(store.chatMessage));
 			}
 		},
 		{

@@ -1,14 +1,15 @@
 <script lang="ts">
-	import { ConglomerateItems, reviveModifiers, type Item } from '$lib/items';
-	import { deepClone, EmptyEquipment, Reforge, type Equipment } from '$lib/types';
+	import { type Item } from '$lib/types/item';
+	import { type Equipment, EmptyEquipment, Reforge } from '$lib/types/equipment';
+	import { ConglomerateItems, deepClone, reviveModifiers } from '$lib/utils';
 	import ItemRenderer from './itemRenderer.svelte';
 	import ItemSelectMenu from './itemSelectMenu.svelte';
 
 	const {
 		item,
-		equipment,
-		inventory
-	}: { item: Item | undefined; equipment: Equipment; inventory: Item[] } = $props();
+		equipment = EmptyEquipment,
+		inventory = []
+	}: { item: Item | undefined; equipment?: Equipment; inventory?: Item[] } = $props();
 
 	let selectedItem: Item | undefined = $state<Item | undefined>(item);
 	let selectedItemInventoryId: number = inventory.findIndex(

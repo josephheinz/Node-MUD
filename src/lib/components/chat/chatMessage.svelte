@@ -1,13 +1,11 @@
 <script lang="ts">
 	import ItemHover from './itemHover.svelte';
 	import type { ChatMessage } from '$lib/types';
-	import { type Item } from '$lib/items';
+	import { type Item } from '$lib/types/item';
 	import { extractItemsFromMessage } from '$lib/utils';
 
-	// Props
 	let { msg }: { msg: ChatMessage } = $props();
 
-	// Reactive derived parts
 	let parts: (string | Item)[] = $derived.by(() => extractItemsFromMessage(msg.content));
 </script>
 
@@ -18,7 +16,7 @@
 		{#if typeof part === 'string'}
 			<span>{part}</span>
 		{:else}
-			<ItemHover item={part} mode={'icon'} />
+			<ItemHover item={part} />
 		{/if}
 	{/each}
 </li>

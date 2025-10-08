@@ -22,12 +22,10 @@ class SocketStore {
 
     this.socket.on('connect', () => {
       this.connected = true;
-      console.log('Socket connected:', this.socket?.id);
     });
 
     this.socket.on('disconnect', () => {
       this.connected = false;
-      console.log('Socket disconnected');
     });
 
     this.socket.on('connect_error', (error) => {

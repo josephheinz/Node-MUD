@@ -2,10 +2,11 @@
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import * as store from '$lib/store';
-	import { page } from '$app/stores';
-	import { hydrateEquipment, hydrateInventory } from '$lib/items';
-	import { getModifiedStats, Stats } from '$lib/stats';
+	import { hydrateEquipment } from '$lib/types/equipment';
+	import { hydrateInventory } from '$lib/utils';
+	import { getModifiedStats, Stats } from '$lib/types/stats';
 	import { get } from 'svelte/store';
+	import { page } from '$app/stores';
 
 	let { children } = $props();
 

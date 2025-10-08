@@ -1,8 +1,10 @@
 import { supabase } from "$lib/auth/supabaseClient";
-import { encodeDbItem, loadDbItem, type DBItem, type Item } from "$lib/items.js";
 import { instantiateModifierFromClass } from "$lib/modifiers/modifiersRegistry.js";
 import { ReforgeModifier, rollReforge, type ReforgeGroup } from "$lib/modifiers/reforges.js";
-import { serializeEquipment, type Equipment, type EquipmentSlot, type InventoryRow } from "$lib/types.js";
+import type { InventoryRow } from "$lib/types";
+import { serializeEquipment, type Equipment, type EquipmentSlot } from "$lib/types/equipment";
+import type { DBItem, Item } from "$lib/types/item.js";
+import { encodeDbItem, loadDbItem } from "$lib/utils";
 
 export async function POST({ request, params, cookies }) {
     const { id } = params;

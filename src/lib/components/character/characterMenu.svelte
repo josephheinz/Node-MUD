@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Item } from '$lib/items';
-	import type { StatList } from '$lib/stats';
-	import type { Equipment } from '$lib/types';
+	import type { Equipment } from '$lib/types/equipment';
+	import type { Item } from '$lib/types/item';
+	import type { StatList } from '$lib/types/stats';
 	import EquipmentDisplay from './equipmentDisplay.svelte';
 	import Inventory from './inventory.svelte';
 	import StatsDisplay from './statsDisplay.svelte';

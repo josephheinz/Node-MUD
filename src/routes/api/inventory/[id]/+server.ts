@@ -1,6 +1,7 @@
 import { supabase } from "$lib/auth/supabaseClient";
 
 export async function GET({ params }) {
+
     const { id } = params;
 
     const { data, error } = await supabase

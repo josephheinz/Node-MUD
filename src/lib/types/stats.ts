@@ -1,5 +1,6 @@
-import { computeItemStats, type Item } from "./items";
-import { deepClone, type Equipment, type EquipmentSlot } from "./types";
+import type { Equipment, EquipmentSlot } from "./equipment";
+import { computeItemStats, type Item } from "./item";
+import { deepClone } from "../utils";
 
 export type Stat = {
     name: string;
@@ -45,7 +46,7 @@ export function getModifiedStats(stats: StatList, equipment: Equipment): StatLis
     Object.values(itemStats).forEach((itemStats: Record<string, { base: number; modifiers: number; reforges: number; }>) => {
         Object.entries(itemStats).forEach(([stat, amounts]) => {
             Object.values(amounts).forEach((val) => {
-                if(result[val]) result[stat] += Number(val);
+                if (result[val]) result[stat] += Number(val);
             });
         });
     });

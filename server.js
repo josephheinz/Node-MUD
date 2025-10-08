@@ -18,10 +18,8 @@ const io = new Server(httpServer, {
 });
 
 io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
 
   socket.on('message', (data) => {
-    console.log('Received message:', data);
     io.emit('message', {
       id: socket.id,
       ...data
@@ -29,7 +27,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('private-message', (data) => {
-    console.log('Private message:', data);
     if (data.to) {
       socket.to(data.to).emit('private-message', {
         from: socket.id,
@@ -40,13 +37,11 @@ io.on('connection', (socket) => {
 
   socket.on('join-room', (room) => {
     socket.join(room);
-    console.log(`Socket ${socket.id} joined room: ${room}`);
     io.to(room).emit('user-joined', { socketId: socket.id, room });
   });
 
   socket.on('leave-room', (room) => {
     socket.leave(room);
-    console.log(`Socket ${socket.id} left room: ${room}`);
     io.to(room).emit('user-left', { socketId: socket.id, room });
   });
 

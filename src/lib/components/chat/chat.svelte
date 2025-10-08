@@ -4,7 +4,7 @@
 	import type { ChatMessage } from '$lib/types';
 	import type { User } from '@supabase/supabase-js';
 	import ChatMessageComp from './chatMessage.svelte';
-	import type { Item } from '$lib/items';
+	import type { Item } from '$lib/types/item';
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
 
@@ -85,10 +85,9 @@
 	}
 
 	onMount(() => {
-		// Listen for messages
 		socketStore.on('message', (data) => {
 			messages.push(data);
-			messages = messages; // Trigger reactivity
+			messages = messages;
 		});
 
 		socketStore.on('room-message', (data) => {

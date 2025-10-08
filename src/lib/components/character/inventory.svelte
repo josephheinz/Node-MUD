@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Item } from '$lib/items';
+	import type { Item } from '$lib/types/item';
 	import ItemRenderer from '../itemRenderer.svelte';
 
 	const { inventory }: { inventory: Item[] } = $props();

@@ -1,5 +1,5 @@
-import { type IItemModifier } from "$lib/items";
-import type { StatList } from "$lib/stats";
+import { type IItemModifier } from "$lib/types/item";
+import type { StatList } from "$lib/types/stats";
 
 export interface IReforge {
     name: string;

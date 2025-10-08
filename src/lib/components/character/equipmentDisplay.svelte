@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { EquipmentSlot, Equipment } from '$lib/types';
-	import type { Item } from '$lib/items';
+	import type { EquipmentSlot, Equipment } from '$lib/types/equipment';
+	import type { Item } from '$lib/types/item';
 	import ItemRenderer from '../itemRenderer.svelte';
 
 	const { equipment }: { equipment: Equipment } = $props();

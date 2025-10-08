@@ -1,8 +1,9 @@
 import { supabase } from "$lib/auth/supabaseClient";
-import type { DBItem } from "$lib/items.js";
-import type { Equipment, EquipmentSlot, InventoryRow } from "$lib/types.js";
+import type { Equipment, EquipmentSlot } from "$lib/types/equipment";
+import { type DBItem } from "$lib/types/item.js";
 
 export async function POST({ request, params, cookies }) {
+
     const { id } = params;
     const { slot } = await request.json();
 

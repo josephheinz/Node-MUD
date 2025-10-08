@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { StatIcons, type StatList } from '$lib/stats';
+	import { StatIcons, type StatList } from '$lib/types/stats';
 
 	const { stats }: { stats: StatList } = $props();
 

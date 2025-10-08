@@ -2,14 +2,13 @@
 	import LoginModal from '$lib/components/auth/loginModal.svelte';
 	import LoginButton from '$lib/components/auth/loginButton.svelte';
 	import ProfileDropdown from '$lib/components/auth/profileDropdown.svelte';
-	import { type Equipment } from '$lib/types';
+	import { type Equipment } from '$lib/types/equipment';
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
-	import { type Item } from '$lib/items';
+	import { type Item } from '$lib/types/item';
 	import CharacterMenu from '$lib/components/character/characterMenu.svelte';
-	import { getModifiedStats, type StatList } from '$lib/stats';
+	import { getModifiedStats, type StatList } from '$lib/types/stats';
 	import Reforger from '$lib/components/reforger.svelte';
-	import ProgressBar from '$lib/components/actions/progressBar.svelte';
 	import Action from '$lib/components/actions/action.svelte';
 	import type { Action as IAction } from '$lib/types';
 	import Chat from '$lib/components/chat/chat.svelte';
@@ -48,18 +47,18 @@
 	}, 50);
 </script>
 
-{#if user}
-	<ProfileDropdown {user} />
-	<Chat {user}/>
-{:else}
-	<LoginButton onclick={() => (loginModalOpen = true)} />
-	<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
-{/if}
-<br />
-{#if inventory && equipment}
-	<CharacterMenu {inventory} {equipment} {stats} />
-{/if}
-<div class="absolute top-30 right-10 z-0 flex">
+<div class="top-30 right-10 z-0 flex items-start justify-start">
+	{#if user}
+		<ProfileDropdown {user} />
+		<Chat {user} />
+	{:else}
+		<LoginButton onclick={() => (loginModalOpen = true)} />
+		<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
+	{/if}
+	<br />
+	{#if inventory && equipment}
+		<CharacterMenu {inventory} {equipment} {stats} />
+	{/if}
 	<Reforger item={undefined} {equipment} {inventory} />
 	<Action action={testAction} />
 </div>

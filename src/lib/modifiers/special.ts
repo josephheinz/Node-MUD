@@ -1,4 +1,4 @@
-import { type IItemModifier } from "$lib/items";
+import { type IItemModifier } from "$lib/types/item";
 
 export class CaduceusModifier implements IItemModifier {
     type = "Caduceus";

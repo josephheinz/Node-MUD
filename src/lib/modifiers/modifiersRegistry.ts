@@ -1,4 +1,4 @@
-import type { IItemModifier } from '$lib/items';
+import type { IItemModifier } from '$lib/types/item';
 import { ReforgeModifier, ReforgeableModifier } from './reforges';
 import { StarsModifier } from './stars';
 import { CaduceusModifier } from './special';

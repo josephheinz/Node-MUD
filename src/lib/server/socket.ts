@@ -15,11 +15,9 @@ export function initSocketServer(server: HTTPServer) {
   });
 
   io.on('connection', (socket) => {
-    console.log('Client connected:', socket.id);
 
     // Example: Handle custom events
     socket.on('message', (data) => {
-      console.log('Received message:', data);
       // Broadcast to all clients
       io?.emit('message', {
         id: socket.id,
@@ -28,7 +26,6 @@ export function initSocketServer(server: HTTPServer) {
     });
 
     socket.on('private-message', (data) => {
-      console.log('Private message:', data);
       // Send to specific client
       if (data.to) {
         socket.to(data.to).emit('private-message', {
@@ -41,13 +38,11 @@ export function initSocketServer(server: HTTPServer) {
     // Handle room joining
     socket.on('join-room', (room: string) => {
       socket.join(room);
-      console.log(`Socket ${socket.id} joined room: ${room}`);
       io?.to(room).emit('user-joined', { socketId: socket.id, room });
     });
 
     socket.on('leave-room', (room: string) => {
       socket.leave(room);
-      console.log(`Socket ${socket.id} left room: ${room}`);
       io?.to(room).emit('user-left', { socketId: socket.id, room });
     });
 
