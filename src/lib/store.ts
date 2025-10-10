@@ -2,8 +2,8 @@ import { writable } from "svelte/store";
 import type { Item } from "./types/item";
 import { Stats, type StatList } from "./types/stats";
 import type { User } from "@supabase/supabase-js";
-import { deepClone } from "./utils";
 import type { Equipment } from "./types/equipment";
+import { deepClone } from "./utils/general";
 
 export const user = writable<User>();
 export const inventory = writable<Item[]>();

@@ -3,10 +3,10 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import * as store from '$lib/store';
 	import { hydrateEquipment } from '$lib/types/equipment';
-	import { hydrateInventory } from '$lib/utils';
 	import { getModifiedStats, Stats } from '$lib/types/stats';
 	import { get } from 'svelte/store';
 	import { page } from '$app/stores';
+	import { hydrateInventory } from '$lib/utils/item';
 
 	let { children } = $props();
 

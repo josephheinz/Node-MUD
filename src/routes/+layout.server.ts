@@ -2,9 +2,6 @@ import { supabase } from '$lib/auth/supabaseClient.js';
 import { type Item } from '$lib/types/item.js';
 import { Stats } from '$lib/types/stats.js';
 import { EmptyEquipment } from '$lib/types/equipment';
-import * as store from '$lib/store.js';
-import { hydrateInventory } from '$lib/utils.js';
-import { hydrateEquipment } from '$lib/types/equipment.js';
 
 export async function load({ cookies, fetch }) {
     // Load supabase session

@@ -1,6 +1,6 @@
+import { deepClone } from "$lib/utils/general";
 import type { Equipment, EquipmentSlot } from "./equipment";
 import { computeItemStats, type Item } from "./item";
-import { deepClone } from "../utils";
 
 export type Stat = {
     name: string;
@@ -31,7 +31,6 @@ export const StatIcons: Record<string, string> = {
 
 export function getModifiedStats(stats: StatList, equipment: Equipment): StatList {
     const result: StatList = deepClone<StatList>(stats); // copy so references to an original Stats store doesn't get changed
-
     let itemStats: Record<string, Record<string, { base: number; modifiers: number; reforges: number; }>> = {};
 
     for (const key in equipment) {
@@ -46,7 +45,9 @@ export function getModifiedStats(stats: StatList, equipment: Equipment): StatLis
     Object.values(itemStats).forEach((itemStats: Record<string, { base: number; modifiers: number; reforges: number; }>) => {
         Object.entries(itemStats).forEach(([stat, amounts]) => {
             Object.values(amounts).forEach((val) => {
-                if (result[val]) result[stat] += Number(val);
+                if (result[stat] != undefined) {
+                    result[stat] += Number(val);
+                }
             });
         });
     });

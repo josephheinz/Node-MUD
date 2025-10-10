@@ -2,8 +2,9 @@ import { parse } from "yaml";
 import { type ITooltipData } from "../components/tooltip";
 import { instantiateModifier } from "../modifiers/modifiersRegistry";
 import type { StatList } from "./stats";
-import { capitalizeFirstLetter, determineSlot } from "../utils";
 import { type EquipmentSlot } from "./equipment";
+import { determineSlot } from "$lib/utils/item";
+import { capitalizeFirstLetter } from "$lib/utils/general";
 
 export type RarityKey = keyof typeof Rarity;
 

@@ -2,7 +2,7 @@ import { supabase } from "$lib/auth/supabaseClient";
 import type { InventoryRow } from "$lib/types";
 import { serializeEquipment, type Equipment, type EquipmentSlot } from "$lib/types/equipment";
 import { type DBItem, type Item } from "$lib/types/item";
-import { determineSlot, encodeDbItem, loadDbItem } from "$lib/utils";
+import { determineSlot, encodeDbItem, loadDbItem } from "$lib/utils/item";
 
 export async function POST({ request, params, cookies }) {
     const { id } = params;

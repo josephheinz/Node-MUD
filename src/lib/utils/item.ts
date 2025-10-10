@@ -1,75 +1,9 @@
+import type { Equipment, EquipmentSlot } from "$lib/types/equipment";
+import { itemRegistry, type DBItem, type IItemModifier, type Item } from "$lib/types/item";
+import { deepClone } from "./general";
 import { get } from "svelte/store";
-import type { Equipment, EquipmentSlot } from "./types/equipment";
-import { itemRegistry, type DBItem, type IItemModifier, type Item } from "./types/item";
 import * as store from "$lib/store";
-import { instantiateModifier, instantiateModifierFromClass } from "./modifiers/modifiersRegistry";
-
-export function extractItemsFromMessage(message: string): (string | Item)[] {
-    const result: (string | Item)[] = [];
-    let cursor = 0;
-
-    while (true) {
-        const start = message.indexOf("[item:", cursor);
-        if (start === -1) {
-            // push remaining text
-            result.push(message.slice(cursor));
-            break;
-        }
-
-        // push text before item
-        if (start > cursor) result.push(message.slice(cursor, start));
-
-        let depth = 0;
-        let end = start + 6; // position after "[item:"
-        let inString = false;
-
-        while (end < message.length) {
-            const char = message[end];
-
-            if (char === '"' && message[end - 1] !== "\\") {
-                inString = !inString;
-            }
-
-            if (!inString) {
-                if (char === '{') depth++;
-                else if (char === '}') depth--;
-
-                if (depth === 0) break;
-            }
-            end++;
-        }
-
-        const jsonStr = message.slice(start + 6, end + 1); // include final }
-        try {
-            result.push(JSON.parse(jsonStr) as Item);
-        } catch {
-            result.push("[item:" + jsonStr + "]");
-        }
-
-        cursor = end + 2; // position after closing ]
-    }
-
-    return result;
-}
-
-export function linkToChat(
-    itemLinkTable: Record<number, Item>,
-    message: string,
-    item: Item
-): { message: string, itemLinkTable: Record<number, Item> } {
-    const nextIndex = Object.keys(itemLinkTable).length + 1;
-    message += `[ItemLink#${nextIndex}]`;
-    itemLinkTable[nextIndex] = item;
-    return { message, itemLinkTable };
-}
-
-export function deepClone<T>(item: T): T {
-    return JSON.parse(JSON.stringify(item));
-}
-
-export function capitalizeFirstLetter(str: string): string {
-    return String(str).charAt(0).toUpperCase() + String(str).slice(1);
-}
+import { instantiateModifier, instantiateModifierFromClass } from "$lib/modifiers/modifiersRegistry";
 
 export function ConglomerateItems(inventory: Item[], equipment: Equipment): Item[] {
     let inventoryCopy: Item[] = deepClone<Item[]>(inventory);

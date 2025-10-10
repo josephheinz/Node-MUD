@@ -2,7 +2,7 @@
 	import ItemHover from './itemHover.svelte';
 	import type { ChatMessage } from '$lib/types';
 	import { type Item } from '$lib/types/item';
-	import { extractItemsFromMessage } from '$lib/utils';
+	import { extractItemsFromMessage } from '$lib/utils/chat';
 
 	let { msg }: { msg: ChatMessage } = $props();
 

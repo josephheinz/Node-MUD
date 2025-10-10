@@ -2,7 +2,7 @@ import { type DBItem, type Item } from "$lib/types/item";
 import { getModifiedStats } from "$lib/types/stats";
 import * as store from "$lib/store";
 import { get } from "svelte/store";
-import { determineSlot, encodeDbItem, hydrateInventory, loadDbItem } from "$lib/utils";
+import { determineSlot, encodeDbItem, hydrateInventory, loadDbItem } from "$lib/utils/item";
 
 export type EquipmentSlot = keyof Equipment;
 

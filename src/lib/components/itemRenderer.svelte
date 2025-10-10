@@ -3,9 +3,10 @@
 	import { tooltip } from './tooltip';
 	import { Equip, Unequip, type EquipmentSlot } from '$lib/types/equipment';
 	import { contextMenu, type ContextMenuItem } from './contextmenu';
-	import { determineSlot, linkToChat } from '$lib/utils';
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
+	import { linkToChat } from '$lib/utils/chat';
+	import { determineSlot } from '$lib/utils/item';
 
 	interface Props {
 		item: Item;
@@ -40,40 +41,6 @@
 				const chatLink = linkToChat(get(store.chatItemLinkTable), get(store.chatMessage), item);
 				store.chatItemLinkTable.set(chatLink.itemLinkTable);
 				store.chatMessage.set(chatLink.message);
-			}
-		},
-		{
-			name: 'zoom',
-			displayText: 'Zoom',
-			icon: 'fa-solid fa-magnifying-glass',
-			onClick: () => {
-				message = 'Zooom...';
-			}
-		},
-		{
-			name: 'print',
-			displayText: 'Print',
-			icon: 'fa-solid fa-print',
-			onClick: () => {
-				message = 'Printed...';
-			}
-		},
-		{ name: 'hr', isDivider: true },
-		{
-			name: 'settings',
-			displayText: 'Settings',
-			icon: 'fa-solid fa-gear',
-			onClick: () => {
-				message = 'Settings...';
-			}
-		},
-		{ name: 'hr', isDivider: true },
-		{
-			name: 'trash',
-			displayText: 'Trash',
-			icon: 'fa-solid fa-trash-can',
-			onClick: () => {
-				message = 'Removed...';
 			}
 		}
 	];

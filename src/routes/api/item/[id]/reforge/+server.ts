@@ -4,7 +4,7 @@ import { ReforgeModifier, rollReforge, type ReforgeGroup } from "$lib/modifiers/
 import type { InventoryRow } from "$lib/types";
 import { serializeEquipment, type Equipment, type EquipmentSlot } from "$lib/types/equipment";
 import type { DBItem, Item } from "$lib/types/item.js";
-import { encodeDbItem, loadDbItem } from "$lib/utils";
+import { encodeDbItem, loadDbItem } from "$lib/utils/item";
 
 export async function POST({ request, params, cookies }) {
     const { id } = params;

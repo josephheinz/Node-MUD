@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { type Item } from '$lib/types/item';
 	import { type Equipment, EmptyEquipment, Reforge } from '$lib/types/equipment';
-	import { ConglomerateItems, deepClone, reviveModifiers } from '$lib/utils';
 	import ItemRenderer from './itemRenderer.svelte';
 	import ItemSelectMenu from './itemSelectMenu.svelte';
+	import { ConglomerateItems, reviveModifiers } from '$lib/utils/item';
+	import { deepClone } from '$lib/utils/general';
 
 	const {
 		item,

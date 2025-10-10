@@ -2,7 +2,8 @@
 	import type { Item } from '$lib/types/item';
 	import { tooltip } from '../tooltip';
 	import { getItemData } from '$lib/types/item';
-	import { deepClone, reviveModifiers } from '$lib/utils';
+	import { reviveModifiers } from '$lib/utils/item';
+	import { deepClone } from '$lib/utils/general';
 
 	let { item }: { item: Item } = $props();
 
