@@ -1,7 +1,8 @@
 <script lang="ts">
 	import Fa from 'svelte-fa';
 	import { faRightFromBracket, faUser, faGear } from '@fortawesome/free-solid-svg-icons';
-	let { user } = $props();
+	import type { User } from '@supabase/supabase-js';
+	let { user }: { user: User } = $props();
 
 	let opened = $state(false);
 	let displayName =
@@ -36,7 +37,7 @@
 		onclick={() => (opened = !opened)}
 	>
 		<img
-			src={user.user_metadata?.avatar_url ?? 'https://avatar.iran.liara.run/public/30'}
+			src={user.user_metadata?.avatar_url ?? '/images/blank_pfp.webp'}
 			alt="Profile"
 			class="h-12 rounded-full"
 		/>
@@ -56,7 +57,7 @@
 				><Fa icon={faUser} /> Profile
 			</a>
 			<a
-				href="#"
+				href="/profile/{user.user_metadata?.full_name}/settings"
 				role="menuitem"
 				class="flex w-full cursor-pointer items-center justify-start gap-2 px-4 py-2 text-left hover:bg-zinc-500"
 				><Fa icon={faGear} /> Settings

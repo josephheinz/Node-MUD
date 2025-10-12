@@ -2,7 +2,7 @@
 	import type { Item } from '$lib/types/item';
 	import ItemRenderer from '../itemRenderer.svelte';
 
-	const { inventory }: { inventory: Item[] } = $props();
+	const { inventory, display = false }: { inventory: Item[]; display?: boolean } = $props();
 
 	const baseSlots = 25; // minimum visible slots
 	const totalSlots = Math.max(inventory.length, baseSlots);
@@ -12,7 +12,7 @@
 	{#each Array(totalSlots) as _, index (inventory[index]?.uid ?? `empty-${index}`)}
 		{@const item = inventory[index]}
 		{#if item}
-			<ItemRenderer {item} pclass="" equippedSlot={undefined} />
+			<ItemRenderer {item} pclass="" equippedSlot={undefined} equippable={!display} />
 		{:else}
 			<div class="h-16 w-16 rounded-lg"></div>
 		{/if}

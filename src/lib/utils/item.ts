@@ -1,4 +1,4 @@
-import type { Equipment, EquipmentSlot } from "$lib/types/equipment";
+import { EmptyEquipment, type Equipment, type EquipmentSlot } from "$lib/types/equipment";
 import { itemRegistry, type DBItem, type IItemModifier, type Item } from "$lib/types/item";
 import { deepClone } from "./general";
 import { get } from "svelte/store";
@@ -6,7 +6,7 @@ import * as store from "$lib/store";
 import { instantiateModifier, instantiateModifierFromClass } from "$lib/modifiers/modifiersRegistry";
 
 export function ConglomerateItems(inventory: Item[], equipment: Equipment): Item[] {
-    let inventoryCopy: Item[] = deepClone<Item[]>(inventory);
+    let inventoryCopy: Item[] = deepClone<Item[]>(inventory) ?? [];
     let result: Item[] = [];
 
     inventoryCopy.forEach((item: Item) => {
@@ -14,7 +14,7 @@ export function ConglomerateItems(inventory: Item[], equipment: Equipment): Item
         result.push(item as Item);
     })
 
-    Object.values(deepClone<Equipment>(equipment)).forEach((item: Item | null) => {
+    Object.values(deepClone<Equipment>(equipment) ?? EmptyEquipment).forEach((item: Item | null) => {
         if (item) {
             // re-instantiate all modifiers so methods exist
             item.modifiers = reviveModifiers(item.modifiers);

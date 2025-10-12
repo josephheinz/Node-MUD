@@ -37,7 +37,6 @@ export function sendMessage(msg: string, username: string, itemLinkTable: Record
     if (!msg.trim()) return;
 
     msg = prepareMessage(msg, itemLinkTable);
-    console.log(username);
     socketStore.emit('message', {
         author: username,
         content: msg,

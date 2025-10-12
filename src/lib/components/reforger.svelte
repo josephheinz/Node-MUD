@@ -39,7 +39,7 @@
 		try {
 			const newItem: Item | null = await Reforge(item);
 			if (newItem) {
-				selectedItem = deepClone<Item>(newItem);
+				selectedItem = deepClone<Item>(newItem) ?? newItem;
 				selectedItem.modifiers = reviveModifiers(selectedItem.modifiers);
 			}
 		} catch (err) {

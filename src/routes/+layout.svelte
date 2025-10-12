@@ -10,7 +10,8 @@
 
 	let { children } = $props();
 
-	(async () => {
+	import { onMount } from 'svelte';
+	onMount(() => {
 		const inv = hydrateInventory($page.data.inventory);
 		const eq = hydrateEquipment($page.data.equipment);
 
@@ -19,7 +20,7 @@
 		store.user.set($page.data.user ?? null);
 		store.baseStats.set($page.data.stats ?? { ...Stats });
 		store.modifiedStats.set(getModifiedStats(get(store.baseStats), get(store.equipment)));
-	})();
+	});
 </script>
 
 <svelte:head>

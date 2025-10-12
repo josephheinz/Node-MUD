@@ -18,7 +18,6 @@
 	const { item, pclass = '', equippedSlot = undefined, equippable = true }: Props = $props();
 
 	function handleClick() {
-		console.log(item);
 		if (equippedSlot && equippable) {
 			Unequip(equippedSlot);
 		} else {

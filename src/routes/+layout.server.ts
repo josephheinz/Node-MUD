@@ -78,7 +78,7 @@ export async function load({ cookies, fetch }) {
 
     let stats = { ...Stats };
 
-    const loadStats = await fetch(`api/stats/${userId}`, {
+    const loadStats = await fetch(`/api/stats/${userId}`, {
         method: "GET",
         headers: {
             'Content-Type': 'application/json'
