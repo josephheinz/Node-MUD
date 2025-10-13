@@ -8,7 +8,7 @@ export interface IReforge {
 
 export class ReforgeModifier implements IItemModifier {
     type = "Reforge";
-    private reforge: IReforge;
+    protected reforge: IReforge;
     statChanges?: StatList | undefined;
 
     constructor(reforge: IReforge | string) {
@@ -37,7 +37,8 @@ export const Reforges: Record<string, IReforge> = {
 
 export const ReforgeGroups: Record<string, IReforge[]> = {
     Sword: [Reforges.Sharp, Reforges.Heroic],
-    Armor: [Reforges.Hardened]
+    Armor: [Reforges.Hardened],
+    Jewelry: []
 };
 
 export function rollReforge(group: ReforgeGroup): IReforge {

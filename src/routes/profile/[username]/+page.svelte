@@ -29,6 +29,7 @@
 		if (profile) {
 			inventory = await getInventory(`${profile?.id}`);
 			equipment = await getEquipment(`${profile?.id}`);
+			console.log(apiSettings);
 		}
 	});
 </script>

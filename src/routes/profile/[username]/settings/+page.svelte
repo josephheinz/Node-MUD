@@ -18,13 +18,37 @@
 
 	let profile: Profile | undefined = $page.data.profile;
 	let user: User | undefined = $page.data.user;
-	let apiSettings: IApiSettings = $page.data.apiSettings;
+	let apiSettings: IApiSettings = $state<IApiSettings>($page.data.api_settings);
 
 	onMount(async () => {
 		if (profile?.id !== user?.id) {
 			location.href = '/';
 		}
 	});
+
+	async function updateSetting(name: string, value: any): Promise<void> {
+		fetch(`/api/settings/${user?.id}`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ setting: { name: name, value: value } })
+		})
+			.then(async (response) => {
+				let responseJson = await response.json();
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				return responseJson;
+			})
+			.then((data) => {
+				console.log(data);
+				apiSettings = data.settings as IApiSettings;
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	}
 </script>
 
 <title>Your Settings</title>
@@ -61,8 +85,8 @@
 			<div class="m-2 w-max rounded-lg border-2 border-zinc-700 bg-zinc-800 p-2">
 				<h1 class="text-xl font-bold">API Settings</h1>
 				<hr class="mb-2 text-zinc-500" />
-				{@render apiSetting('inventory_api', apiSettings?.inventory_api ?? true)}
-				{@render apiSetting('equipment_api', apiSettings?.equipment_api ?? true)}
+				{@render apiSetting('inventory_api', apiSettings?.inventory_api)}
+				{@render apiSetting('equipment_api', apiSettings?.equipment_api)}
 			</div>
 		</section>
 	</main>
@@ -72,6 +96,6 @@
 	{@const displayName = capitalizeAfterSpaces(name.split('_').join(' '))}
 	<div class="flex w-full items-center justify-between gap-8">
 		<span class="text-lg font-semibold">{displayName}</span>
-		<ToggleSwitch value={on} />
+		<ToggleSwitch value={on} on:toggle={async () => await updateSetting(name, !on)} />
 	</div>
 {/snippet}

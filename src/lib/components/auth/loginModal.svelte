@@ -131,14 +131,14 @@
 					<p id="error-text" class="text-red-500">{errorText}</p>
 					<button
 						onclick={signup}
-						class="my-2 cursor-pointer rounded-md border-2 border-zinc-700 bg-zinc-900 hover:border-zinc-300 px-4 py-2 text-white"
+						class="my-2 cursor-pointer rounded-md border-2 border-zinc-700 bg-zinc-900 px-4 py-2 text-white hover:border-zinc-300"
 						>Sign Up</button
 					>
 				{:else}
 					<p id="error-text" class="text-red-500">{errorText}</p>
 					<button
 						onclick={login}
-						class="my-2 cursor-pointer rounded-md border-2 border-zinc-700 bg-zinc-900 hover:border-zinc-300 px-4 py-2 text-white"
+						class="my-2 cursor-pointer rounded-md border-2 border-zinc-700 bg-zinc-900 px-4 py-2 text-white hover:border-zinc-300"
 						>Login</button
 					>
 				{/if}

@@ -6,13 +6,13 @@ export function escapeRegExp(str: string) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export function deepClone<T>(item: T): T | undefined {
+export function deepClone<T>(item: T): T {
     if (item === undefined || item === null) return item;
     try {
         return JSON.parse(JSON.stringify(item));
     } catch (e) {
         console.error('deepClone error:', e, item);
-        return undefined;
+        return item;
     }
 }
 
