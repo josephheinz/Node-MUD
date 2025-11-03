@@ -11,7 +11,8 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
-		"lint": "prettier --check ."
+		"lint": "prettier --check .",
+		"loc": "git ls-files | grep -Ev \"package-lock\\.json|\\.png$|\\.jpg$|\\.jpeg$|\\.gif$|\\.svg$|\\.ico$|\\.webp$|\\.pdf$|\\.ttf$|\\.woff2?$|\\.mp4$|\\.mov$|\\.exe$|\\.bin$\" | xargs wc -l"
 	},
 	"devDependencies": {
 		"@fortawesome/free-brands-svg-icons": "^7.1.0",

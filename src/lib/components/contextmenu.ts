@@ -27,9 +27,9 @@ export function contextMenu(node: HTMLElement, options: ContextMenuOptions) {
         menuElement.style.cssText = `
             position: fixed;
             display: inline-flex;
-            border: 1px #999 solid;
+            border: 2px oklch(37% 0.013 285.805) solid;
             width: 170px;
-            background-color: #fff;
+            background-color: oklch(27.4% 0.006 286.033);
             border-radius: 10px;
             overflow: hidden;
             flex-direction: column;
@@ -49,7 +49,7 @@ export function contextMenu(node: HTMLElement, options: ContextMenuOptions) {
                 const hr = document.createElement('hr');
                 hr.style.cssText = `
                     border: none;
-                    border-bottom: 1px solid #ccc;
+                    border-bottom: 1px solid oklch(70.8% 0 0);
                     margin: 5px 0px;
                 `;
                 ul.appendChild(hr);
@@ -63,12 +63,12 @@ export function contextMenu(node: HTMLElement, options: ContextMenuOptions) {
                 const button = document.createElement('button');
                 button.style.cssText = `
                     font-size: 1rem;
-                    color: #222;
+                    color: white;
                     width: 100%;
                     height: 30px;
                     text-align: left;
                     border: 0;
-                    background-color: #fff;
+                    background-color: oklch(27.4% 0.006 286.033);
                     cursor: pointer;
                     padding: 0 10px;
                     font-family: inherit;
@@ -88,14 +88,13 @@ export function contextMenu(node: HTMLElement, options: ContextMenuOptions) {
                 }
 
                 button.addEventListener('mouseenter', () => {
-                    button.style.backgroundColor = '#eee';
+                    button.style.backgroundColor = 'oklch(37% 0.013 285.805)';
                     button.style.borderRadius = '5px';
-                    button.style.color = '#000';
                 });
 
                 button.addEventListener('mouseleave', () => {
-                    button.style.backgroundColor = '#fff';
-                    button.style.color = '#222';
+                    button.style.backgroundColor = 'oklch(27.4% 0.006 286.033)';
+                    button.style.color = 'white';
                 });
 
                 if (item.onClick) {

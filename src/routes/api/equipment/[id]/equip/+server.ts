@@ -1,5 +1,5 @@
 import { supabase } from "$lib/auth/supabaseClient";
-import type { InventoryRow } from "$lib/types";
+import type { InventoryRow } from "$lib/types.svelte";
 import { serializeEquipment, type Equipment, type EquipmentSlot } from "$lib/types/equipment";
 import { type DBItem, type Item } from "$lib/types/item";
 import { determineSlot, encodeDbItem, loadDbItem } from "$lib/utils/item";

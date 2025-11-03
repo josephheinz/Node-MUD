@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { socketStore } from '$lib/stores/socket.svelte';
 	import { onMount, onDestroy } from 'svelte';
-	import type { ChatMessage } from '$lib/types';
+	import type { ChatMessage } from '$lib/types.svelte';
 	import type { User } from '@supabase/supabase-js';
 	import ChatMessageComp from './chatMessage.svelte';
 	import type { Item } from '$lib/types/item';
@@ -71,7 +71,7 @@
 	{:else}
 		<!-- Message history -->
 		<ul class="wrap-pretty flex w-full grow flex-col gap-1 overflow-y-scroll py-2">
-			{#each messages as msg}
+			{#each messages.toReversed() as msg}
 				<ChatMessageComp {msg} />
 			{/each}
 		</ul>

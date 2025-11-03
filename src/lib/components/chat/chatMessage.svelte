@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ItemHover from './itemHover.svelte';
-	import type { ChatMessage } from '$lib/types';
+	import type { ChatMessage } from '$lib/types.svelte';
 	import { type Item } from '$lib/types/item';
 	import { extractItemsFromMessage } from '$lib/utils/chat';
 

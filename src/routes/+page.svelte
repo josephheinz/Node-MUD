@@ -9,8 +9,6 @@
 	import CharacterMenu from '$lib/components/character/characterMenu.svelte';
 	import { getModifiedStats, type StatList } from '$lib/types/stats';
 	import Reforger from '$lib/components/reforger.svelte';
-	import Action from '$lib/components/actions/action.svelte';
-	import type { Action as IAction } from '$lib/types';
 	import Chat from '$lib/components/chat/chat.svelte';
 	import { type User } from '@supabase/supabase-js';
 
@@ -38,13 +36,6 @@
 	store.modifiedStats.subscribe((value) => {
 		stats = value;
 	});
-
-	let testAction: IAction = $state({ value: 10, max: 100, name: 'test action' });
-
-	setInterval(() => {
-		if (testAction.value < testAction.max) testAction.value += Math.random();
-		else testAction.value = 0;
-	}, 50);
 </script>
 
 <div class="top-30 right-10 z-0 flex items-start justify-start">
@@ -60,5 +51,4 @@
 		<CharacterMenu {inventory} {equipment} {stats} />
 	{/if}
 	<Reforger item={undefined} {equipment} {inventory} />
-	<Action action={testAction} />
 </div>
