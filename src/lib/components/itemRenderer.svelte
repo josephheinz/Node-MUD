@@ -32,6 +32,19 @@
 	let message = $state('Right click on the box!');
 
 	const menuItems: ContextMenuItem[] = [
+		// This piece of crap lets me only show equip/unequip if the item is equippable
+		...(equippable
+			? [
+					{
+						name: 'equip',
+						displayText: `${equippedSlot ? 'Unequip' : 'Equip'}`,
+						icon: 'fa-solid fa-plus',
+						onClick: () => {
+							handleClick();
+						}
+					}
+				]
+			: []),
 		{
 			name: 'link',
 			displayText: 'Link In Chat',
