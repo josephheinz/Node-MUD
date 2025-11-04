@@ -11,30 +11,21 @@ export async function POST({ request, params, cookies }) {
     // Load supabase session
     const sessionCookie = cookies.get("supabase.session");
     if (!sessionCookie) {
-        return new Response(JSON.stringify({ error: "No session" }), {
-            status: 404,
-            headers: { "Content-Type": "application/json" }
-        });
+        return Response.json({}, { status: 404, statusText: "No session found" });
     }
 
     let sessionParsed: any;
     try {
         sessionParsed = JSON.parse(sessionCookie);
     } catch {
-        return new Response(JSON.stringify({ error: "Invalid session cookie" }), {
-            status: 400,
-            headers: { "Content-Type": "application/json" }
-        });
+        return Response.json({}, { status: 400, statusText: "Invalid session cookie" });
     }
 
     const refresh_token = sessionParsed.refresh_token;
     const { data: user_data, error: user_error } = await supabase.auth.refreshSession({ refresh_token });
 
     if (user_error || !user_data?.user || user_data.user.id !== id) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-            status: 401,
-            headers: { "Content-Type": "application/json" }
-        });
+        return Response.json({}, { status: 401, statusText: "Unauthorized" });
     }
 
     const { user } = user_data;
