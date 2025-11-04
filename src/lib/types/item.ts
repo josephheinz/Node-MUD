@@ -33,7 +33,7 @@ export interface DBItem {
     modifiers?: IItemModifier[];
 }
 
-export interface Item {
+export type Item  = {
     uid: string;
     id: string;
     name: string;
