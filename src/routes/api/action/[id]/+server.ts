@@ -1,4 +1,5 @@
 import { supabase } from "$lib/auth/supabaseClient";
+import { actionRegistry, getAction, type Action, type DBQueueAction } from "$lib/types/action.js";
 
 export async function GET({ params, cookies }) {
     const { id } = params;
@@ -39,7 +40,7 @@ export async function GET({ params, cookies }) {
 
 export async function POST({ request, params, cookies }) {
     const { id } = params;
-    const { actionID } = await request.json();
+    const { actionID, amount = 1 }: { actionID: string; amount: Number; } = await request.json();
 
     // Load supabase session
     const sessionCookie = cookies.get("supabase.session");
@@ -61,8 +62,30 @@ export async function POST({ request, params, cookies }) {
         return Response.json({}, { status: 401, statusText: "Unauthorized" });
     }
 
-    /**
-     * loading from the action
-     * repository will go here once it is created
-     */
+    // Load and update user's action queue
+    const action: Action | null = getAction(actionID);
+    if (!action) return Response.json({}, { status: 400, statusText: "Provided action ID not found in action registry" });
+
+    const dbAction: DBQueueAction = { action, amount };
+
+    const { data: getData, error: getError } = await supabase
+        .from("actions")
+        .select("*")
+        .eq("player_id", id);
+
+    if (!getData || getError) throw new Error(getError.message);
+
+    const currentQueue: DBQueueAction[] = getData[0].queue as DBQueueAction[];
+
+    const updatedQueue: DBQueueAction[] = [...currentQueue, dbAction];
+
+    const { data: setData, error: setError } = await supabase
+        .from("actions")
+        .update({ queue: updatedQueue })
+        .eq("player_id", id)
+        .select();
+
+    if (!setData || setError) throw new Error(setError.message);
+
+    return Response.json({ queue: setData[0].queue }, { status: 200 });
 }

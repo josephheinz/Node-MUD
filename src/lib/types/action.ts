@@ -1,6 +1,9 @@
+import { parse } from "yaml";
+import { getDisplayDescription } from "./item";
+
 export type ActionInput = {
     ids: string[];
-    amounts?: Number[];
+    amounts: Number[];
 };
 
 export type ChanceItem = {
@@ -11,8 +14,7 @@ export type ChanceItem = {
 };
 
 export type ActionOutput = {
-    ids: string[];
-
+    items: ChanceItem[];
 };
 
 export type Action = {
@@ -21,3 +23,34 @@ export type Action = {
     outputs: ActionOutput;
     time: Number;
 };
+
+export type DBQueueAction = {
+    action: Action;
+    amount: Number;
+}
+
+export function parseYAMLToAction(yamlString: string): Action {
+    let action = parse(yamlString)[0];
+    return {
+        name: action.name,
+        inputs: action.inputs,
+        outputs: action.outputs,
+        time: action.time
+    };
+}
+
+export function getAction(id: string): Action | null {
+    if (actionRegistry[id]) return actionRegistry[id];
+    return null;
+}
+
+export const actionRegistry: Record<string, Action> = {};
+
+const actions = import.meta.glob("$lib/actions/*", { eager: true, as: "raw" });
+
+for (const action in actions) {
+    const id = action.split("/").pop()!.replace(/\.[^/.]+$/, '');
+    let _action = (actions[action] as any).default ?? actions[action];
+    actionRegistry[id] = parseYAMLToAction(_action);
+    console.log(actionRegistry[id]);
+}
