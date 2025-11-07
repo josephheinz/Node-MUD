@@ -4,6 +4,8 @@
     ascii: "𐕣"
     image: "/images/items/sword.svg"
   rarity: Common
+  stats:
+    damage: 5
   modifiers:
     - type: Equippable
       value: mainhand

@@ -144,6 +144,11 @@ export function getDisplayDescription(item: Item): string {
     ) ?? base;
 }
 
+export function getItem(id: string): Item | null {
+    if (itemRegistry[id]) return itemRegistry[id];
+    return null;
+}
+
 // Load all the items for api
 
 export const itemRegistry: Record<string, Item> = {};

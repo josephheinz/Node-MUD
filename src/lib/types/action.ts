@@ -34,7 +34,7 @@ export function parseYAMLToAction(yamlString: string): Action {
     return {
         name: action.name,
         inputs: action.inputs,
-        outputs: action.outputs,
+        outputs: { items: action.outputs },
         time: action.time
     };
 }

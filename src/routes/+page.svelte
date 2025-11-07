@@ -11,6 +11,7 @@
 	import Reforger from '$lib/components/reforger.svelte';
 	import Chat from '$lib/components/chat/chat.svelte';
 	import { type User } from '@supabase/supabase-js';
+	import Action from '$lib/components/actions/action.svelte';
 
 	let loginModalOpen = $state(false);
 
@@ -51,4 +52,5 @@
 		<CharacterMenu {inventory} {equipment} {stats} />
 	{/if}
 	<Reforger item={undefined} {equipment} {inventory} />
+	<Action action={'test_action'} amount={1} />
 </div>
