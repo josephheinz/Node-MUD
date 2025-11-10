@@ -2,6 +2,10 @@ import type { Item } from "$lib/types/item";
 import { socketStore } from "$lib/stores/socket.svelte";
 import * as store from "$lib/store";
 import { escapeRegExp } from "./general";
+import Fa from "svelte-fa";
+import type { IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faSquareWebAwesome } from "@fortawesome/free-brands-svg-icons";
+import { faMedal } from "@fortawesome/free-solid-svg-icons";
 
 export function linkToChat(
     itemLinkTable: Record<number, Item>,
@@ -13,6 +17,17 @@ export function linkToChat(
     itemLinkTable[nextIndex] = item;
     return { message, itemLinkTable };
 }
+
+export const AccoladeReferences: Record<string, { icon: IconDefinition, color: string }> = {
+    "owner": {
+        icon: faSquareWebAwesome,
+        color: "#4287f5"
+    },
+    "vip": {
+        color: "#00ff00",
+        icon: faMedal
+    }
+};
 
 export function prepareMessage(msg: string, itemLinkTable: Record<number, Item>): string {
     const itemLinkRegex = /\[ItemLink#\d+\]/g;
@@ -69,7 +84,6 @@ export function sendRoomMessage(msg: string, username: string, currentRoom: stri
 
     return '';
 }
-
 
 export function extractItemsFromMessage(message: string): (string | Item)[] {
     const result: (string | Item)[] = [];

@@ -10,6 +10,7 @@
 	import { onMount } from 'svelte';
 	import Fa from 'svelte-fa';
 	import type { IApiSettings } from './+layout.server';
+	import { AccoladeReferences } from '$lib/utils/chat';
 
 	type Profile = {
 		id: string;
@@ -18,6 +19,7 @@
 		last_logged_in: Date;
 		profile_picture: string;
 		display_name: string;
+		accolades: string[];
 	};
 
 	let profile: Profile | undefined = $page.data.profile;
@@ -60,6 +62,12 @@
 				<p class="text-sm font-light text-zinc-500">
 					Last Online: {lastOnline.toLocaleDateString()}
 				</p>
+				<div class="m-auto grid w-full grid-cols-4 gap-2 p-4">
+					{#each profile.accolades as accolade}
+						{@const accRef = AccoladeReferences[accolade]}
+						<Fa icon={accRef.icon} style={`color:${accRef.color};`} size={'lg'} />
+					{/each}
+				</div>
 			</section>
 			{#if profile.id === user?.id}
 				<a
