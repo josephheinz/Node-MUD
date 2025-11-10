@@ -27,7 +27,7 @@
 	}
 </script>
 
-<div class="">
+<div class="relative">
 	<button
 		class="flex items-start justify-around gap-2 {opened == true
 			? 'rounded-t-md'
@@ -48,7 +48,7 @@
 	{#if opened}
 		<div
 			role="menu"
-			class="w-48 rounded-b-md border-2 border-t-0 border-zinc-700 bg-zinc-800 shadow-lg"
+			class="absolute w-48 rounded-b-md border-2 border-t-0 border-zinc-700 bg-zinc-800 shadow-lg"
 		>
 			<a
 				href="/profile/{user.user_metadata?.full_name}"

@@ -14,6 +14,15 @@ export async function GET({ cookies }) {
         console.log(error.message);
     }
 
+    const { data: d, error: e } = await supabase
+        .from("profiles")
+        .update({ last_logged_in: new Date(Date.now()) })
+        .eq("id", data.user?.id);
+
+    if (e) {
+        console.log(e);
+    }
+
     const { session, user } = data;
 
     return Response.json({ session, user }, { status: 200 });

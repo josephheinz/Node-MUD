@@ -30,6 +30,16 @@ export async function load({ cookies, fetch }) {
 
     if (!user) return { user, inventory: [], equipment: EmptyEquipment };
 
+    // Update last time logged in
+    const { data: d, error: e } = await supabase
+        .from("profiles")
+        .update({ last_logged_in: new Date(Date.now()) })
+        .eq("id", user.id);
+
+    if (e) {
+        console.log(e);
+    }
+
     // Load inventory
     const userId = user?.id;
 

@@ -15,6 +15,7 @@
 		id: string;
 		username: string;
 		joined_at: Date;
+		last_logged_in: Date;
 		profile_picture: string;
 		display_name: string;
 	};
@@ -38,6 +39,7 @@
 
 {#if profile}
 	{@const joinDate = new Date(profile.joined_at)}
+	{@const lastOnline = new Date(profile.last_logged_in)}
 	<main class="flex h-full w-full gap-2">
 		<aside
 			class="flex h-full flex-col items-end justify-between border-r-2 border-zinc-700 p-4 py-[10vh]"
@@ -55,6 +57,9 @@
 				</h1>
 				<h2 class="text-lg font-medium text-zinc-500">@{profile.username}</h2>
 				<p class="text-sm font-light text-zinc-500">Joined: {joinDate.toLocaleDateString()}</p>
+				<p class="text-sm font-light text-zinc-500">
+					Last Online: {lastOnline.toLocaleDateString()}
+				</p>
 			</section>
 			{#if profile.id === user?.id}
 				<a

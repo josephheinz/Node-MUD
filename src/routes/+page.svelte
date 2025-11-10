@@ -58,7 +58,7 @@
 		<nav class="flex h-min w-full items-center justify-evenly border-b-2 border-zinc-600 p-2">
 			<Queue {queue} />
 			{#if user}
-				<div class="flex grow items-center justify-end">
+				<div class="flex grow items-start justify-end">
 					<ProfileDropdown {user} />
 				</div>
 			{:else}
