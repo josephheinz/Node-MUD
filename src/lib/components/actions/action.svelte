@@ -5,6 +5,8 @@
 	import type { Item } from '$lib/types/item';
 	import { getItem } from '$lib/types/item';
 	import numeral from 'numeral';
+	import { get } from 'svelte/store';
+	import { actionQueue, user } from '$lib/store';
 
 	let { action, amount = 1 }: { action: string; amount: Number } = $props();
 
@@ -33,11 +35,33 @@
 			});
 		}
 	});
+
+	async function addToQueue() {
+		let addFetch = await fetch(`/api/action/${get(user)?.id}`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ actionID: action, amount: 1 })
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error('HTTP Error');
+				}
+
+				return response.json();
+			})
+			.then((data) => {
+				if (data.queue) {
+					actionQueue.set(data.queue);
+				}
+			});
+	}
 </script>
 
 {#if loadedAction}
 	<div
-		class="flex aspect-2/3 flex-col items-start justify-start gap-2 rounded-md border-2 border-zinc-700 bg-zinc-800 p-2"
+		class="flex aspect-1/1 flex-col items-start justify-start gap-2 rounded-md border-2 border-zinc-700 bg-zinc-800 p-2"
 	>
 		<h1 class="w-full text-center text-xl font-bold">{loadedAction.name}</h1>
 		<div>
@@ -66,5 +90,11 @@
 			</ul>
 		</div>
 		<span><b>Duration:</b> {loadedAction.time}s</span>
+		<button
+			class="m-auto cursor-pointer rounded-md border-2 border-indigo-700 bg-indigo-500 p-2 text-sm"
+			onclick={addToQueue}
+		>
+			Add to Queue
+		</button>
 	</div>
 {/if}

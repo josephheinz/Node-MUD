@@ -44,6 +44,12 @@ export function getAction(id: string): Action | null {
     return null;
 }
 
+export type ActionCategory = keyof typeof actionCategories;
+
+export const actionCategories: Record<string, Array<string>> = {
+    "test": ["test_action"]
+};
+
 export const actionRegistry: Record<string, Action> = {};
 
 const actions = import.meta.glob("$lib/actions/*", { eager: true, as: "raw" });

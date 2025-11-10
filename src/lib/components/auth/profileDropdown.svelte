@@ -27,7 +27,7 @@
 	}
 </script>
 
-<div class="absolute top-0 right-0">
+<div class="">
 	<button
 		class="flex items-start justify-around gap-2 {opened == true
 			? 'rounded-t-md'
