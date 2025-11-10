@@ -1,5 +1,4 @@
 import { parse } from "yaml";
-import { getDisplayDescription } from "./item";
 
 export type ActionInput = {
     ids: string[];
