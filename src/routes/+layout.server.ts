@@ -2,6 +2,7 @@ import { supabase } from '$lib/auth/supabaseClient.js';
 import { type Item } from '$lib/types/item.js';
 import { Stats } from '$lib/types/stats.js';
 import { EmptyEquipment } from '$lib/types/equipment';
+import type { DBQueueAction } from '$lib/types/action.js';
 
 export async function load({ cookies, fetch }) {
     // Load supabase session
@@ -11,7 +12,8 @@ export async function load({ cookies, fetch }) {
             user: null,
             inventory: [],
             equipment: EmptyEquipment,
-            stats: Stats
+            stats: Stats,
+            queue: []
         };
     }
 
@@ -98,5 +100,27 @@ export async function load({ cookies, fetch }) {
             console.error(error);
         });
 
-    return { user, inventory, equipment, stats };
+    let queue: DBQueueAction[] = [];
+
+    const loadQueue = await fetch(`/api/action/${userId}`, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(async (response) => {
+            let responseJson = await response.json();
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return responseJson;
+        })
+        .then(async (data) => {
+            queue = data.queue;
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+
+    return { user, inventory, equipment, stats, queue };
 };

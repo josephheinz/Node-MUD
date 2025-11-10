@@ -12,6 +12,8 @@
 	import Chat from '$lib/components/chat/chat.svelte';
 	import { type User } from '@supabase/supabase-js';
 	import Action from '$lib/components/actions/action.svelte';
+	import { type DBQueueAction } from '$lib/types/action';
+	import Queue from '$lib/components/actions/queue.svelte';
 
 	let loginModalOpen = $state(false);
 
@@ -19,6 +21,7 @@
 	let inventory = $state<Item[]>(get(store.inventory));
 	let equipment = $state<Equipment>(get(store.equipment));
 	let stats = $state<StatList>(get(store.modifiedStats)); // not base because base only gets updated when character upgrades are made
+	let queue = $state<DBQueueAction[]>(get(store.actionQueue));
 
 	store.inventory.subscribe((value) => {
 		inventory = value;
@@ -37,6 +40,10 @@
 	store.modifiedStats.subscribe((value) => {
 		stats = value;
 	});
+
+	store.actionQueue.subscribe((value) => {
+		queue = value;
+	});
 </script>
 
 <div class="top-30 right-10 z-0 flex items-start justify-start">
@@ -53,4 +60,5 @@
 	{/if}
 	<Reforger item={undefined} {equipment} {inventory} />
 	<Action action={'test_action'} amount={1} />
+	<Queue {queue} />
 </div>
