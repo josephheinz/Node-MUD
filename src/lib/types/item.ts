@@ -5,6 +5,7 @@ import type { StatList } from "./stats";
 import { type EquipmentSlot } from "./equipment";
 import { determineSlot } from "$lib/utils/item";
 import { capitalizeFirstLetter } from "$lib/utils/general";
+import type { ReforgeableModifier } from "$lib/modifiers/reforges";
 
 export type RarityKey = keyof typeof Rarity;
 
@@ -98,14 +99,15 @@ export function computeItemStats(item: Item): Record<string, { base: number; mod
 
 export function getItemData(item: Item, equippable: boolean = true): ITooltipData {
     let rarityName: string = getRarity(item.rarity);
-    let descriptor: string = `<b style="color:${item.rarity}">${rarityName} Item</b>`;
+    let reforgeGroup: ReforgeableModifier | undefined = item.modifiers.find(m => m.type === "Reforgeable") as ReforgeableModifier;
+    let descriptor: string = `<b style="color:${item.rarity}">${rarityName} ${reforgeGroup ? reforgeGroup.group : "Item"}</b>`;
 
     let itemName: string = getDisplayName(item);
     let itemDesc: string = getDisplayDescription(item);
 
     let slot: EquipmentSlot | undefined = determineSlot(item);
     let equipMsg: string = "";
-    if (slot && equippable) equipMsg = `[Equip - Double-click]<br/>Slot: ${slot}<br/>`;
+    if (slot && equippable) equipMsg = `Slot: ${slot}<br/>`;
 
     let stats = computeItemStats(item);
     let statsString = "";

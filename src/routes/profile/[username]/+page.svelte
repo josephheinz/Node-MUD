@@ -4,7 +4,7 @@
 	import Inventory from '$lib/components/character/inventory.svelte';
 	import { EmptyEquipment, type Equipment } from '$lib/types/equipment';
 	import type { Item } from '$lib/types/item';
-	import { getEquipment, getInventory } from '$lib/utils/general';
+	import { capitalizeFirstLetter, getEquipment, getInventory } from '$lib/utils/general';
 	import { faGear, faHome } from '@fortawesome/free-solid-svg-icons';
 	import type { User } from '@supabase/supabase-js';
 	import { onMount } from 'svelte';
@@ -62,12 +62,22 @@
 				<p class="text-sm font-light text-zinc-500">
 					Last Online: {lastOnline.toLocaleDateString()}
 				</p>
-				<div class="m-auto grid w-full grid-cols-4 gap-2 p-4">
-					{#each profile.accolades as accolade}
-						{@const accRef = AccoladeReferences[accolade]}
-						<Fa icon={accRef.icon} style={`color:${accRef.color};`} size={'lg'} />
-					{/each}
-				</div>
+				{#if profile.accolades && profile.accolades.length}
+					<div class="m-auto grid grid-cols-4 gap-2 px-2 py-4">
+						{#each profile.accolades as accolade, index}
+							{@const accRef = AccoladeReferences[accolade]}
+							<!--We do not mention the grid positioning-->
+							{@const colStart = (index + 1) % 4 == 0 ? -4 : ((index + 1) % 4) * -1}
+							{@const rowStart = Math.trunc((index != 4 ? index : 3 + 1) / 4) + 1}
+							<Fa
+								icon={accRef.icon}
+								size="lg"
+								style={`color:${accRef.color}; grid-column-start: ${colStart}; grid-row-start:${rowStart};`}
+								title={capitalizeFirstLetter(accolade)}
+							/>
+						{/each}
+					</div>
+				{/if}
 			</section>
 			{#if profile.id === user?.id}
 				<a
