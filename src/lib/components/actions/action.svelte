@@ -8,12 +8,12 @@
 	import { get } from 'svelte/store';
 	import { actionQueue, user } from '$lib/store';
 
-	let { action, amount = 1 }: { action: string; amount: Number } = $props();
+	let { action, amount = 1 }: { action: string; amount: number } = $props();
 
 	let loadedAction: Action | null = $state(null);
-	let loadedInputs: { item: Item; amount: Number }[] = $state<{ item: Item; amount: Number }[]>([]);
-	let loadedOutputs: { item: Item; min: Number; max: Number; chance?: Number }[] = $state<
-		{ item: Item; min: Number; max: Number; chance?: Number }[]
+	let loadedInputs: { item: Item; amount: number }[] = $state<{ item: Item; amount: number }[]>([]);
+	let loadedOutputs: { item: Item; min: number; max: number; chance?: number }[] = $state<
+		{ item: Item; min: number; max: number; chance?: number }[]
 	>([]);
 	onMount(() => {
 		loadedAction = getAction(action);

@@ -43,6 +43,28 @@ export async function load({ cookies, fetch }) {
     // Load inventory
     const userId = user?.id;
 
+    let queue: DBQueueAction[] = [];
+
+    const loadQueue = await fetch(`/api/action/${userId}`, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(async (response) => {
+            let responseJson = await response.json();
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return responseJson;
+        })
+        .then(async (data) => {
+            queue = data.queue;
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+
     let inventory: Item[] = [];
 
     const loadInventory = await fetch(`/api/inventory/${userId}`, {
@@ -110,27 +132,6 @@ export async function load({ cookies, fetch }) {
             console.error(error);
         });
 
-    let queue: DBQueueAction[] = [];
-
-    const loadQueue = await fetch(`/api/action/${userId}`, {
-        method: "GET",
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(async (response) => {
-            let responseJson = await response.json();
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return responseJson;
-        })
-        .then(async (data) => {
-            queue = data.queue;
-        })
-        .catch((error) => {
-            console.error(error);
-        });
 
     return { user, inventory, equipment, stats, queue };
 };

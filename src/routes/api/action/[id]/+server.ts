@@ -1,5 +1,7 @@
 import { supabase } from "$lib/auth/supabaseClient";
-import { actionRegistry, getAction, type Action, type DBQueueAction } from "$lib/types/action.js";
+import { getAction, type Action, type DBQueueAction } from "$lib/types/action.js";
+import type { Item } from "$lib/types/item";
+import { checkQueueCompletion, processQueue } from "$lib/utils/action.js";
 
 export async function GET({ params, cookies }) {
     const { id } = params;
@@ -32,7 +34,33 @@ export async function GET({ params, cookies }) {
     if (error) throw new Error(error.message);
 
     if (data.length == 1) {
-        return Response.json({ queue: data[0].queue, started: data[0].started_at }, { status: 200 });
+        const processedQueue = processQueue(data[0].queue, data[0].started_at);
+        const { data: invData, error: invError } = await supabase
+            .from("inventories")
+            .select("inventory_data")
+            .eq("player_id", id);
+
+        if (invError) throw new Error(invError.message);
+
+        const inventory: Item[] = invData[0].inventory_data;
+        console.log(inventory, processedQueue);
+
+        const updatedInv: Item[] = [...inventory, ...processedQueue.outputs];
+        const updatedQueue: DBQueueAction[] = processedQueue.queue;
+
+        const { error: updateInvErr } = await supabase
+            .from("inventories")
+            .update({ inventory_data: updatedInv })
+            .eq("player_id", id);
+        if (updateInvErr) throw new Error(updateInvErr.message);
+
+        const { error: updateQueueErr } = await supabase
+            .from("actions")
+            .update({ queue: updatedQueue })
+            .eq("player_id", id);
+        if (updateQueueErr) throw new Error(updateQueueErr.message);
+
+        return Response.json({ queue: updatedQueue, started: data[0].started_at, inventory: updatedInv }, { status: 200 });
     }
 
     return Response.json({ queue: undefined, started: undefined }, { status: 404 });
@@ -40,7 +68,7 @@ export async function GET({ params, cookies }) {
 
 export async function POST({ request, params, cookies }) {
     const { id } = params;
-    const { actionID, amount = 1 }: { actionID: string; amount: Number; } = await request.json();
+    const { actionID, amount = 1 }: { actionID: string; amount: number; } = await request.json();
 
     // Load supabase session
     const sessionCookie = cookies.get("supabase.session");

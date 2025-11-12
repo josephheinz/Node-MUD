@@ -13,7 +13,7 @@ export const baseStats = writable<StatList>(deepClone<StatList>(Stats));
 export const modifiedStats = writable<StatList>(deepClone<StatList>(Stats));
 export const actionQueue = writable<{
     action: Action;
-    amount: Number;
+    amount: number;
 }[]>([]);
 
 export const chatMessage = writable<string>("");

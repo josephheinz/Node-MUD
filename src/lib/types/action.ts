@@ -2,14 +2,14 @@ import { parse } from "yaml";
 
 export type ActionInput = {
     ids: string[];
-    amounts: Number[];
+    amounts: number[];
 };
 
 export type ChanceItem = {
     id: string;
-    min: Number;
-    max: Number;
-    chance?: Number; // Denominator of a fraction, e.g. 1/1000 to be rolled
+    min: number;
+    max: number;
+    chance?: number; // Denominator of a fraction, e.g. 1/1000 to be rolled
 };
 
 export type ActionOutput = {
@@ -20,12 +20,12 @@ export type Action = {
     name: string;
     inputs: ActionInput;
     outputs: ActionOutput;
-    time: Number;
+    time: number;
 };
 
 export type DBQueueAction = {
     action: Action;
-    amount: Number;
+    amount: number;
 }
 
 export function parseYAMLToAction(yamlString: string): Action {
@@ -41,6 +41,16 @@ export function parseYAMLToAction(yamlString: string): Action {
 export function getAction(id: string): Action | null {
     if (actionRegistry[id]) return actionRegistry[id];
     return null;
+}
+
+export function rollChance(item: ChanceItem): boolean {
+  // No chance means always succeeds
+  if (!item.chance || item.chance <= 1) return true;
+  return Math.floor(Math.random() * item.chance) === 0;
+}
+
+export function rollValue(item: ChanceItem): number {
+  return Math.floor(Math.random() * (item.max - item.min + 1)) + item.min;
 }
 
 export type ActionCategory = keyof typeof actionCategories;
