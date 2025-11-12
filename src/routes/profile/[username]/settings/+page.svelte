@@ -45,7 +45,6 @@
 				return responseJson;
 			})
 			.then((data) => {
-				console.log(data);
 				apiSettings = data.settings as IApiSettings;
 			})
 			.catch((error) => {

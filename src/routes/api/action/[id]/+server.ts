@@ -1,7 +1,8 @@
 import { supabase } from "$lib/auth/supabaseClient";
 import { getAction, type Action, type DBQueueAction } from "$lib/types/action.js";
-import type { Item } from "$lib/types/item";
+import type { DBItem, Item } from "$lib/types/item";
 import { checkQueueCompletion, processQueue } from "$lib/utils/action.js";
+import { encodeDbItem } from "$lib/utils/item.js";
 
 export async function GET({ params, cookies }) {
     const { id } = params;
@@ -43,14 +44,28 @@ export async function GET({ params, cookies }) {
         if (invError) throw new Error(invError.message);
 
         const inventory: Item[] = invData[0].inventory_data;
-        console.log(inventory, processedQueue);
 
         const updatedInv: Item[] = [...inventory, ...processedQueue.outputs];
+        let updatedDBInv: DBItem[] = [];
+
+        updatedInv.forEach((item: Item) => {
+            updatedDBInv.push(encodeDbItem(item));
+        });
+
         const updatedQueue: DBQueueAction[] = processedQueue.queue;
+
+        if (data[0].started_at != null && updatedQueue.length <= 0) {
+            const { error: updateStartErr } = await supabase
+                .from("actions")
+                .update({ started_at: null })
+                .eq("player_id", id);
+
+            if (updateStartErr) throw new Error(updateStartErr.message);
+        }
 
         const { error: updateInvErr } = await supabase
             .from("inventories")
-            .update({ inventory_data: updatedInv })
+            .update({ inventory_data: updatedDBInv })
             .eq("player_id", id);
         if (updateInvErr) throw new Error(updateInvErr.message);
 
@@ -106,10 +121,11 @@ export async function POST({ request, params, cookies }) {
     const currentQueue: DBQueueAction[] = getData[0].queue as DBQueueAction[];
 
     const updatedQueue: DBQueueAction[] = [...currentQueue, dbAction];
+    const started_at: Date = getData[0].started_at ?? new Date(Date.now());
 
     const { data: setData, error: setError } = await supabase
         .from("actions")
-        .update({ queue: updatedQueue })
+        .update({ queue: updatedQueue, started_at })
         .eq("player_id", id)
         .select();
 

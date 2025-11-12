@@ -1,4 +1,4 @@
-import { type Action, type DBQueueAction, type ChanceItem, rollChance, rollValue } from "$lib/types/action";
+import { type Action, type DBQueueAction, type ChanceItem, rollChance, rollValue, actionCategories } from "$lib/types/action";
 import type { Item } from "$lib/types/item";
 import { loadDbItem } from "./item";
 
@@ -39,7 +39,10 @@ export function processQueue(queue: DBQueueAction[], started_at: Date): { output
         let currentTimeDeficit: number = 0;
         while (currentTimeDeficit < timeDifference && queue.length >= 1) {
             let action = queue[0]
-            currentTimeDeficit += action.action.time;
+            currentTimeDeficit += action.action.time * 1000;
+
+            if (currentTimeDeficit > timeDifference) break;
+
             action.amount--;
             if (action.amount <= 0) queue.shift();
 

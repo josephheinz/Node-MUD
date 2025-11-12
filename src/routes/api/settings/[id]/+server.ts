@@ -65,7 +65,6 @@ export async function GET({ request, params }) {
 
     if (!settings || error) return Response.json({ status: 404 });
 
-    console.log(settings);
     return Response.json({ settings: settings[0] }, {
         status: 200,
         headers: { "Content-Type": "application/json" }
