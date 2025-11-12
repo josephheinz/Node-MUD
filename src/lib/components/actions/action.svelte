@@ -7,20 +7,35 @@
 	import numeral from 'numeral';
 	import { get } from 'svelte/store';
 	import { actionQueue, user } from '$lib/store';
+	import { getInventoryCounts } from '$lib/utils/action';
 
-	let { action, amount = 1 }: { action: string; amount: number } = $props();
+	let {
+		action,
+		amount = 1,
+		inventory
+	}: { action: string; amount: number; inventory: Item[] } = $props();
 
 	let loadedAction: Action | null = $state(null);
 	let loadedInputs: { item: Item; amount: number }[] = $state<{ item: Item; amount: number }[]>([]);
 	let loadedOutputs: { item: Item; min: number; max: number; chance?: number }[] = $state<
 		{ item: Item; min: number; max: number; chance?: number }[]
 	>([]);
+
+	let inputsPresent: { id: string; required: number; present: number }[] = $state<
+		{ id: string; required: number; present: number }[]
+	>([]);
+	let canAct: boolean = $state(true);
+
 	onMount(() => {
 		loadedAction = getAction(action);
 		if (loadedAction) {
 			loadedAction.inputs.ids.forEach((id) => {
 				let loadedItem: Item | null = getItem(id);
 				if (loadedItem) loadedInputs.push({ item: loadedItem, amount: amount });
+			});
+			inputsPresent = getInventoryCounts(inventory, loadedInputs);
+			loadedInputs.forEach((_, index) => {
+				if (inputsPresent[index].present < inputsPresent[index].required) canAct = false;
 			});
 
 			loadedAction.outputs.items.forEach((output) => {
@@ -37,6 +52,10 @@
 	});
 
 	async function addToQueue() {
+		loadedInputs.forEach((_, index) => {
+			if (inputsPresent[index].present < inputsPresent[index].required) return;
+		});
+
 		let addFetch = await fetch(`/api/action/${get(user)?.id}`, {
 			method: 'POST',
 			headers: {
@@ -67,9 +86,10 @@
 		<div>
 			<h1>Inputs:</h1>
 			<ul>
-				{#each loadedInputs as { item, amount }}
+				{#each loadedInputs as { item, amount }, index}
+					{@const itemsPresent = inputsPresent[index].present}
 					<li class="flex items-center justify-between gap-2">
-						<b>{amount}</b>
+						<b class={itemsPresent < amount ? 'text-rose-400' : ''}>{itemsPresent}/{amount}</b>
 						<ItemHover {item} />
 					</li>
 				{/each}
@@ -91,8 +111,10 @@
 		</div>
 		<span><b>Duration:</b> {loadedAction.time}s</span>
 		<button
-			class="m-auto cursor-pointer rounded-md border-2 border-indigo-700 bg-indigo-500 p-2 text-sm"
+			class="m-auto cursor-pointer rounded-md border-2 border-indigo-700 bg-indigo-500 p-2 text-sm
+			disabled:border-zinc-900 disabled:bg-zinc-700 disabled:text-zinc-500 disabled:cursor-not-allowed"
 			onclick={addToQueue}
+			disabled={!canAct}
 		>
 			Add to Queue
 		</button>

@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { actionCategories, getAction, type Action as TypeAction } from '$lib/types/action';
+	import type { Item } from '$lib/types/item';
 	import Action from './action.svelte';
 
-	const { category }: { category: string } = $props();
+	const { category, inventory }: { category: string; inventory: Item[] } = $props();
 	const categoryArray = actionCategories[category] ?? [];
 </script>
 
@@ -10,7 +11,7 @@
 	{#each categoryArray as actionName, index}
 		{@const action: TypeAction | null = getAction(actionName)}
 		{#if action}
-			<Action action={actionName} amount={1} />
+			<Action action={actionName} amount={1} {inventory} />
 		{/if}
 	{/each}
 </div>

@@ -88,7 +88,7 @@
 				{:else if currentTab === 'Reforge'}
 					<Reforger item={undefined} {equipment} {inventory} />
 				{:else if currentTab === 'Actions'}
-					<ActionSelect categories={Object.keys(actionCategories)} />
+					<ActionSelect categories={Object.keys(actionCategories)} {inventory} />
 				{/if}
 			</div>
 		</main>

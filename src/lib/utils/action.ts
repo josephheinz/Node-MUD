@@ -12,8 +12,6 @@ export function checkQueueCompletion(queue: DBQueueAction[], started_at: Date): 
     const now: number = Date.now();
     const totalActionTimeMilliseconds: number = totalActionTime * 1000;
 
-    console.log();
-
     if (now - startedMilliseconds > totalActionTimeMilliseconds) {
         return { status: "Complete", timings: { start: startedMilliseconds, now, total: totalActionTimeMilliseconds } };
     }
@@ -21,9 +19,21 @@ export function checkQueueCompletion(queue: DBQueueAction[], started_at: Date): 
     return { status: "Active", timings: { start: startedMilliseconds, now, total: totalActionTimeMilliseconds } };
 }
 
+export function getInventoryCounts(inventory: Item[], inputs: { item: Item; amount: number }[]): { id: string; required: number; present: number }[] {
+    return inputs.map(({ item, amount }) => {
+        const count = inventory.filter(i => i.id === item.id).length;
+        return {
+            id: item.id,
+            required: amount,
+            present: count,
+        };
+    });
+}
+
+
+
 export function processQueue(queue: DBQueueAction[], started_at: Date): { outputs: Item[]; queue: DBQueueAction[] } {
     const completion = checkQueueCompletion(queue, started_at);
-    console.log(completion);
 
     let outputs: Item[] = [];
 
