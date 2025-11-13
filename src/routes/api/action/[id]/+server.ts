@@ -1,8 +1,9 @@
 import { supabase } from "$lib/auth/supabaseClient";
 import { getAction, type Action, type DBQueueAction } from "$lib/types/action.js";
 import type { DBItem, Item } from "$lib/types/item";
-import { checkQueueCompletion, processQueue } from "$lib/utils/action.js";
+import { getInventoryCounts, processQueue, removeInputsFromInventory } from "$lib/utils/action.js";
 import { encodeDbItem } from "$lib/utils/item.js";
+import { getItem } from "$lib/types/item";
 
 export async function GET({ params, cookies }) {
     const { id } = params;
@@ -111,6 +112,30 @@ export async function POST({ request, params, cookies }) {
 
     const dbAction: DBQueueAction = { action, amount };
 
+    const { data: invData, error: invErr } = await supabase
+        .from("inventories")
+        .select("inventory_data")
+        .eq("player_id", id);
+
+    if (!invData || invData.length <= 0) throw new Error("Player does not have an inventory, so inputs cannot be taken out");
+
+    const inventory: Item[] = invData[0].inventory_data;
+
+    let loadedInputs: { item: Item; amount: number }[] = [];
+    let inputsPresent: { id: string; required: number; present: number }[];
+
+    action.inputs.ids.forEach((_id) => {
+        let loadedItem: Item | null = getItem(_id);
+        if (loadedItem) loadedInputs.push({ item: loadedItem, amount: amount });
+    });
+
+    inputsPresent = getInventoryCounts(inventory, loadedInputs);
+    loadedInputs.forEach((_, index) => {
+        if (inputsPresent[index].present < inputsPresent[index].required * amount) return;
+    });
+
+    const updatedInventory: Item[] = removeInputsFromInventory(inventory, loadedInputs);
+
     const { data: getData, error: getError } = await supabase
         .from("actions")
         .select("*")
@@ -129,7 +154,12 @@ export async function POST({ request, params, cookies }) {
         .eq("player_id", id)
         .select();
 
+    const { error: setInvErr } = await supabase
+        .from("inventories")
+        .update({ inventory_data: updatedInventory })
+        .eq("player_id", id);
+
     if (!setData || setError) throw new Error(setError.message);
 
-    return Response.json({ queue: setData[0].queue }, { status: 200 });
+    return Response.json({ queue: setData[0].queue, inventory: updatedInventory }, { status: 200 });
 }

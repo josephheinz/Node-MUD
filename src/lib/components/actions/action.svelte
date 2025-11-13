@@ -8,6 +8,7 @@
 	import { get } from 'svelte/store';
 	import { actionQueue, user } from '$lib/store';
 	import { getInventoryCounts } from '$lib/utils/action';
+	import * as store from '$lib/store';
 
 	let {
 		action,
@@ -74,6 +75,9 @@
 				if (data.queue) {
 					actionQueue.set(data.queue);
 				}
+				if (data.inventory) {
+					store.inventory.set(data.inventory);
+				}
 			});
 	}
 </script>
@@ -112,7 +116,7 @@
 		<span><b>Duration:</b> {loadedAction.time}s</span>
 		<button
 			class="m-auto cursor-pointer rounded-md border-2 border-indigo-700 bg-indigo-500 p-2 text-sm
-			disabled:border-zinc-900 disabled:bg-zinc-700 disabled:text-zinc-500 disabled:cursor-not-allowed"
+			disabled:cursor-not-allowed disabled:border-zinc-900 disabled:bg-zinc-700 disabled:text-zinc-500"
 			onclick={addToQueue}
 			disabled={!canAct}
 		>

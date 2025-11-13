@@ -30,6 +30,25 @@ export function getInventoryCounts(inventory: Item[], inputs: { item: Item; amou
     });
 }
 
+export function removeInputsFromInventory(
+    inventory: Item[],
+    inputs: { item: Item; amount: number }[]
+): Item[] {
+    // Make a mutable copy of remaining counts per id
+    const remaining = Object.fromEntries(
+        inputs.map(({ item, amount }) => [item.id, amount])
+    );
+
+    // Filter out items used for the action
+    return inventory.filter(i => {
+        const needed = remaining[i.id];
+        if (needed && needed > 0) {
+            remaining[i.id]--;
+            return false;
+        }
+        return true;
+    });
+}
 
 
 export function processQueue(queue: DBQueueAction[], started_at: Date): { outputs: Item[]; queue: DBQueueAction[] } {
