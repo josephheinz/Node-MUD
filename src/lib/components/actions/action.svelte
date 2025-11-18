@@ -30,9 +30,11 @@
 	onMount(() => {
 		loadedAction = getAction(action);
 		if (loadedAction) {
-			loadedAction.inputs.ids.forEach((id) => {
+			loadedAction.inputs.ids.forEach((id, index) => {
 				let loadedItem: Item | null = getItem(id);
-				if (loadedItem) loadedInputs.push({ item: loadedItem, amount: amount });
+				if (loadedItem)
+					loadedInputs.push({ item: loadedItem, amount: loadedAction?.inputs.amounts[index] ?? 1 });
+				console.log(loadedItem, loadedAction?.inputs.amounts[index]);
 			});
 			inputsPresent = getInventoryCounts(inventory, loadedInputs);
 			loadedInputs.forEach((_, index) => {
@@ -57,6 +59,10 @@
 			if (inputsPresent[index].present < inputsPresent[index].required) return;
 		});
 
+		const now: number = Date.now();
+
+		const inventorySnapshot: Item[] = get(store.inventory);
+
 		let addFetch = await fetch(`/api/action/${get(user)?.id}`, {
 			method: 'POST',
 			headers: {
@@ -74,6 +80,11 @@
 			.then((data) => {
 				if (data.queue) {
 					actionQueue.set(data.queue);
+					if (!get(store.queueActive)) {
+						store.queueStart.set(now);
+						store.queueEnd.set(now + (loadedAction?.time ?? 0) * 1000);
+						store.queueActive.set(true);
+					}
 				}
 				if (data.inventory) {
 					store.inventory.set(data.inventory);
@@ -106,7 +117,7 @@
 					{@const chanceDecimal = chance ? 1 / (chance as number) : 1}
 					{@const chancePercent = numeral(chanceDecimal).format('0[.][0000]%')}
 					<li>
-						<b>{min} - {max}</b>
+						<b>{min != max ? `${min} - ${max}` : `${max}`}</b>
 						<ItemHover {item} />
 						<span>{chancePercent == '100%' ? '' : chancePercent}</span>
 					</li>

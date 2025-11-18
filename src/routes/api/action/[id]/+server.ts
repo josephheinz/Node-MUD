@@ -44,8 +44,10 @@ export async function GET({ params, cookies }) {
 
         if (invError) throw new Error(invError.message);
 
+        // Inventory is an array of Item objects
         const inventory: Item[] = invData[0].inventory_data;
 
+        // Combining old inventory with new outputs from the queue
         const updatedInv: Item[] = [...inventory, ...processedQueue.outputs];
         let updatedDBInv: DBItem[] = [];
 
@@ -122,19 +124,39 @@ export async function POST({ request, params, cookies }) {
     const inventory: Item[] = invData[0].inventory_data;
 
     let loadedInputs: { item: Item; amount: number }[] = [];
-    let inputsPresent: { id: string; required: number; present: number }[];
 
-    action.inputs.ids.forEach((_id) => {
-        let loadedItem: Item | null = getItem(_id);
-        if (loadedItem) loadedInputs.push({ item: loadedItem, amount: amount });
-    });
+    // 1. Determine required inputs
+    // NOTE: Action inputs use parallel arrays (ids and amounts). We need to combine them.
+    for (let i = 0; i < action.inputs.ids.length; i++) {
+        const itemId = action.inputs.ids[i];
+        const requiredAmount = action.inputs.amounts[i] * amount; // Scale by queue amount
+        const loadedItem: Item | null = getItem(itemId);
 
-    inputsPresent = getInventoryCounts(inventory, loadedInputs);
-    loadedInputs.forEach((_, index) => {
-        if (inputsPresent[index].present < inputsPresent[index].required * amount) return;
-    });
+        // Push the item object and the total required amount
+        if (loadedItem) {
+            // Create a temporary Item object to represent the input requirement
+            loadedInputs.push({ item: loadedItem, amount: requiredAmount });
+        }
+    }
 
+
+    // 2. Check if all required inputs are present
+    const inputsPresent = getInventoryCounts(inventory, loadedInputs);
+
+    // Check if the player can afford all inputs
+    const canAfford = inputsPresent.every(input => input.present >= input.required);
+
+    // 🔥 CRITICAL FIX: Halt if inputs are insufficient
+    if (!canAfford) {
+        return Response.json({ status: "Insufficient items in inventory." }, { status: 403 });
+    }
+
+    // 3. Remove required inputs from inventory (only if affordable)
+    // The utility function `removeInputsFromInventory` handles the array removal correctly 
+    // for the item-per-slot inventory model.
     const updatedInventory: Item[] = removeInputsFromInventory(inventory, loadedInputs);
+
+    // 4. Update Queue and Database (rest of the original logic)
 
     const { data: getData, error: getError } = await supabase
         .from("actions")
@@ -154,12 +176,19 @@ export async function POST({ request, params, cookies }) {
         .eq("player_id", id)
         .select();
 
+    // Must encode updated inventory array for the database
+    let updatedDBInv: DBItem[] = [];
+    updatedInventory.forEach((item: Item) => {
+        updatedDBInv.push(encodeDbItem(item));
+    });
+
     const { error: setInvErr } = await supabase
         .from("inventories")
-        .update({ inventory_data: updatedInventory })
+        .update({ inventory_data: updatedDBInv })
         .eq("player_id", id);
 
     if (!setData || setError) throw new Error(setError.message);
+    if (setInvErr) throw new Error(setInvErr.message);
 
     return Response.json({ queue: setData[0].queue, inventory: updatedInventory }, { status: 200 });
 }

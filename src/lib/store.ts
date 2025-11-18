@@ -16,5 +16,9 @@ export const actionQueue = writable<{
     amount: number;
 }[]>([]);
 
+export const queueStart = writable<number | null>();
+export const queueEnd = writable<number | null>();
+export const queueActive = writable<boolean>(false);
+
 export const chatMessage = writable<string>("");
 export const chatItemLinkTable = writable<Record<number, Item>>({});

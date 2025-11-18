@@ -62,7 +62,7 @@ export function processQueue(queue: DBQueueAction[], started_at: Date): { output
                 outputs = [...outputs, ...completeAction(action.action)];
             }
         });
-        queue = [];
+        queue.length = 0;
     } else if (completion.status === "Active") {
         let timeDifference: number = completion.timings.now - completion.timings.start;
         let currentTimeDeficit: number = 0;

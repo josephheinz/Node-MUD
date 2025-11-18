@@ -11,7 +11,6 @@
 	import Reforger from '$lib/components/reforger.svelte';
 	import Chat from '$lib/components/chat/chat.svelte';
 	import { type User } from '@supabase/supabase-js';
-	import Action from '$lib/components/actions/action.svelte';
 	import { actionCategories, type DBQueueAction } from '$lib/types/action';
 	import Queue from '$lib/components/actions/queue.svelte';
 	import ActionSelect from '$lib/components/actions/actionSelect.svelte';
@@ -23,6 +22,7 @@
 	let equipment = $state<Equipment>(get(store.equipment));
 	let stats = $state<StatList>(get(store.modifiedStats)); // not base because base only gets updated when character upgrades are made
 	let queue = $state<DBQueueAction[]>(get(store.actionQueue));
+	let queueActive = $state<boolean>(get(store.queueActive));
 
 	let tabs: string[] = ['Character', 'Reforge', 'Actions'];
 	let currentTab: string = $state(tabs[0]);
@@ -48,6 +48,10 @@
 	store.actionQueue.subscribe((value) => {
 		queue = value;
 	});
+
+	store.queueActive.subscribe((value) => {
+		queueActive = value;
+	});
 </script>
 
 <title>Web-based Runescape-like Alpha</title>
@@ -56,7 +60,7 @@
 <div class="z-0 flex h-full items-start justify-start">
 	<div class="relative flex h-full w-full flex-col items-start justify-start">
 		<nav class="flex h-min w-full items-center justify-evenly border-b-2 border-zinc-600 p-2">
-			<Queue {queue} />
+			<Queue {queue} running={queueActive} />
 			{#if user}
 				<div class="flex grow items-start justify-end">
 					<ProfileDropdown {user} />

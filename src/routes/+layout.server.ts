@@ -44,6 +44,7 @@ export async function load({ cookies, fetch }) {
     const userId = user?.id;
 
     let queue: DBQueueAction[] = [];
+    let started: Date = new Date(Date.now());
 
     const loadQueue = await fetch(`/api/action/${userId}`, {
         method: "GET",
@@ -60,6 +61,8 @@ export async function load({ cookies, fetch }) {
         })
         .then(async (data) => {
             queue = data.queue;
+            started = data.started;
+            console.log(started)
         })
         .catch((error) => {
             console.error(error);
@@ -133,5 +136,5 @@ export async function load({ cookies, fetch }) {
         });
 
 
-    return { user, inventory, equipment, stats, queue };
+    return { user, inventory, equipment, stats, queue, started };
 };
