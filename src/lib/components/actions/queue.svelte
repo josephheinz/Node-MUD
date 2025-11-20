@@ -50,6 +50,7 @@
 				stopTimer();
 				isUpdating = true;
 
+				await new Promise((resolve) => setTimeout(resolve, 100));
 				await tryUpdateQueue();
 
 				isUpdating = false;
@@ -79,6 +80,8 @@
 			elapsedPercent = 0;
 
 			if (shouldContinue) {
+				isUpdating = false;
+
 				store.queueStart.set(Date.now());
 				startTimer();
 			} else {
