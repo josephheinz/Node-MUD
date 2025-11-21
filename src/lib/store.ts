@@ -22,3 +22,5 @@ export const queueActive = writable<boolean>(false);
 
 export const chatMessage = writable<string>("");
 export const chatItemLinkTable = writable<Record<number, Item>>({});
+
+export const actionModalData = writable<{ action: string; visible: boolean; amount: number }>({ action: "", visible: false, amount: 1 });

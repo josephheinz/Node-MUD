@@ -1,137 +1,19 @@
 <script lang="ts">
 	import { getAction, type Action } from '$lib/types/action';
-	import { onMount } from 'svelte';
-	import ItemHover from '../chat/itemHover.svelte';
-	import type { Item } from '$lib/types/item';
-	import { getItem } from '$lib/types/item';
-	import numeral from 'numeral';
-	import { get } from 'svelte/store';
-	import { actionQueue, user } from '$lib/store';
-	import { getInventoryCounts } from '$lib/utils/action';
-	import * as store from '$lib/store';
 
-	let {
-		action,
-		amount = 1,
-		inventory
-	}: { action: string; amount: number; inventory: Item[] } = $props();
+	let { action, onclick: onclickfunc }: { action: string; onclick: (action: string) => void } =
+		$props();
 
-	let loadedAction: Action | null = $state(null);
-	let loadedInputs: { item: Item; amount: number }[] = $state<{ item: Item; amount: number }[]>([]);
-	let loadedOutputs: { item: Item; min: number; max: number; chance?: number }[] = $state<
-		{ item: Item; min: number; max: number; chance?: number }[]
-	>([]);
-
-	let inputsPresent: { id: string; required: number; present: number }[] = $state<
-		{ id: string; required: number; present: number }[]
-	>([]);
-	let canAct: boolean = $state(true);
-
-	onMount(() => {
-		loadedAction = getAction(action);
-		if (loadedAction) {
-			loadedAction.inputs.ids.forEach((id, index) => {
-				let loadedItem: Item | null = getItem(id);
-				if (loadedItem)
-					loadedInputs.push({ item: loadedItem, amount: loadedAction?.inputs.amounts[index] ?? 1 });
-				console.log(loadedItem, loadedAction?.inputs.amounts[index]);
-			});
-			inputsPresent = getInventoryCounts(inventory, loadedInputs);
-			loadedInputs.forEach((_, index) => {
-				if (inputsPresent[index].present < inputsPresent[index].required) canAct = false;
-			});
-
-			loadedAction.outputs.items.forEach((output) => {
-				let loadedItem: Item | null = getItem(output.id);
-				if (loadedItem)
-					loadedOutputs.push({
-						item: loadedItem,
-						min: output.min,
-						max: output.max,
-						chance: output.chance
-					});
-			});
-		}
-	});
-
-	async function addToQueue() {
-		loadedInputs.forEach((_, index) => {
-			if (inputsPresent[index].present < inputsPresent[index].required) return;
-		});
-
-		const now: number = Date.now();
-
-		const inventorySnapshot: Item[] = get(store.inventory);
-
-		let addFetch = await fetch(`/api/action/${get(user)?.id}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ actionID: action, amount: 1 })
-		})
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error('HTTP Error');
-				}
-
-				return response.json();
-			})
-			.then((data) => {
-				if (data.queue) {
-					actionQueue.set(data.queue);
-					if (!get(store.queueActive)) {
-						store.queueStart.set(now);
-						store.queueEnd.set(now + (loadedAction?.time ?? 0) * 1000);
-						store.queueActive.set(true);
-					}
-				}
-				if (data.inventory) {
-					store.inventory.set(data.inventory);
-				}
-			});
-	}
+	let loadedAction: Action | null = $derived(getAction(action));
 </script>
 
 {#if loadedAction}
-	<div
-		class="flex aspect-1/1 flex-col items-start justify-start gap-2 rounded-md border-2 border-zinc-700 bg-zinc-800 p-2"
+	<button
+		class="flex aspect-1/1 cursor-pointer items-center justify-center gap-2 rounded-md border-2 border-zinc-700 bg-zinc-800 p-4"
+		onclick={() => {
+			onclickfunc(action);
+		}}
 	>
-		<h1 class="w-full text-center text-xl font-bold">{loadedAction.name}</h1>
-		<div>
-			<h1>Inputs:</h1>
-			<ul>
-				{#each loadedInputs as { item, amount }, index}
-					{@const itemsPresent = inputsPresent[index].present}
-					<li class="flex items-center justify-between gap-2">
-						<b class={itemsPresent < amount ? 'text-rose-400' : ''}>{itemsPresent}/{amount}</b>
-						<ItemHover {item} />
-					</li>
-				{/each}
-			</ul>
-		</div>
-		<div>
-			<h1>Outputs:</h1>
-			<ul>
-				{#each loadedOutputs as { item, min, max, chance }}
-					{@const chanceDecimal = chance ? 1 / (chance as number) : 1}
-					{@const chancePercent = numeral(chanceDecimal).format('0[.][0000]%')}
-					<li>
-						<b>{min != max ? `${min} - ${max}` : `${max}`}</b>
-						<ItemHover {item} />
-						<span>{chancePercent == '100%' ? '' : chancePercent}</span>
-					</li>
-				{/each}
-			</ul>
-		</div>
-		<span><b>Duration:</b> {loadedAction.time}s</span>
-		<button
-			class="m-auto cursor-pointer rounded-md border-2 border-indigo-700 bg-indigo-500 p-2 text-sm
-			disabled:cursor-not-allowed disabled:border-zinc-900 disabled:bg-zinc-700 disabled:text-zinc-500"
-			onclick={addToQueue}
-			disabled={!canAct}
-		>
-			Add to Queue
-		</button>
-	</div>
+		<h1 class="w-full text-center text-lg font-bold">{loadedAction.name}</h1>
+	</button>
 {/if}

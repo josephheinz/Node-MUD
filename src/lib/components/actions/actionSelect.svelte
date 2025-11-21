@@ -1,9 +1,8 @@
 <script lang="ts">
 	import ActionCategory from './actionCategory.svelte';
 	import type { ActionCategory as AC } from '$lib/types/action';
-	import type { Item } from '$lib/types/item';
 
-	const { categories, inventory }: { categories: AC[]; inventory: Item[] } = $props();
+	const { categories }: { categories: AC[]; } = $props();
 	let selectedCategory: AC = $state(categories[0]);
 </script>
 
@@ -21,6 +20,6 @@
 		{/each}
 	</aside>
 	<main class="h-full grow p-2">
-		<ActionCategory category={selectedCategory} {inventory} />
+		<ActionCategory category={selectedCategory} />
 	</main>
 </div>

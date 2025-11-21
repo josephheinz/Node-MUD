@@ -14,6 +14,7 @@
 	import { actionCategories, type DBQueueAction } from '$lib/types/action';
 	import Queue from '$lib/components/actions/queue.svelte';
 	import ActionSelect from '$lib/components/actions/actionSelect.svelte';
+	import ActionModal from '$lib/components/actions/actionModal.svelte';
 
 	let loginModalOpen = $state(false);
 
@@ -32,26 +33,15 @@
 		store.modifiedStats.set(getModifiedStats(get(store.baseStats), get(store.equipment)));
 	});
 
-	store.user.subscribe((value) => {
-		user = value;
-	});
-
 	store.equipment.subscribe((value) => {
 		equipment = value;
 		store.modifiedStats.set(getModifiedStats(get(store.baseStats), equipment));
 	});
 
-	store.modifiedStats.subscribe((value) => {
-		stats = value;
-	});
-
-	store.actionQueue.subscribe((value) => {
-		queue = value;
-	});
-
-	store.queueActive.subscribe((value) => {
-		queueActive = value;
-	});
+	store.user.subscribe((value) => (user = value));
+	store.modifiedStats.subscribe((value) => (stats = value));
+	store.actionQueue.subscribe((value) => (queue = value));
+	store.queueActive.subscribe((value) => (queueActive = value));
 </script>
 
 <title>Web-based Runescape-like Alpha</title>
@@ -71,6 +61,7 @@
 			{/if}
 		</nav>
 		{#if user}
+			<ActionModal />
 			<Chat {user} />
 		{/if}
 		<main class="flex grow items-start justify-start">
@@ -92,7 +83,7 @@
 				{:else if currentTab === 'Reforge'}
 					<Reforger item={undefined} {equipment} {inventory} />
 				{:else if currentTab === 'Actions'}
-					<ActionSelect categories={Object.keys(actionCategories)} {inventory} />
+					<ActionSelect categories={Object.keys(actionCategories)} />
 				{/if}
 			</div>
 		</main>

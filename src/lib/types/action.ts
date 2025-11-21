@@ -44,19 +44,19 @@ export function getAction(id: string): Action | null {
 }
 
 export function rollChance(item: ChanceItem): boolean {
-  // No chance means always succeeds
-  if (!item.chance || item.chance <= 1) return true;
-  return Math.floor(Math.random() * item.chance) === 0;
+    // No chance means always succeeds
+    if (!item.chance || item.chance <= 1) return true;
+    return Math.floor(Math.random() * item.chance) === 0;
 }
 
 export function rollValue(item: ChanceItem): number {
-  return Math.floor(Math.random() * (item.max - item.min + 1)) + item.min;
+    return Math.floor(Math.random() * (item.max - item.min + 1)) + item.min;
 }
 
 export type ActionCategory = keyof typeof actionCategories;
 
 export const actionCategories: Record<string, Array<string>> = {
-    "test": ["test_action"]
+    "test": ["test_action", "test_action2"]
 };
 
 export const actionRegistry: Record<string, Action> = {};

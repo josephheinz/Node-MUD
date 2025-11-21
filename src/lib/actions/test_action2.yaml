@@ -1,0 +1,12 @@
+- id: test_action2
+  name: Test Action 2
+  inputs:
+    ids:
+      - gold_sword
+    amounts:
+      - 1
+  outputs:
+    - id: iron_sword
+      min: 1
+      max: 1
+  time: 5
