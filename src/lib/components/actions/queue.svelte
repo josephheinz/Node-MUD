@@ -67,7 +67,6 @@
 			}
 
 			const data = await response.json();
-			console.log(data);
 			if (data.queue) {
 				store.actionQueue.set(data.queue);
 			}
@@ -98,17 +97,9 @@
 		}
 	}
 
-	store.queueEnd.subscribe((value) => {
-		copyEnd = value ?? 0;
-	});
-
-	store.queueStart.subscribe((value) => {
-		copyStart = value ?? 0;
-	});
-
-	store.actionQueue.subscribe((value) => {
-		queue = value;
-	});
+	store.queueEnd.subscribe((value) => (copyEnd = value ?? 0));
+	store.queueStart.subscribe((value) => (copyStart = value ?? 0));
+	store.actionQueue.subscribe((value) => (queue = value));
 
 	store.queueActive.subscribe((value) => {
 		if (value === true) {

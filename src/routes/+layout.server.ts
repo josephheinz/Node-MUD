@@ -62,7 +62,6 @@ export async function load({ cookies, fetch }) {
         .then(async (data) => {
             queue = data.queue;
             started = data.started;
-            console.log(started)
         })
         .catch((error) => {
             console.error(error);

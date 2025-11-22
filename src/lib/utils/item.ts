@@ -4,6 +4,7 @@ import { deepClone } from "./general";
 import { get } from "svelte/store";
 import * as store from "$lib/store";
 import { instantiateModifier, instantiateModifierFromClass } from "$lib/modifiers/modifiersRegistry";
+import type { StackableModifier } from "$lib/modifiers/basicModifiers";
 
 export function ConglomerateItems(inventory: Item[], equipment: Equipment): Item[] {
     let inventoryCopy: Item[] = deepClone<Item[]>(inventory) ?? [];
@@ -63,34 +64,56 @@ export async function getItem(id: string): Promise<Item> {
 }
 
 export function loadDbItem(item: DBItem): Item {
-    const base = itemRegistry[item.id];
-    base.uid = crypto.randomUUID();
+    const base = deepClone(itemRegistry[item.id]);
     if (!base) throw new Error(`Unknown item id: ${item.id}`);
 
-    const playerModifiers = item.modifiers?.map(instantiateModifier) ?? [];
+    const overrides = item.modifiers ?? [];
+
+    // Merge base modifiers with overrides
+    const mergedModifiers = base.modifiers.map(baseMod => {
+        const o = overrides.find(om => om.type === baseMod.type);
+        return o ? { ...baseMod, ...o } : baseMod;
+    });
 
     return {
         ...base,
-        // merge modifiers: base first, then player ones
-        modifiers: [...base.modifiers, ...playerModifiers]
+        uid: crypto.randomUUID(),
+        modifiers: mergedModifiers
     };
 }
 
 export function encodeDbItem(item: Item): DBItem {
     const base = itemRegistry[item.id];
 
-    // Use both type + value (or the whole object) to compare
-    const baseMods = new Set(
-        (base.modifiers ?? []).map(m => JSON.stringify(m))
-    );
+    const encodedMods = [];
 
-    return {
-        id: item.id,
-        modifiers: (item.modifiers ?? []).filter(
-            mod => !baseMods.has(JSON.stringify(mod))
-        )
-    };
+    for (const mod of item.modifiers ?? []) {
+        const baseMod = base.modifiers.find(b => b.type === mod.type);
+
+        if (!baseMod) {
+            // Not a base modifier → store full modifier
+            encodedMods.push(mod);
+            continue;
+        }
+
+        // Compare field-by-field
+        const diff: any = { type: mod.type };
+
+        let changed = false;
+        for (const key of Object.keys(mod) as (keyof IItemModifier)[]) {
+            if (mod[key] !== baseMod[key]) {
+                diff[key] = mod[key];
+                changed = true;
+            }
+        }
+
+        // Only store if anything actually changed
+        if (changed) encodedMods.push(diff);
+    }
+
+    return { id: item.id, modifiers: encodedMods };
 }
+
 
 export function hydrateInventory(inventory: DBItem[]): Item[] {
     let hydratedInventory: Item[] = [];
@@ -105,4 +128,35 @@ export function hydrateInventory(inventory: DBItem[]): Item[] {
 
 export function reviveModifiers(mods: IItemModifier[]): IItemModifier[] {
     return mods.map(mod => instantiateModifierFromClass(mod));
+}
+
+export function tryStackItemInInventory(item: Item, inventory: Item[]): Item[] {
+    const stackableModifier: StackableModifier | undefined = item.modifiers.find(
+        (m) => m.type == 'Stackable'
+    ) as StackableModifier;
+
+    if (!stackableModifier) {
+        console.log("Item not stackable");
+        inventory.push(item);
+        return inventory;
+    }
+
+    const inventoryStacks: Item[] = inventory.filter(i => i.id === item.id);
+
+    if (inventoryStacks.length === 0) {
+        console.log("No items in inventory to stack onto");
+        inventory.push(item);
+        return inventory;
+    }
+
+    let updatedStackIndex: number = inventory.findIndex(i => i.id === item.id && (i.modifiers.find(m => m.type === "Stackable") as StackableModifier)?.value + stackableModifier.value < stackableModifier.stack);
+
+    if (updatedStackIndex === -1) {
+        inventory.push(item);
+        return inventory;
+    } else {
+        const stackModifierIndex: number = inventory[updatedStackIndex].modifiers.findIndex(m => m.type === "Stackable");
+        (inventory[updatedStackIndex].modifiers[stackModifierIndex] as StackableModifier).value += stackableModifier.value;
+        return inventory;
+    }
 }

@@ -3,7 +3,6 @@
 	import { getItem, type Item } from '$lib/types/item';
 	import { getInventoryCounts } from '$lib/utils/action';
 	import { faX } from '@fortawesome/free-solid-svg-icons';
-	import { onMount } from 'svelte';
 	import Fa from 'svelte-fa';
 	import ItemHover from '../chat/itemHover.svelte';
 	import numeral from 'numeral';
@@ -20,24 +19,32 @@
 
 	let loadedInputs = $derived.by(() => {
 		if (!loadedAction) return [];
-		return loadedAction.inputs.ids
-			.map((id, i) => {
-				const item = getItem(id);
-				if (!item) return null;
-				return { item, amount: loadedAction.inputs.amounts[i] ?? 1 };
-			})
-			.filter(Boolean) as { item: Item; amount: number }[];
+		if (!loadedAction.inputs || !loadedAction.inputs.ids || !loadedAction.inputs.amounts) return [];
+
+		return (
+			(loadedAction.inputs.ids
+				.map((id, i) => {
+					const item = getItem(id);
+					if (!item) return null;
+					return { item, amount: loadedAction.inputs.amounts[i] ?? 1 };
+				})
+				.filter(Boolean) as { item: Item; amount: number }[]) ?? []
+		);
 	});
 
 	let loadedOutputs = $derived.by(() => {
 		if (!loadedAction) return [];
-		return loadedAction.outputs.items
-			.map((o) => {
-				const item = getItem(o.id);
-				if (!item) return null;
-				return { item, min: o.min, max: o.max, chance: o.chance };
-			})
-			.filter(Boolean) as { item: Item; min: number; max: number; chance?: number }[];
+		if (!loadedAction.outputs) return [];
+
+		return (
+			(loadedAction.outputs.items
+				.map((o) => {
+					const item = getItem(o.id);
+					if (!item) return null;
+					return { item, min: o.min, max: o.max, chance: o.chance };
+				})
+				.filter(Boolean) as { item: Item; min: number; max: number; chance?: number }[]) ?? []
+		);
 	});
 
 	let inputsPresent = $derived.by(() => getInventoryCounts(inventory, loadedInputs));
@@ -108,7 +115,7 @@
 			>
 			<h1 class="w-full text-center text-xl font-bold">{loadedAction?.name ?? 'Loading'}</h1>
 			<div>
-				<h1 class="text-lg font-semibold">Inputs:</h1>
+				<h1 class="text-center text-lg font-semibold">Inputs:</h1>
 				<ul>
 					{#each loadedInputs as { item, amount }, index}
 						{@const itemsPresent = inputsPresent[index].present}
@@ -119,10 +126,13 @@
 							<ItemHover {item} />
 						</li>
 					{/each}
+					{#if loadedInputs.length == 0}
+						<li>None</li>
+					{/if}
 				</ul>
 			</div>
 			<div>
-				<h1 class="text-lg font-semibold">Outputs:</h1>
+				<h1 class="text-center text-lg font-semibold">Outputs:</h1>
 				<ul>
 					{#each loadedOutputs as { item, min, max, chance }}
 						{@const chanceDecimal = chance ? 1 / (chance as number) : 1}

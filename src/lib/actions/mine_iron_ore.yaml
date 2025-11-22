@@ -1,0 +1,10 @@
+- id: mine_iron_ore
+  name: Mine Iron Ore
+  inputs:
+    ids:
+    amounts:
+  outputs:
+    - id: iron_bar
+      min: 3
+      max: 5
+  time: 5

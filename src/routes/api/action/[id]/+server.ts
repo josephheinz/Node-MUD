@@ -2,7 +2,7 @@ import { supabase } from "$lib/auth/supabaseClient";
 import { getAction, type Action, type DBQueueAction } from "$lib/types/action.js";
 import type { DBItem, Item } from "$lib/types/item";
 import { getInventoryCounts, processQueue, removeInputsFromInventory } from "$lib/utils/action.js";
-import { encodeDbItem } from "$lib/utils/item.js";
+import { encodeDbItem, hydrateInventory, tryStackItemInInventory } from "$lib/utils/item.js";
 import { getItem } from "$lib/types/item";
 
 export async function GET({ params, cookies }) {
@@ -45,10 +45,13 @@ export async function GET({ params, cookies }) {
         if (invError) throw new Error(invError.message);
 
         // Inventory is an array of Item objects
-        const inventory: Item[] = invData[0].inventory_data;
+        const inventory: Item[] = hydrateInventory(invData[0].inventory_data);
 
         // Combining old inventory with new outputs from the queue
-        const updatedInv: Item[] = [...inventory, ...processedQueue.outputs];
+        let updatedInv: Item[] = [...inventory];
+        processedQueue.outputs.forEach((output: Item) => {
+            updatedInv = tryStackItemInInventory(output, updatedInv);
+        });
         let updatedDBInv: DBItem[] = [];
 
         updatedInv.forEach((item: Item) => {
@@ -121,42 +124,32 @@ export async function POST({ request, params, cookies }) {
 
     if (!invData || invData.length <= 0) throw new Error("Player does not have an inventory, so inputs cannot be taken out");
 
-    const inventory: Item[] = invData[0].inventory_data;
+    const inventory: Item[] = hydrateInventory(invData[0].inventory_data);
 
     let loadedInputs: { item: Item; amount: number }[] = [];
 
-    // 1. Determine required inputs
-    // NOTE: Action inputs use parallel arrays (ids and amounts). We need to combine them.
+    action.inputs.ids = action.inputs.ids ?? [];
+    action.inputs.amounts = action.inputs.amounts ?? [];
+
     for (let i = 0; i < action.inputs.ids.length; i++) {
         const itemId = action.inputs.ids[i];
         const requiredAmount = action.inputs.amounts[i] * amount; // Scale by queue amount
         const loadedItem: Item | null = getItem(itemId);
 
-        // Push the item object and the total required amount
         if (loadedItem) {
-            // Create a temporary Item object to represent the input requirement
             loadedInputs.push({ item: loadedItem, amount: requiredAmount });
         }
     }
 
-
-    // 2. Check if all required inputs are present
     const inputsPresent = getInventoryCounts(inventory, loadedInputs);
 
-    // Check if the player can afford all inputs
     const canAfford = inputsPresent.every(input => input.present >= input.required);
 
-    // 🔥 CRITICAL FIX: Halt if inputs are insufficient
     if (!canAfford) {
         return Response.json({ status: "Insufficient items in inventory." }, { status: 403 });
     }
 
-    // 3. Remove required inputs from inventory (only if affordable)
-    // The utility function `removeInputsFromInventory` handles the array removal correctly 
-    // for the item-per-slot inventory model.
     const updatedInventory: Item[] = removeInputsFromInventory(inventory, loadedInputs);
-
-    // 4. Update Queue and Database (rest of the original logic)
 
     const { data: getData, error: getError } = await supabase
         .from("actions")

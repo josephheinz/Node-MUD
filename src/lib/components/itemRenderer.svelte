@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { type Item, getItemData } from '$lib/types/item';
+	import { type IItemModifier, type Item, getItemData } from '$lib/types/item';
 	import { tooltip } from './tooltip';
 	import { Equip, Unequip, type EquipmentSlot } from '$lib/types/equipment';
 	import { contextMenu, type ContextMenuItem } from './contextmenu';
@@ -7,6 +7,9 @@
 	import * as store from '$lib/store';
 	import { linkToChat } from '$lib/utils/chat';
 	import { determineSlot } from '$lib/utils/item';
+	import type { StackableModifier } from '$lib/modifiers/basicModifiers';
+	import { onMount } from 'svelte';
+	import numeral from 'numeral';
 
 	interface Props {
 		item: Item;
@@ -56,10 +59,14 @@
 			}
 		}
 	];
+
+	const stackableModifier: StackableModifier | undefined = item.modifiers.find(
+		(m) => m.type == 'Stackable'
+	) as StackableModifier;
 </script>
 
 <div
-	class="flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-600 p-2 {pclass}"
+	class="relative flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-600 p-2 {pclass}"
 	style="border:2px solid {item?.rarity};"
 	title=""
 	use:tooltip={getItemData(item as Item, equippable)}
@@ -82,6 +89,11 @@
 	{:else}
 		<span class="ascii-item text-4xl select-none" style="color:{item?.rarity};"
 			>{item?.icon?.ascii}</span
+		>
+	{/if}
+	{#if stackableModifier != undefined}
+		<span class="absolute right-1 bottom-1 font-medium"
+			>{numeral(stackableModifier.value).format('0,00a')}</span
 		>
 	{/if}
 </div>

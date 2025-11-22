@@ -8,3 +8,12 @@ export class EquippableModifier implements IItemModifier {
         this.value = slot;
     }
 }
+
+export class StackableModifier implements IItemModifier {
+    type = "Stackable";
+    value;
+
+    constructor(amount: number, public stack: number) {
+        this.value = amount;
+    }
+}

@@ -6,6 +6,8 @@ import { type EquipmentSlot } from "./equipment";
 import { determineSlot } from "$lib/utils/item";
 import { capitalizeFirstLetter } from "$lib/utils/general";
 import type { ReforgeableModifier } from "$lib/modifiers/reforges";
+import type { StackableModifier } from "$lib/modifiers/basicModifiers";
+import numeral from "numeral";
 
 export type RarityKey = keyof typeof Rarity;
 
@@ -112,6 +114,15 @@ export function getItemData(item: Item, equippable: boolean = true): ITooltipDat
     let stats = computeItemStats(item);
     let statsString = "";
 
+    const stackableModifier: StackableModifier | undefined = item.modifiers.find(
+        (m) => m.type == 'Stackable'
+    ) as StackableModifier;
+    let stackString = "";
+
+    if (stackableModifier != undefined) {
+        stackString = `Stack: ${numeral(stackableModifier.value).format("0,0a")} / ${numeral(stackableModifier.stack).format("0,0a")}</br>`;
+    }
+
     for (const key in stats) {
         const s = stats[key];
         if (s.base || s.modifiers > 0 || s.reforges > 0) {
@@ -121,7 +132,7 @@ export function getItemData(item: Item, equippable: boolean = true): ITooltipDat
 
     return {
         title: itemName,
-        body: `${equipMsg}${statsString}${itemDesc}<br/>${descriptor}`
+        body: `${stackString}${equipMsg}${statsString}${itemDesc}<br/>${descriptor}`
     }
 }
 

@@ -1,6 +1,6 @@
 import { type Action, type DBQueueAction, type ChanceItem, rollChance, rollValue, actionCategories } from "$lib/types/action";
 import type { Item } from "$lib/types/item";
-import { loadDbItem } from "./item";
+import { loadDbItem, tryStackItemInInventory } from "./item";
 
 export function checkQueueCompletion(queue: DBQueueAction[], started_at: Date): { status: string; timings: { start: number; now: number; total: number; } } {
     let totalActionTime: number = 0;
@@ -86,10 +86,13 @@ export function completeAction(action: Action): Item[] {
     let outputs: Item[] = [];
 
     action.outputs.items.forEach((item: ChanceItem) => {
-        const loadedItem: Item = loadDbItem({ id: item.id });
         if (rollChance(item)) {
             const amount: number = rollValue(item);
-            outputs.push(...Array(amount).fill(loadedItem));
+            for (let i = 0; i < amount; i++) {
+                const loadedItem: Item = loadDbItem({ id: item.id });
+                outputs = tryStackItemInInventory(loadedItem, outputs);
+            }
+            ///outputs.push(...Array(amount).fill(loadedItem));
         }
     });
 

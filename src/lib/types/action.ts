@@ -56,7 +56,8 @@ export function rollValue(item: ChanceItem): number {
 export type ActionCategory = keyof typeof actionCategories;
 
 export const actionCategories: Record<string, Array<string>> = {
-    "test": ["test_action", "test_action2"]
+    "Mining": ["mine_iron_ore"],
+    "Crafting": ["craft_iron_sword"]
 };
 
 export const actionRegistry: Record<string, Action> = {};
@@ -67,5 +68,4 @@ for (const action in actions) {
     const id = action.split("/").pop()!.replace(/\.[^/.]+$/, '');
     let _action = (actions[action] as any).default ?? actions[action];
     actionRegistry[id] = parseYAMLToAction(_action);
-    console.log(actionRegistry[id]);
 }
