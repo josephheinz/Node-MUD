@@ -1,3 +1,4 @@
+import type { StackableModifier } from "$lib/modifiers/basicModifiers";
 import { type Action, type DBQueueAction, type ChanceItem, rollChance, rollValue, actionCategories } from "$lib/types/action";
 import type { Item } from "$lib/types/item";
 import { loadDbItem, tryStackItemInInventory } from "./item";
@@ -21,7 +22,17 @@ export function checkQueueCompletion(queue: DBQueueAction[], started_at: Date): 
 
 export function getInventoryCounts(inventory: Item[], inputs: { item: Item; amount: number }[]): { id: string; required: number; present: number }[] {
     return inputs.map(({ item, amount }) => {
-        const count = inventory.filter(i => i.id === item.id).length;
+        let count: number = 0;
+        const stackableModifier: StackableModifier | undefined = item.modifiers.find(
+            (m) => m.type == 'Stackable'
+        ) as StackableModifier;
+        if (stackableModifier) {
+            inventory.filter(i => i.id === item.id).forEach((instance: Item) => {
+                count += (instance.modifiers.find(m => m.type === "Stackable") as StackableModifier).value;
+            });
+        } else {
+            count = inventory.filter(i => i.id === item.id).length;
+        }
         return {
             id: item.id,
             required: amount,
@@ -43,8 +54,18 @@ export function removeInputsFromInventory(
     return inventory.filter(i => {
         const needed = remaining[i.id];
         if (needed && needed > 0) {
-            remaining[i.id]--;
-            return false;
+            const stackableModifier: StackableModifier | undefined = i.modifiers.find(
+                (m) => m.type == 'Stackable'
+            ) as StackableModifier;
+            if (stackableModifier) {
+                stackableModifier.value -= remaining[i.id];
+                remaining[i.id] = Math.max(remaining[i.id] - stackableModifier.value, 0);
+                if (remaining[i.id] === 0) return true;
+                else return false;
+            } else {
+                remaining[i.id]--;
+                return false;
+            }
         }
         return true;
     });

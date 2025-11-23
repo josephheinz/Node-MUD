@@ -3,8 +3,8 @@
 	import Action from './action.svelte';
 	import * as store from '$lib/store';
 
-	let { category }: { category: string } = $props();
-	const categoryArray = actionCategories[category] ?? [];
+	let { category = $bindable() }: { category: string } = $props();
+	const categoryArray = $derived(actionCategories[category] ?? []);
 </script>
 
 <div class="grid grid-cols-6 gap-2 overflow-y-scroll">

@@ -136,7 +136,6 @@ export function tryStackItemInInventory(item: Item, inventory: Item[]): Item[] {
     ) as StackableModifier;
 
     if (!stackableModifier) {
-        console.log("Item not stackable");
         inventory.push(item);
         return inventory;
     }
@@ -144,7 +143,6 @@ export function tryStackItemInInventory(item: Item, inventory: Item[]): Item[] {
     const inventoryStacks: Item[] = inventory.filter(i => i.id === item.id);
 
     if (inventoryStacks.length === 0) {
-        console.log("No items in inventory to stack onto");
         inventory.push(item);
         return inventory;
     }

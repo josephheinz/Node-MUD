@@ -2,7 +2,7 @@
 	import ActionCategory from './actionCategory.svelte';
 	import type { ActionCategory as AC } from '$lib/types/action';
 
-	const { categories }: { categories: AC[]; } = $props();
+	const { categories }: { categories: AC[] } = $props();
 	let selectedCategory: AC = $state(categories[0]);
 </script>
 
@@ -20,6 +20,6 @@
 		{/each}
 	</aside>
 	<main class="h-full grow p-2">
-		<ActionCategory category={selectedCategory} />
+		<ActionCategory bind:category={selectedCategory} />
 	</main>
 </div>
