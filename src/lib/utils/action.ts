@@ -58,10 +58,14 @@ export function removeInputsFromInventory(
                 (m) => m.type == 'Stackable'
             ) as StackableModifier;
             if (stackableModifier) {
-                stackableModifier.value -= remaining[i.id];
-                remaining[i.id] = Math.max(remaining[i.id] - stackableModifier.value, 0);
-                if (remaining[i.id] === 0) return true;
-                else return false;
+                const stackStartValue: number = stackableModifier.value;
+
+                stackableModifier.value = Math.max(stackStartValue - remaining[i.id], 0);
+                remaining[i.id] = Math.max(remaining[i.id] - stackStartValue, 0);
+
+                // if theres no more items in the stack remove it from the inventory
+                if (stackableModifier.value === 0) return false;
+                else return true;
             } else {
                 remaining[i.id]--;
                 return false;
