@@ -143,7 +143,6 @@ export async function Reforge(item: Item): Promise<Item | null> {
     }
 
     const data = await res.json();
-
     // Update client state with server response
     let newEq = hydrateEquipment(data.serializedEquipment);
     let newInv = hydrateInventory(data.inventory);

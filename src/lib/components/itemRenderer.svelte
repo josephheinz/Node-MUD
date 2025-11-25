@@ -8,7 +8,6 @@
 	import { linkToChat } from '$lib/utils/chat';
 	import { determineSlot } from '$lib/utils/item';
 	import type { StackableModifier } from '$lib/modifiers/basicModifiers';
-	import { onMount } from 'svelte';
 	import numeral from 'numeral';
 
 	interface Props {
@@ -32,7 +31,6 @@
 			}
 		}
 	}
-	let message = $state('Right click on the box!');
 
 	const menuItems: ContextMenuItem[] = [
 		// This piece of crap lets me only show equip/unequip if the item is equippable

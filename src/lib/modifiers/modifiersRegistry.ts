@@ -4,7 +4,7 @@ import { StarsModifier } from './stars';
 import { CaduceusModifier } from './special';
 import { EquippableModifier, StackableModifier } from './basicModifiers';
 
-export const modifierRegistry: Record<string, { new(...args: any[]): IItemModifier; type?: string }> = {
+export const modifierRegistry: Record<string, { new(...args: any[]): IItemModifier; type?: string; fromJSON?: (raw: any) => IItemModifier; }> = {
     Stackable: StackableModifier,
     Equippable: EquippableModifier,
     Reforgeable: ReforgeableModifier,
@@ -13,21 +13,15 @@ export const modifierRegistry: Record<string, { new(...args: any[]): IItemModifi
     Caduceus: CaduceusModifier,
 };
 
-export function instantiateModifier(modYaml: any): IItemModifier {
-    const ModClass = modifierRegistry[modYaml.type];
-    if (!ModClass) throw new Error(`Unknown modifier: ${modYaml.type}`);
+export function instantiateModifier(raw: any): IItemModifier {
+    const ModClass = modifierRegistry[raw.type];
+    if (!ModClass) throw new Error(`Unknown modifier: ${raw.type}`);
 
-    const args = { ...modYaml };
-    delete args.type;
+    if (typeof ModClass.fromJSON === "function") {
+        return ModClass.fromJSON(raw);
+    }
 
-    return new ModClass(...Object.values(args));
-}
-
-export function instantiateModifierFromClass(mod: IItemModifier): IItemModifier {
-    const ModClass = modifierRegistry[mod.type];
-    if (!ModClass) throw new Error(`Unknown modifier: ${mod.type}`);
-
-    const args = { ...mod } as any;
+    const args = { ...raw };
     delete args.type;
 
     return new ModClass(...Object.values(args));

@@ -29,6 +29,8 @@ export interface IItemModifier {
     modifyName?(baseName: string): string;
     modifyDescription?(baseDesc: string): string;
     statChanges?: StatList;
+    toJSON?: () => object;
+    fromJSON?: (json: any) => IItemModifier;
 }
 
 export interface DBItem {
@@ -166,7 +168,6 @@ export function getItem(id: string): Item | null {
 
 export const itemRegistry: Record<string, Item> = {};
 
-// Update the glob path to match your actual items directory
 const items = import.meta.glob("$lib/items/*", { eager: true, as: "raw" });
 
 for (const item in items) {
