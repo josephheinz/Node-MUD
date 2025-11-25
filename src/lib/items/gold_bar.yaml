@@ -1,0 +1,10 @@
+- id: gold_bar
+  name: Gold Bar
+  icon:
+    ascii: "="
+    image: "/images/items/metalBar.svg"
+  rarity: Common
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 1000

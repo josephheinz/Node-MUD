@@ -1,0 +1,10 @@
+- id: hardened_titanium_bar
+  name: Hardened Titanium Bar
+  icon:
+    ascii: "="
+    image: "/images/items/metalBar.svg"
+  rarity: Rare
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 500

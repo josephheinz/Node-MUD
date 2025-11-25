@@ -1,0 +1,10 @@
+- id: mine_gold_ore
+  name: Mine Gold Ore
+  inputs:
+    ids:
+    amounts:
+  outputs:
+    - id: gold_ore
+      min: 3
+      max: 5
+  time: 10

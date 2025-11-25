@@ -1,71 +1,75 @@
-import { parse } from "yaml";
+import { parse } from 'yaml';
 
 export type ActionInput = {
-    ids: string[];
-    amounts: number[];
+	ids: string[];
+	amounts: number[];
 };
 
 export type ChanceItem = {
-    id: string;
-    min: number;
-    max: number;
-    chance?: number; // Denominator of a fraction, e.g. 1/1000 to be rolled
+	id: string;
+	min: number;
+	max: number;
+	chance?: number; // Denominator of a fraction, e.g. 1/1000 to be rolled
 };
 
 export type ActionOutput = {
-    items: ChanceItem[];
+	items: ChanceItem[];
 };
 
 export type Action = {
-    name: string;
-    inputs: ActionInput;
-    outputs: ActionOutput;
-    time: number;
+	name: string;
+	inputs: ActionInput;
+	outputs: ActionOutput;
+	time: number;
 };
 
 export type DBQueueAction = {
-    action: Action;
-    amount: number;
-}
+	action: Action;
+	amount: number;
+};
 
 export function parseYAMLToAction(yamlString: string): Action {
-    let action = parse(yamlString)[0];
-    return {
-        name: action.name,
-        inputs: action.inputs,
-        outputs: { items: action.outputs },
-        time: action.time
-    };
+	let action = parse(yamlString)[0];
+	return {
+		name: action.name,
+		inputs: action.inputs,
+		outputs: { items: action.outputs },
+		time: action.time
+	};
 }
 
 export function getAction(id: string): Action | null {
-    if (actionRegistry[id]) return actionRegistry[id];
-    return null;
+	if (actionRegistry[id]) return actionRegistry[id];
+	return null;
 }
 
 export function rollChance(item: ChanceItem): boolean {
-    // No chance means always succeeds
-    if (!item.chance || item.chance <= 1) return true;
-    return Math.floor(Math.random() * item.chance) === 0;
+	// No chance means always succeeds
+	if (!item.chance || item.chance <= 1) return true;
+	return Math.floor(Math.random() * item.chance) === 0;
 }
 
 export function rollValue(item: ChanceItem): number {
-    return Math.floor(Math.random() * (item.max - item.min + 1)) + item.min;
+	return Math.floor(Math.random() * (item.max - item.min + 1)) + item.min;
 }
 
 export type ActionCategory = keyof typeof actionCategories;
 
 export const actionCategories: Record<string, Array<string>> = {
-    "Mining": ["mine_iron_ore"],
-    "Crafting": ["craft_iron_sword"]
+	Mining: ['mine_iron_ore', 'mine_gold_ore', 'mine_titanium_ore'],
+	Crafting: ['craft_iron_sword', 'craft_gold_sword', 'craft_titanium_sword'],
+	Smelt: ['smelt_iron_bar', 'smelt_gold_bar', 'smelt_titanium_bar', 'smelt_hardened_titanium_bar']
 };
 
 export const actionRegistry: Record<string, Action> = {};
 
-const actions = import.meta.glob("$lib/actions/*", { eager: true, as: "raw" });
+const actions = import.meta.glob('$lib/actions/*', { eager: true, as: 'raw' });
 
 for (const action in actions) {
-    const id = action.split("/").pop()!.replace(/\.[^/.]+$/, '');
-    let _action = (actions[action] as any).default ?? actions[action];
-    actionRegistry[id] = parseYAMLToAction(_action);
+	const id = action
+		.split('/')
+		.pop()!
+		.replace(/\.[^/.]+$/, '');
+	let _action = (actions[action] as any).default ?? actions[action];
+	actionRegistry[id] = parseYAMLToAction(_action);
 }
