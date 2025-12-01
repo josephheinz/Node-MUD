@@ -1,0 +1,15 @@
+- id: craft_iron_shield
+  name: Craft Iron Shield
+  icon:
+    image: "/images/items/checkedShield.svg"
+    color: "#bdbdbd"
+  inputs:
+    ids:
+      - iron_bar
+    amounts:
+      - 10
+  outputs:
+    - id: kite_shield
+      min: 1
+      max: 1
+  time: 5
