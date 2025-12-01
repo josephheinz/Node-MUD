@@ -1,13 +1,10 @@
 <script lang="ts">
-	// bindable props must come from $props()
 	let {
-		value: initialValue = $bindable(),
+		value = $bindable(),
 		min = undefined,
 		max = undefined,
 		step = 1
 	}: { value: number; min: number | undefined; max: number | undefined; step: number } = $props();
-
-	let value: number = $state(initialValue);
 </script>
 
 <div

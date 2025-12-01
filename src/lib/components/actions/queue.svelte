@@ -97,6 +97,12 @@
 		}
 	}
 
+	$effect(() => {
+		if (queue.length > 0 && !running && timer === undefined) {
+			startTimer();
+		}
+	});
+
 	store.queueEnd.subscribe((value) => (copyEnd = value ?? 0));
 	store.queueStart.subscribe((value) => (copyStart = value ?? 0));
 	store.actionQueue.subscribe((value) => (queue = value));

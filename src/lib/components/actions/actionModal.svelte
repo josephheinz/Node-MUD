@@ -11,7 +11,7 @@
 	import NumberInput from '../NumberInput.svelte';
 
 	let action: string = $state(get(store.actionModalData).action);
-	let amount: number = $state(get(store.actionModalData).amount);
+	let amount: number = $state(1);
 	let inventory: Item[] = $state(get(store.inventory));
 	let isVisible: boolean = $state(get(store.actionModalData).visible);
 
@@ -26,7 +26,7 @@
 				.map((id, i) => {
 					const item = getItem(id);
 					if (!item) return null;
-					return { item, amount: loadedAction.inputs.amounts[i] ?? 1 };
+					return { item, amount: loadedAction.inputs.amounts[i] * amount };
 				})
 				.filter(Boolean) as { item: Item; amount: number }[]) ?? []
 		);
@@ -41,7 +41,7 @@
 				.map((o) => {
 					const item = getItem(o.id);
 					if (!item) return null;
-					return { item, min: o.min, max: o.max, chance: o.chance };
+					return { item, min: o.min * amount, max: o.max * amount, chance: o.chance };
 				})
 				.filter(Boolean) as { item: Item; min: number; max: number; chance?: number }[]) ?? []
 		);
@@ -55,12 +55,10 @@
 
 	async function addToQueue() {
 		loadedInputs.forEach((_, index) => {
-			if (inputsPresent[index].present < inputsPresent[index].required) return;
+			if (inputsPresent[index].present < inputsPresent[index].required * amount) return;
 		});
 
 		const now: number = Date.now();
-
-		const inventorySnapshot: Item[] = get(store.inventory);
 
 		let addFetch = await fetch(`/api/action/${get(store.user)?.id}`, {
 			method: 'POST',
@@ -145,7 +143,7 @@
 					{/each}
 				</ul>
 			</div>
-			<span class="text-md"><b>Duration:</b> {loadedAction.time}s</span>
+			<span class="text-md"><b>Duration:</b> {numeral(loadedAction.time * amount).format("[00:][00:]00")}s</span>
 			<span><b>Amount: </b><NumberInput bind:value={amount} min={1} max={1000} step={1} /></span>
 			<button
 				class="m-auto cursor-pointer rounded-md border-2 border-indigo-700 bg-indigo-500 p-2 text-sm
