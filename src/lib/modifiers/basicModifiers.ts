@@ -1,19 +1,22 @@
-import { type IItemModifier } from "$lib/types/item";
+import { type IItemModifier } from '$lib/types/item';
 
 export class EquippableModifier implements IItemModifier {
-    type = "Equippable";
-    value;
+	type = 'Equippable';
+	value;
 
-    constructor(slot: string) {
-        this.value = slot;
-    }
+	constructor(slot: string) {
+		this.value = slot;
+	}
 }
 
 export class StackableModifier implements IItemModifier {
-    type = "Stackable";
-    value;
+	type = 'Stackable';
+	value;
 
-    constructor(amount: number, public stack: number) {
-        this.value = amount;
-    }
+	constructor(
+		public stack: number,
+		amount: number
+	) {
+		this.value = amount;
+	}
 }
