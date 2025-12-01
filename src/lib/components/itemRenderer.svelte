@@ -90,7 +90,7 @@
 		>
 	{/if}
 	{#if stackableModifier != undefined}
-		<span class="absolute right-1 bottom-1 font-medium select-none"
+		<span class="absolute right-1 bottom-0 font-semibold select-none"
 			>{numeral(stackableModifier.value).format('0,00a')}</span
 		>
 	{/if}
