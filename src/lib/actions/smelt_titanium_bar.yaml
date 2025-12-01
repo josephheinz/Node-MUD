@@ -1,5 +1,8 @@
 - id: smelt_titanium_bar
   name: Smelt Titanium Bar
+  icon:
+    image: "/images/actions/foundryBucket.svg"
+    color: "#bdbdbd"
   inputs:
     ids:
       - titanium_ore

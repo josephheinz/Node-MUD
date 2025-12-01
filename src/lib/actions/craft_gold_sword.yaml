@@ -1,5 +1,8 @@
 - id: craft_gold_sword
   name: Craft Gold Sword
+  icon:
+    image: "/images/actions/swordMold.svg"
+    color: "#bdbdbd"
   inputs:
     ids:
       - gold_bar

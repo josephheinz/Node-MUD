@@ -2,7 +2,7 @@
   name: Hardened Titanium Bar
   icon:
     ascii: "="
-    image: "/images/items/metalBar.svg"
+    image: "/images/items/iBeam.svg"
   rarity: Rare
   modifiers:
     - type: Stackable

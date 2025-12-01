@@ -1,5 +1,8 @@
 - id: smelt_iron_bar
   name: Smelt Iron Bar
+  icon:
+    image: "/images/actions/foundryBucket.svg"
+    color: "#bdbdbd"
   inputs:
     ids:
       - iron_ore

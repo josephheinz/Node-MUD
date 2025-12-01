@@ -1,5 +1,8 @@
 - id: smelt_hardened_titanium_bar
   name: Smelt Hardened Titanium Bar
+  icon:
+    image: "/images/actions/foundryBucket.svg"
+    color: "#bdbdbd"
   inputs:
     ids:
       - titanium_bar

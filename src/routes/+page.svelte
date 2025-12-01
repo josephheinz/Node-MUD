@@ -64,7 +64,7 @@
 			<ActionModal />
 			<Chat {user} />
 		{/if}
-		<main class="flex grow items-start justify-start">
+		<main class="flex grow items-start justify-start w-full">
 			<aside class="flex h-full shrink flex-col border-r-4 border-zinc-600">
 				{#each tabs as tab}
 					<button
@@ -75,7 +75,7 @@
 					</button>
 				{/each}
 			</aside>
-			<div class="h-full grow">
+			<div class="h-full grow w-full">
 				{#if currentTab === 'Character'}
 					{#if inventory && equipment}
 						<CharacterMenu {inventory} {equipment} {stats} />

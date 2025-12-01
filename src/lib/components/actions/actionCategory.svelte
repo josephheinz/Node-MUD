@@ -7,7 +7,7 @@
 	const categoryArray = $derived(actionCategories[category] ?? []);
 </script>
 
-<div class="grid grid-cols-6 gap-2 overflow-y-scroll">
+<div class="grid w-full grid-cols-8 gap-2 overflow-y-scroll">
 	{#each categoryArray as actionName, index}
 		{@const action: TypeAction | null = getAction(actionName)}
 		{#if action}

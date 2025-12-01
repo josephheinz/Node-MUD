@@ -1,5 +1,8 @@
 - id: craft_iron_sword
   name: Craft Iron Sword
+  icon:
+    image: "/images/actions/swordMold.svg"
+    color: "#bdbdbd"
   inputs:
     ids:
       - iron_bar

@@ -1,5 +1,8 @@
 - id: mine_gold_ore
   name: Mine Gold Ore
+  icon:
+    image: "/images/actions/miner.svg"
+    color: "#bdbdbd"
   inputs:
     ids:
     amounts:

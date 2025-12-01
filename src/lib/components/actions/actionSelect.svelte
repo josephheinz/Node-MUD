@@ -19,7 +19,7 @@
 			</button>
 		{/each}
 	</aside>
-	<main class="h-full grow p-2">
+	<main class="h-full w-full grow p-2">
 		<ActionCategory bind:category={selectedCategory} />
 	</main>
 </div>

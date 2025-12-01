@@ -21,6 +21,12 @@ export type Action = {
 	inputs: ActionInput;
 	outputs: ActionOutput;
 	time: number;
+	icon: ActionIcon;
+};
+
+export type ActionIcon = {
+	image: string;
+	color: string;
 };
 
 export type DBQueueAction = {
@@ -34,7 +40,8 @@ export function parseYAMLToAction(yamlString: string): Action {
 		name: action.name,
 		inputs: action.inputs,
 		outputs: { items: action.outputs },
-		time: action.time
+		time: action.time,
+		icon: { image: action.icon.image, color: action.icon.color }
 	};
 }
 
