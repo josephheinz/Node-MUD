@@ -5,6 +5,12 @@ import { getInventoryCounts, processQueue, removeInputsFromInventory } from '$li
 import { encodeDbItem, hydrateInventory, tryStackItemInInventory } from '$lib/utils/item.js';
 import { getItem } from '$lib/types/item';
 
+/**
+ * Validate the user's session, process their action queue (applying completed outputs to inventory), persist any inventory and queue updates, and return the current queue state and inventory.
+ *
+ * @param params - Route parameters; must include `id` (the player's id used for authorization and data lookup)
+ * @param cookies - Request cookies; must include the `supabase.session` cookie used to refresh and validate the session
+ * @returns An HTTP JSON response. On success (200) returns `queue` (updated queue array), `started` (timestamp or null), and `inventory` (updated Item[]). If no action row is found returns `{ queue: undefined, started: undefined }` with 404. Session-related errors return an appropriate 4xx response.
 export async function GET({ params, cookies }) {
 	const { id } = params;
 
@@ -97,6 +103,13 @@ export async function GET({ params, cookies }) {
 	return Response.json({ queue: undefined, started: undefined }, { status: 404 });
 }
 
+/**
+ * Enqueues a requested action for the specified player after validating the session, action ID, and available inventory.
+ *
+ * Validates the Supabase session cookie, ensures the authenticated user matches the route `id`, verifies the action exists, checks and deducts required input items from the player's inventory, appends the action to the player's queue (setting `started_at` if needed), persists updated inventory and queue to the database, and returns the updated in-memory inventory and queue.
+ *
+ * @returns JSON containing the updated `queue` and the updated in-memory `inventory` on success; on failure returns an HTTP error response with an appropriate status for cases including missing/invalid session, unauthorized user, unknown action ID, insufficient inventory, or database errors.
+ */
 export async function POST({ request, params, cookies }) {
 	const { id } = params;
 	const { actionID, amount }: { actionID: string; amount: number } = await request.json();

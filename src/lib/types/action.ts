@@ -34,6 +34,12 @@ export type DBQueueAction = {
 	amount: number;
 };
 
+/**
+ * Create an Action object from a YAML string describing one or more actions by using the first document.
+ *
+ * @param yamlString - YAML content that defines an action or an array of actions; the first item is used
+ * @returns An Action populated with name, inputs, outputs (as `{ items: [...] }`), time, and icon
+ */
 export function parseYAMLToAction(yamlString: string): Action {
 	let action = parse(yamlString)[0];
 	return {
@@ -45,17 +51,35 @@ export function parseYAMLToAction(yamlString: string): Action {
 	};
 }
 
+/**
+ * Retrieve an action by its registry identifier.
+ *
+ * @param id - The action identifier (registry key)
+ * @returns The Action associated with `id`, or `null` if no matching action is found
+ */
 export function getAction(id: string): Action | null {
 	if (actionRegistry[id]) return actionRegistry[id];
 	return null;
 }
 
+/**
+ * Determines whether a ChanceItem is granted based on its `chance` denominator.
+ *
+ * @param item - The ChanceItem whose `chance` property is used as a denominator; if `chance` is missing or less than or equal to 1 the item is always granted.
+ * @returns `true` if the item is granted according to its chance, `false` otherwise.
+ */
 export function rollChance(item: ChanceItem): boolean {
 	// No chance means always succeeds
 	if (!item.chance || item.chance <= 1) return true;
 	return Math.floor(Math.random() * item.chance) === 0;
 }
 
+/**
+ * Selects a random integer within the chance item's defined range.
+ *
+ * @param item - The chance item whose `min` and `max` define the inclusive range
+ * @returns A random integer between `item.min` and `item.max`, inclusive
+ */
 export function rollValue(item: ChanceItem): number {
 	return Math.floor(Math.random() * (item.max - item.min + 1)) + item.min;
 }

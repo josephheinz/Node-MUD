@@ -4,6 +4,15 @@ import { serializeEquipment, type Equipment, type EquipmentSlot } from "$lib/typ
 import { type DBItem, type Item } from "$lib/types/item";
 import { determineSlot, encodeDbItem, loadDbItem } from "$lib/utils/item";
 
+/**
+ * Handle equipping an item from a player's inventory and persist the updated inventory and equipment.
+ *
+ * Authenticates the player using the "supabase.session" cookie, removes the specified `dbItem` from the player's inventory, determines the appropriate equipment slot, moves any previously equipped item back into the inventory, stores the new item in the slot, and updates the database.
+ *
+ * @param request - The incoming request; must contain a JSON body with `dbItem` (the item to equip).
+ * @param params - Route parameters; `params.id` must be the player's id.
+ * @returns A Response containing the updated `inventory` and `serializedEquipment` on success; on failure returns a Response with an appropriate HTTP status and JSON error details. 
+ */
 export async function POST({ request, params, cookies }) {
     const { id } = params;
     const { dbItem } = await request.json();
