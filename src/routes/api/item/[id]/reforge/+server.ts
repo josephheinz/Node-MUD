@@ -6,6 +6,16 @@ import { serializeEquipment, type Equipment, type EquipmentSlot } from '$lib/typ
 import type { DBItem, Item } from '$lib/types/item.js';
 import { encodeDbItem, loadDbItem } from '$lib/utils/item';
 
+/**
+ * Handle POST requests to reforge a player's item and persist the change to either inventory or equipment.
+ *
+ * Accepts a JSON body with `dbItem` and uses `params.id` and the `supabase.session` cookie to authenticate and authorize the player.
+ *
+ * @param request - The incoming Request whose JSON body must contain `dbItem` (the database representation of the item to reforge).
+ * @param params - Route parameters; `params.id` is the player's id to operate on.
+ * @param cookies - Cookie store used to read the `supabase.session` cookie for session refresh and authorization.
+ * @returns A Response containing JSON. On success with status 200 it includes a message, the updated serialized equipment or inventory, and `updatedItem`. On error it returns an appropriate HTTP status and a JSON object with an `error` message.
+ */
 export async function POST({ request, params, cookies }) {
 	const { id } = params;
 	const { dbItem } = await request.json();

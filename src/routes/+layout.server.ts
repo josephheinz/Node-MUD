@@ -4,6 +4,19 @@ import { Stats } from '$lib/types/stats.js';
 import { EmptyEquipment } from '$lib/types/equipment';
 import type { DBQueueAction } from '$lib/types/action.js';
 
+/**
+ * Load the current authenticated user (if any) and assemble their inventory, equipment, stats, action queue, and queue start time for page initialization.
+ *
+ * If no session cookie is present, `user` will be `null` and the returned collections will be empty or defaulted.
+ *
+ * @returns An object with:
+ *  - `user`: the authenticated user object or `null` when not authenticated,
+ *  - `inventory`: an array of items belonging to the user,
+ *  - `equipment`: the user's equipment object,
+ *  - `stats`: the user's stats object,
+ *  - `queue`: an array of queued actions for the user,
+ *  - `started`: the timestamp when the queue processing started.
+ */
 export async function load({ cookies, fetch }) {
     // Load supabase session
     const sessionCookie = cookies.get("supabase.session");

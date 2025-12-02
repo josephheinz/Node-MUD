@@ -7,6 +7,16 @@ import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
 import type { StackableModifier } from '$lib/modifiers/basicModifiers';
 import ItemHover from '$lib/components/chat/itemHover.svelte';
 
+/**
+ * Combine inventory and equipped items into a single list with modifiers reinstantiated.
+ *
+ * Returns a new array containing all items from `inventory` and all non-null items from `equipment`.
+ * Each item in the result has its modifiers revived (instantiated) so modifier methods are available.
+ *
+ * @param inventory - Array of inventory items to include
+ * @param equipment - Equipment object whose non-null slots will be included
+ * @returns An array of items from inventory and equipment with revived modifiers
+ */
 export function ConglomerateItems(inventory: Item[], equipment: Equipment): Item[] {
 	let inventoryCopy: Item[] = deepClone<Item[]>(inventory) ?? [];
 	let result: Item[] = [];
@@ -27,6 +37,14 @@ export function ConglomerateItems(inventory: Item[], equipment: Equipment): Item
 	return result;
 }
 
+/**
+ * Determine which equipment slot the item is marked as equippable for.
+ *
+ * @param item - The item to inspect for an `Equippable` modifier
+ * @param equipment - Optional equipment map used for context (defaults to the current store equipment)
+ * @returns The `EquipmentSlot` the item is equippable to, or `undefined` if no equippable slot is specified
+ * @throws Error if an `Equippable` modifier contains an invalid slot value
+ */
 export function determineSlot(
 	item: Item,
 	equipment: Equipment = get(store.equipment)
@@ -47,6 +65,13 @@ export function determineSlot(
 	return slot;
 }
 
+/**
+ * Fetches an item by its identifier from the backend API.
+ *
+ * @param id - The identifier of the item to retrieve
+ * @returns The fetched `Item`
+ * @throws Error if the item cannot be retrieved or does not exist
+ */
 export async function getItem(id: string): Promise<Item> {
 	let item: Item | undefined;
 	const res = await fetch(`/api/item/${id}`)
@@ -67,6 +92,13 @@ export async function getItem(id: string): Promise<Item> {
 	throw new Error(`Item not found: ${id}`);
 }
 
+/**
+ * Create a runtime Item from a stored DBItem by merging its modifier overrides with the base item and reviving modifier instances.
+ *
+ * @param dbItem - Database representation containing the base item `id` and optional `modifiers` to add or replace
+ * @returns A new Item cloned from the registry entry with a freshly generated `uid` and revived, merged modifiers
+ * @throws Error if `dbItem.id` does not exist in the item registry
+ */
 export function loadDbItem(dbItem: DBItem): Item {
 	const base = deepClone(itemRegistry[dbItem.id]);
 	if (!base) throw new Error(`Unknown item id: ${dbItem.id}`);
@@ -94,6 +126,12 @@ export function loadDbItem(dbItem: DBItem): Item {
 	};
 }
 
+/**
+ * Produce a compact DB representation of an Item by including only modifiers that differ from the registry base or are new.
+ *
+ * @param item - The in-memory Item to encode
+ * @returns A DBItem containing the item's `id` and an array of modifiers that are either not present on the base item or have fields that differ from the base
+ */
 export function encodeDbItem(item: Item): DBItem {
 	const base = itemRegistry[item.id];
 	const encodedMods: IItemModifier[] = [];
@@ -122,6 +160,12 @@ export function encodeDbItem(item: Item): DBItem {
 	return { id: item.id, modifiers: encodedMods };
 }
 
+/**
+ * Convert an array of database item records into fully hydrated Item instances.
+ *
+ * @param inventory - Array of `DBItem` records to hydrate into runtime `Item` objects
+ * @returns An array of `Item` objects with modifiers revived and other runtime fields populated
+ */
 export function hydrateInventory(inventory: DBItem[]): Item[] {
 	let hydratedInventory: Item[] = [];
 
@@ -133,10 +177,23 @@ export function hydrateInventory(inventory: DBItem[]): Item[] {
 	return hydratedInventory;
 }
 
+/**
+ * Reinstantiates raw modifier objects into their concrete modifier instances.
+ *
+ * @param mods - Array of modifier data (possibly plain objects) to revive into instantiated modifiers
+ * @returns An array of instantiated `IItemModifier` objects with runtime behavior restored
+ */
 export function reviveModifiers(mods: IItemModifier[]): IItemModifier[] {
 	return mods.map((mod) => instantiateModifier(mod));
 }
 
+/**
+ * Adds an item to the inventory, merging its Stackable value into an existing stack of the same item when capacity allows.
+ *
+ * @param item - The item to add or merge into the inventory
+ * @param inventory - The inventory array to update; this array is mutated and also returned
+ * @returns The updated inventory array with the item merged into an existing stack if possible, otherwise appended as a new entry
+ */
 export function tryStackItemInInventory(item: Item, inventory: Item[]): Item[] {
 	const stackableModifier: StackableModifier | undefined = item.modifiers.find(
 		(m) => m.type == 'Stackable'

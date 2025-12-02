@@ -101,6 +101,13 @@ export function computeItemStats(item: Item): Record<string, { base: number; mod
     return stats;
 }
 
+/**
+ * Builds tooltip data for an item including title and a formatted body with stats, description, rarity, and optional slot/stack info.
+ *
+ * @param item - The item to render into tooltip data
+ * @param equippable - If true, includes the equipment slot line when the item is equippable
+ * @returns An ITooltipData object whose `title` is the item's display name and whose `body` contains (in order) stack information if present, an optional slot line, formatted stat lines showing base/modifier/reforge values, the item description, and a colored rarity descriptor
+ */
 export function getItemData(item: Item, equippable: boolean = true): ITooltipData {
     let rarityName: string = getRarity(item.rarity);
     let reforgeGroup: ReforgeableModifier | undefined = item.modifiers.find(m => m.type === "Reforgeable") as ReforgeableModifier;
@@ -151,6 +158,12 @@ export function getDisplayName(item: Item): string {
     return name;
 }
 
+/**
+ * Produce the item's final description after applying each modifier's description hook in order.
+ *
+ * @param item - The item whose description will be produced
+ * @returns The final description string with each modifier's `modifyDescription` applied sequentially
+ */
 export function getDisplayDescription(item: Item): string {
     const base = item.desc ?? "";
     return item.modifiers?.reduce(
@@ -159,6 +172,12 @@ export function getDisplayDescription(item: Item): string {
     ) ?? base;
 }
 
+/**
+ * Retrieve an item by its registry id.
+ *
+ * @param id - The item's identifier in the registry
+ * @returns The matching Item if found, `null` otherwise
+ */
 export function getItem(id: string): Item | null {
     if (itemRegistry[id]) return itemRegistry[id];
     return null;

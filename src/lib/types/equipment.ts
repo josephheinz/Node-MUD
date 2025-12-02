@@ -126,6 +126,14 @@ export async function Unequip(slot: keyof Equipment) {
     }
 }
 
+/**
+ * Reforges the given item for the currently logged-in user.
+ *
+ * Updates client state (equipment, inventory, and modified stats) with the server response when successful.
+ *
+ * @param item - The item to reforge
+ * @returns The updated `Item` returned by the server, or `null` if reforging failed
+ */
 export async function Reforge(item: Item): Promise<Item | null> {
     const userId = get(store.user)?.id;
 
