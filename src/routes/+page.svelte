@@ -11,6 +11,10 @@
 	import Reforger from '$lib/components/reforger.svelte';
 	import Chat from '$lib/components/chat/chat.svelte';
 	import { type User } from '@supabase/supabase-js';
+	import { actionCategories, type DBQueueAction } from '$lib/types/action';
+	import Queue from '$lib/components/actions/queue.svelte';
+	import ActionSelect from '$lib/components/actions/actionSelect.svelte';
+	import ActionModal from '$lib/components/actions/actionModal.svelte';
 
 	let loginModalOpen = $state(false);
 
@@ -18,14 +22,15 @@
 	let inventory = $state<Item[]>(get(store.inventory));
 	let equipment = $state<Equipment>(get(store.equipment));
 	let stats = $state<StatList>(get(store.modifiedStats)); // not base because base only gets updated when character upgrades are made
+	let queue = $state<DBQueueAction[]>(get(store.actionQueue));
+	let queueActive = $state<boolean>(get(store.queueActive));
+
+	let tabs: string[] = ['Character', 'Reforge', 'Actions'];
+	let currentTab: string = $state(tabs[0]);
 
 	store.inventory.subscribe((value) => {
 		inventory = value;
 		store.modifiedStats.set(getModifiedStats(get(store.baseStats), get(store.equipment)));
-	});
-
-	store.user.subscribe((value) => {
-		user = value;
 	});
 
 	store.equipment.subscribe((value) => {
@@ -33,22 +38,54 @@
 		store.modifiedStats.set(getModifiedStats(get(store.baseStats), equipment));
 	});
 
-	store.modifiedStats.subscribe((value) => {
-		stats = value;
-	});
+	store.user.subscribe((value) => (user = value));
+	store.modifiedStats.subscribe((value) => (stats = value));
+	store.actionQueue.subscribe((value) => (queue = value));
+	store.queueActive.subscribe((value) => (queueActive = value));
 </script>
 
-<div class="top-30 right-10 z-0 flex items-start justify-start">
-	{#if user}
-		<ProfileDropdown {user} />
-		<Chat {user} />
-	{:else}
-		<LoginButton onclick={() => (loginModalOpen = true)} />
-		<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
-	{/if}
-	<br />
-	{#if inventory && equipment}
-		<CharacterMenu {inventory} {equipment} {stats} />
-	{/if}
-	<Reforger item={undefined} {equipment} {inventory} />
+<title>Web-based Runescape-like Alpha</title>
+<!--Subject to change-->
+
+<div class="z-0 flex h-full items-start justify-start">
+	<div class="relative flex h-full w-full flex-col items-start justify-start">
+		<nav class="flex h-min w-full items-center justify-evenly border-b-2 border-zinc-600 p-2">
+			<Queue {queue} running={queueActive} />
+			{#if user}
+				<div class="flex grow items-start justify-end">
+					<ProfileDropdown {user} />
+				</div>
+			{:else}
+				<LoginButton onclick={() => (loginModalOpen = true)} />
+				<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
+			{/if}
+		</nav>
+		{#if user}
+			<ActionModal />
+			<Chat {user} />
+		{/if}
+		<main class="flex grow items-start justify-start w-full">
+			<aside class="flex h-full shrink flex-col border-r-4 border-zinc-600">
+				{#each tabs as tab}
+					<button
+						class="text-md cursor-pointer p-6 font-semibold hover:bg-zinc-500"
+						onclick={() => (currentTab = tab)}
+					>
+						{tab}
+					</button>
+				{/each}
+			</aside>
+			<div class="h-full grow w-full">
+				{#if currentTab === 'Character'}
+					{#if inventory && equipment}
+						<CharacterMenu {inventory} {equipment} {stats} />
+					{/if}
+				{:else if currentTab === 'Reforge'}
+					<Reforger item={undefined} {equipment} {inventory} />
+				{:else if currentTab === 'Actions'}
+					<ActionSelect categories={Object.keys(actionCategories)} />
+				{/if}
+			</div>
+		</main>
+	</div>
 </div>

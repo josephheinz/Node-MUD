@@ -15,7 +15,7 @@
 </script>
 
 <span
-	class="inline-flex cursor-default cursor-pointer items-center gap-2 rounded-md border-4 border-zinc-600 bg-zinc-700 px-1 text-sm text-zinc-300"
+	class="inline-flex cursor-default cursor-pointer items-center gap-2 rounded-md border-2 border-zinc-600 bg-zinc-700 px-1 text-sm text-zinc-300"
 	style="color:{hoverItem.rarity};"
 	use:tooltip={getItemData(hoverItem, false)}
 >

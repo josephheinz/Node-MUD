@@ -2,7 +2,21 @@ import { supabase } from '$lib/auth/supabaseClient.js';
 import { type Item } from '$lib/types/item.js';
 import { Stats } from '$lib/types/stats.js';
 import { EmptyEquipment } from '$lib/types/equipment';
+import type { DBQueueAction } from '$lib/types/action.js';
 
+/**
+ * Load the current authenticated user (if any) and assemble their inventory, equipment, stats, action queue, and queue start time for page initialization.
+ *
+ * If no session cookie is present, `user` will be `null` and the returned collections will be empty or defaulted.
+ *
+ * @returns An object with:
+ *  - `user`: the authenticated user object or `null` when not authenticated,
+ *  - `inventory`: an array of items belonging to the user,
+ *  - `equipment`: the user's equipment object,
+ *  - `stats`: the user's stats object,
+ *  - `queue`: an array of queued actions for the user,
+ *  - `started`: the timestamp when the queue processing started.
+ */
 export async function load({ cookies, fetch }) {
     // Load supabase session
     const sessionCookie = cookies.get("supabase.session");
@@ -11,7 +25,8 @@ export async function load({ cookies, fetch }) {
             user: null,
             inventory: [],
             equipment: EmptyEquipment,
-            stats: Stats
+            stats: Stats,
+            queue: []
         };
     }
 
@@ -28,8 +43,42 @@ export async function load({ cookies, fetch }) {
 
     if (!user) return { user, inventory: [], equipment: EmptyEquipment };
 
+    // Update last time logged in
+    const { data: d, error: e } = await supabase
+        .from("profiles")
+        .update({ last_logged_in: new Date(Date.now()) })
+        .eq("id", user.id);
+
+    if (e) {
+        console.log(e);
+    }
+
     // Load inventory
     const userId = user?.id;
+
+    let queue: DBQueueAction[] = [];
+    let started: Date = new Date(Date.now());
+
+    const loadQueue = await fetch(`/api/action/${userId}`, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(async (response) => {
+            let responseJson = await response.json();
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return responseJson;
+        })
+        .then(async (data) => {
+            queue = data.queue;
+            started = data.started;
+        })
+        .catch((error) => {
+            console.error(error);
+        });
 
     let inventory: Item[] = [];
 
@@ -98,5 +147,6 @@ export async function load({ cookies, fetch }) {
             console.error(error);
         });
 
-    return { user, inventory, equipment, stats };
+
+    return { user, inventory, equipment, stats, queue, started };
 };

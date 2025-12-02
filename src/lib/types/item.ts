@@ -5,6 +5,9 @@ import type { StatList } from "./stats";
 import { type EquipmentSlot } from "./equipment";
 import { determineSlot } from "$lib/utils/item";
 import { capitalizeFirstLetter } from "$lib/utils/general";
+import type { ReforgeableModifier } from "$lib/modifiers/reforges";
+import type { StackableModifier } from "$lib/modifiers/basicModifiers";
+import numeral from "numeral";
 
 export type RarityKey = keyof typeof Rarity;
 
@@ -26,6 +29,8 @@ export interface IItemModifier {
     modifyName?(baseName: string): string;
     modifyDescription?(baseDesc: string): string;
     statChanges?: StatList;
+    toJSON?: () => object;
+    fromJSON?: (json: any) => IItemModifier;
 }
 
 export interface DBItem {
@@ -33,7 +38,7 @@ export interface DBItem {
     modifiers?: IItemModifier[];
 }
 
-export interface Item {
+export type Item = {
     uid: string;
     id: string;
     name: string;
@@ -96,19 +101,36 @@ export function computeItemStats(item: Item): Record<string, { base: number; mod
     return stats;
 }
 
+/**
+ * Builds tooltip data for an item including title and a formatted body with stats, description, rarity, and optional slot/stack info.
+ *
+ * @param item - The item to render into tooltip data
+ * @param equippable - If true, includes the equipment slot line when the item is equippable
+ * @returns An ITooltipData object whose `title` is the item's display name and whose `body` contains (in order) stack information if present, an optional slot line, formatted stat lines showing base/modifier/reforge values, the item description, and a colored rarity descriptor
+ */
 export function getItemData(item: Item, equippable: boolean = true): ITooltipData {
     let rarityName: string = getRarity(item.rarity);
-    let descriptor: string = `<b style="color:${item.rarity}">${rarityName} Item</b>`;
+    let reforgeGroup: ReforgeableModifier | undefined = item.modifiers.find(m => m.type === "Reforgeable") as ReforgeableModifier;
+    let descriptor: string = `<b style="color:${item.rarity}">${rarityName} ${reforgeGroup ? reforgeGroup.group : "Item"}</b>`;
 
     let itemName: string = getDisplayName(item);
     let itemDesc: string = getDisplayDescription(item);
 
     let slot: EquipmentSlot | undefined = determineSlot(item);
     let equipMsg: string = "";
-    if (slot && equippable) equipMsg = `[Equip - Double-click]<br/>Slot: ${slot}<br/>`;
+    if (slot && equippable) equipMsg = `Slot: ${slot}<br/>`;
 
     let stats = computeItemStats(item);
     let statsString = "";
+
+    const stackableModifier: StackableModifier | undefined = item.modifiers.find(
+        (m) => m.type == 'Stackable'
+    ) as StackableModifier;
+    let stackString = "";
+
+    if (stackableModifier != undefined) {
+        stackString = `Stack: ${numeral(stackableModifier.value).format("0,0a")} / ${numeral(stackableModifier.stack).format("0,0a")}</br>`;
+    }
 
     for (const key in stats) {
         const s = stats[key];
@@ -119,7 +141,7 @@ export function getItemData(item: Item, equippable: boolean = true): ITooltipDat
 
     return {
         title: itemName,
-        body: `${equipMsg}${statsString}${itemDesc}<br/>${descriptor}`
+        body: `${stackString}${equipMsg}${statsString}${itemDesc}<br/>${descriptor}`
     }
 }
 
@@ -136,6 +158,12 @@ export function getDisplayName(item: Item): string {
     return name;
 }
 
+/**
+ * Produce the item's final description after applying each modifier's description hook in order.
+ *
+ * @param item - The item whose description will be produced
+ * @returns The final description string with each modifier's `modifyDescription` applied sequentially
+ */
 export function getDisplayDescription(item: Item): string {
     const base = item.desc ?? "";
     return item.modifiers?.reduce(
@@ -144,11 +172,21 @@ export function getDisplayDescription(item: Item): string {
     ) ?? base;
 }
 
+/**
+ * Retrieve an item by its registry id.
+ *
+ * @param id - The item's identifier in the registry
+ * @returns The matching Item if found, `null` otherwise
+ */
+export function getItem(id: string): Item | null {
+    if (itemRegistry[id]) return itemRegistry[id];
+    return null;
+}
+
 // Load all the items for api
 
 export const itemRegistry: Record<string, Item> = {};
 
-// Update the glob path to match your actual items directory
 const items = import.meta.glob("$lib/items/*", { eager: true, as: "raw" });
 
 for (const item in items) {

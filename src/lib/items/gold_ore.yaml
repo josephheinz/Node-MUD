@@ -1,0 +1,10 @@
+- id: gold_ore
+  name: Gold Ore
+  icon:
+    ascii: "🪨"
+    image: "/images/items/ore.svg"
+  rarity: Common
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000

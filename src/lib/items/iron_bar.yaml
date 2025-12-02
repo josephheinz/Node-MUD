@@ -1,0 +1,10 @@
+- id: iron_bar
+  name: Iron Bar
+  icon:
+    ascii: "="
+    image: "/images/items/metalBar.svg"
+  rarity: Common
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 1000

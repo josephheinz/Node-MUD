@@ -8,8 +8,8 @@ export interface IReforge {
 
 export class ReforgeModifier implements IItemModifier {
     type = "Reforge";
-    protected reforge: IReforge;
-    statChanges?: StatList | undefined;
+    public reforge: IReforge;
+    statChanges?: StatList;
 
     constructor(reforge: IReforge | string) {
         if (typeof reforge === "string") this.reforge = Reforges[reforge];
@@ -20,7 +20,20 @@ export class ReforgeModifier implements IItemModifier {
     modifyName(baseName: string): string {
         return `${this.reforge.name} ${baseName}`;
     }
-};
+
+    toJSON() {
+        return {
+            type: this.type,
+            reforge: this.reforge.name,
+            statChanges: this.statChanges
+        };
+    }
+
+    static fromJSON(json: any) {
+        return new ReforgeModifier(json.reforge);
+    }
+}
+
 
 export class ReforgeableModifier implements IItemModifier {
     type = "Reforgeable";

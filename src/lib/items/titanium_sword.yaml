@@ -1,13 +1,13 @@
-- id: iron_sword
-  name: Iron Sword
+- id: titanium_sword
+  name: Titanium Sword
   icon:
     ascii: "𐕣"
     image: "/images/items/sword.svg"
-  rarity: Common
+  rarity: Rare
   stats:
-    damage: 5
+    damage: 25
   modifiers:
     - type: Equippable
-      value: mainhand
+      slot: mainhand
     - type: Reforgeable
       group: Sword

@@ -1,0 +1,13 @@
+- id: mine_gold_ore
+  name: Mine Gold Ore
+  icon:
+    image: "/images/actions/miner.svg"
+    color: "#bdbdbd"
+  inputs:
+    ids:
+    amounts:
+  outputs:
+    - id: gold_ore
+      min: 3
+      max: 5
+  time: 10

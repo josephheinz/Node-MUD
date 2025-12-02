@@ -4,6 +4,15 @@ import { serializeEquipment, type Equipment, type EquipmentSlot } from "$lib/typ
 import { type DBItem, type Item } from "$lib/types/item";
 import { determineSlot, encodeDbItem, loadDbItem } from "$lib/utils/item";
 
+/**
+ * Handle equipping an item from a player's inventory and persist the updated inventory and equipment.
+ *
+ * Authenticates the player using the "supabase.session" cookie, removes the specified `dbItem` from the player's inventory, determines the appropriate equipment slot, moves any previously equipped item back into the inventory, stores the new item in the slot, and updates the database.
+ *
+ * @param request - The incoming request; must contain a JSON body with `dbItem` (the item to equip).
+ * @param params - Route parameters; `params.id` must be the player's id.
+ * @returns A Response containing the updated `inventory` and `serializedEquipment` on success; on failure returns a Response with an appropriate HTTP status and JSON error details. 
+ */
 export async function POST({ request, params, cookies }) {
     const { id } = params;
     const { dbItem } = await request.json();
@@ -11,30 +20,21 @@ export async function POST({ request, params, cookies }) {
     // Load supabase session
     const sessionCookie = cookies.get("supabase.session");
     if (!sessionCookie) {
-        return new Response(JSON.stringify({ error: "No session" }), {
-            status: 404,
-            headers: { "Content-Type": "application/json" }
-        });
+        return Response.json({}, { status: 404, statusText: "No session found" });
     }
 
     let sessionParsed: any;
     try {
         sessionParsed = JSON.parse(sessionCookie);
     } catch {
-        return new Response(JSON.stringify({ error: "Invalid session cookie" }), {
-            status: 400,
-            headers: { "Content-Type": "application/json" }
-        });
+        return Response.json({}, { status: 400, statusText: "Invalid session cookie" });
     }
 
     const refresh_token = sessionParsed.refresh_token;
     const { data: user_data, error: user_error } = await supabase.auth.refreshSession({ refresh_token });
 
     if (user_error || !user_data?.user || user_data.user.id !== id) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-            status: 401,
-            headers: { "Content-Type": "application/json" }
-        });
+        return Response.json({}, { status: 401, statusText: "Unauthorized" });
     }
 
     const { user } = user_data;

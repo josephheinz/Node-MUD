@@ -6,14 +6,17 @@
 	import Fa from 'svelte-fa';
 	import type { IApiSettings } from '../+layout.server';
 	import ToggleSwitch from '$lib/components/toggleSwitch.svelte';
-	import { capitalizeAfterSpaces } from '$lib/utils/general';
+	import { capitalizeAfterSpaces, capitalizeFirstLetter } from '$lib/utils/general';
+	import { AccoladeReferences } from '$lib/utils/chat';
 
 	type Profile = {
 		id: string;
 		username: string;
 		joined_at: Date;
+		last_logged_in: Date;
 		profile_picture: string;
 		display_name: string;
+		accolades: string[];
 	};
 
 	let profile: Profile | undefined = $page.data.profile;
@@ -42,7 +45,6 @@
 				return responseJson;
 			})
 			.then((data) => {
-				console.log(data);
 				apiSettings = data.settings as IApiSettings;
 			})
 			.catch((error) => {
@@ -55,6 +57,8 @@
 
 {#if profile}
 	{@const joinDate = new Date(profile.joined_at)}
+		{@const lastOnline = new Date(profile.last_logged_in)}
+
 	<main class="flex h-full w-full gap-2">
 		<aside
 			class="flex h-full flex-col items-end justify-between border-r-2 border-zinc-700 p-4 py-[10vh]"
@@ -72,6 +76,25 @@
 				</h1>
 				<h2 class="text-lg font-medium text-zinc-500">@{profile.username}</h2>
 				<p class="text-sm font-light text-zinc-500">Joined: {joinDate.toLocaleDateString()}</p>
+				<p class="text-sm font-light text-zinc-500">
+					Last Online: {lastOnline.toLocaleDateString()}
+				</p>
+				{#if profile.accolades && profile.accolades.length}
+					<div class="m-auto grid grid-cols-4 gap-2 px-2 py-4">
+						{#each profile.accolades as accolade, index}
+							{@const accRef = AccoladeReferences[accolade]}
+							<!--We do not mention the grid positioning-->
+							{@const colStart = (index + 1) % 4 == 0 ? -4 : ((index + 1) % 4) * -1}
+							{@const rowStart = Math.trunc((index != 4 ? index : 3 + 1) / 4) + 1}
+							<Fa
+								icon={accRef.icon}
+								size="lg"
+								style={`color:${accRef.color}; grid-column-start: ${colStart}; grid-row-start:${rowStart};`}
+								title={capitalizeFirstLetter(accolade)}
+							/>
+						{/each}
+					</div>
+				{/if}
 			</section>
 			{#if profile.id === user?.id}
 				<a

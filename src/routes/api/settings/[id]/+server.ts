@@ -55,6 +55,13 @@ export async function POST({ request, params, cookies }) {
     });
 }
 
+/**
+ * Fetches the profile settings for the `id` route parameter and returns the first matching record.
+ *
+ * If a settings row is found, responds with JSON `{ settings: <row> }` and HTTP 200; if no settings are found or an error occurs, responds with JSON `{ status: 404 }`.
+ *
+ * @returns A `Response` containing `{ settings: <row> }` and status 200 when a record is found, or `{ status: 404 }` when not found or on error.
+ */
 export async function GET({ request, params }) {
     const { id } = params;
 
@@ -65,7 +72,6 @@ export async function GET({ request, params }) {
 
     if (!settings || error) return Response.json({ status: 404 });
 
-    console.log(settings);
     return Response.json({ settings: settings[0] }, {
         status: 200,
         headers: { "Content-Type": "application/json" }

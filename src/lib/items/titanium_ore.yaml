@@ -1,0 +1,10 @@
+- id: titanium_ore
+  name: Titanium Ore
+  icon:
+    ascii: "🪨"
+    image: "/images/items/ore.svg"
+  rarity: Uncommon
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000

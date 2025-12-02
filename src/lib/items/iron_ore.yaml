@@ -1,0 +1,10 @@
+- id: iron_ore
+  name: Iron Ore
+  icon:
+    ascii: "🪨"
+    image: "/images/items/ore.svg"
+  rarity: Common
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000
