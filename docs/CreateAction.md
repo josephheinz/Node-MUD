@@ -95,7 +95,3 @@ Actions are loaded using `import.meta.glob` and processed through `parseYAMLToAc
   For example, all smelting actions might use metal-related SVGs with a similar color.
 * Avoid ambiguous or overly generic action IDs such as `do_craft` or `create_item`. Prefer descriptive names like `example_action` only for testing or documentation.
 * When creating many related actions (e.g. ore → bar → item), ensure the progression makes sense with `time`, `inputs`, and `outputs`.
-
----
-
-If you want this formatted into your project’s `/docs` layout or want a matching **AnatomyOfAnAction.png**, I can generate that too.
