@@ -8,6 +8,7 @@
 	import ToggleSwitch from '$lib/components/toggleSwitch.svelte';
 	import { capitalizeAfterSpaces, capitalizeFirstLetter } from '$lib/utils/general';
 	import { AccoladeReferences } from '$lib/utils/chat';
+	import { json } from '@sveltejs/kit';
 
 	type Profile = {
 		id: string;
@@ -19,9 +20,12 @@
 		accolades: string[];
 	};
 
-	let profile: Profile | undefined = $page.data.profile;
+	let profile: Profile | undefined = $state($page.data.profile);
 	let user: User | undefined = $page.data.user;
 	let apiSettings: IApiSettings = $state<IApiSettings>($page.data.api_settings);
+
+	let displayNameValue: string | undefined = $state(profile?.display_name);
+	let profilePictureValue: string | null = $state(profile?.profile_picture ?? null);
 
 	onMount(async () => {
 		if (profile?.id !== user?.id) {
@@ -51,13 +55,38 @@
 				console.error(error);
 			});
 	}
+
+	async function updateProfile() {
+		fetch(`/profile/${profile?.username}/settings/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				settings: { display_name: displayNameValue, profile_picture: profilePictureValue }
+			})
+		})
+			.then(async (response) => {
+				let responseJson = await response.json();
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				return responseJson;
+			})
+			.then((data) => {
+				profile = data.profile as Profile;
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	}
 </script>
 
 <title>Your Settings</title>
 
 {#if profile}
 	{@const joinDate = new Date(profile.joined_at)}
-		{@const lastOnline = new Date(profile.last_logged_in)}
+	{@const lastOnline = new Date(profile.last_logged_in)}
 
 	<main class="flex h-full w-full gap-2">
 		<aside
@@ -67,7 +96,7 @@
 				<!-- svelte-ignore a11y_img_redundant_alt -->
 				<img
 					src={profile.profile_picture ?? '/images/blank_pfp.webp'}
-					class="aspect-square h-24 rounded-lg border-4 border-zinc-600"
+					class="aspect-square h-24 rounded-lg border-4 border-zinc-600 object-cover"
 					alt="Profile Picture"
 				/>
 
@@ -104,12 +133,48 @@
 				>
 			{/if}
 		</aside>
-		<section class="flex grow-4 items-start justify-start p-4">
+		<section class="flex grow-4 flex-col items-start justify-start p-4">
 			<div class="m-2 w-max rounded-lg border-2 border-zinc-700 bg-zinc-800 p-2">
 				<h1 class="text-xl font-bold">API Settings</h1>
 				<hr class="mb-2 text-zinc-500" />
 				{@render apiSetting('inventory_api', apiSettings?.inventory_api)}
 				{@render apiSetting('equipment_api', apiSettings?.equipment_api)}
+			</div>
+			<div class="m-2 w-max gap-2 rounded-lg border-2 border-zinc-700 bg-zinc-800 p-2">
+				<h1 class="text-xl font-bold">Profile Settings</h1>
+				<hr class="mb-2 text-zinc-500" />
+				<div class="flex items-center gap-2">
+					<!-- svelte-ignore a11y_img_redundant_alt -->
+					<img
+						src={profile.profile_picture ?? '/images/blank_pfp.webp'}
+						alt="Profile Picture"
+						class="inline-block aspect-square h-24 rounded-lg border-4 border-zinc-600 object-cover"
+					/>
+					<div class="flex flex-col items-start justify-start gap-2">
+						<label for="pfp-input">Profile Picture</label>
+						<input
+							type="url"
+							bind:value={profilePictureValue}
+							placeholder="https://example.com/example.png"
+							class="rounded-md border-2 border-zinc-700 bg-zinc-800 transition-all outline-none invalid:border-rose-600 focus:ring-0 focus:outline-none"
+						/>
+					</div>
+				</div>
+				<hr class="my-2 text-zinc-500" />
+				<div class="flex flex-col gap-2">
+					<label for="displayname">Display Name</label>
+					<input
+						type="text"
+						bind:value={displayNameValue}
+						placeholder={profile.display_name ?? profile.username}
+						class="rounded-md border-2 border-zinc-700 bg-zinc-800 transition-all outline-none invalid:border-rose-600 focus:ring-0 focus:outline-none"
+					/>
+				</div>
+				<hr class="my-2 text-zinc-500" />
+				<button
+					class="cursor-pointer rounded-md border-2 border-indigo-800 bg-indigo-500 px-2 py-1 hover:bg-indigo-600"
+					onclick={updateProfile}>Update</button
+				>
 			</div>
 		</section>
 	</main>

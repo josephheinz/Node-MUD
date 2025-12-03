@@ -49,7 +49,7 @@
 				<!-- svelte-ignore a11y_img_redundant_alt -->
 				<img
 					src={profile.profile_picture ?? '/images/blank_pfp.webp'}
-					class="aspect-square h-24 rounded-lg border-4 border-zinc-600"
+					class="aspect-square h-24 rounded-lg border-4 border-zinc-600 object-cover"
 					alt="Profile Picture"
 				/>
 
