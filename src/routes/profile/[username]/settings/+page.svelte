@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { faGear, faUser } from '@fortawesome/free-solid-svg-icons';
+	import { faUser } from '@fortawesome/free-solid-svg-icons';
 	import type { User } from '@supabase/supabase-js';
 	import { onMount } from 'svelte';
 	import Fa from 'svelte-fa';
@@ -8,17 +8,7 @@
 	import ToggleSwitch from '$lib/components/toggleSwitch.svelte';
 	import { capitalizeAfterSpaces, capitalizeFirstLetter } from '$lib/utils/general';
 	import { AccoladeReferences } from '$lib/utils/chat';
-	import { json } from '@sveltejs/kit';
-
-	type Profile = {
-		id: string;
-		username: string;
-		joined_at: Date;
-		last_logged_in: Date;
-		profile_picture: string;
-		display_name: string;
-		accolades: string[];
-	};
+	import type { Profile } from '$lib/store';
 
 	let profile: Profile | undefined = $state($page.data.profile);
 	let user: User | undefined = $page.data.user;

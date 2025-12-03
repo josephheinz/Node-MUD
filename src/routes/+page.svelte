@@ -24,6 +24,7 @@
 	let stats = $state<StatList>(get(store.modifiedStats)); // not base because base only gets updated when character upgrades are made
 	let queue = $state<DBQueueAction[]>(get(store.actionQueue));
 	let queueActive = $state<boolean>(get(store.queueActive));
+	let profile = $state<store.Profile>(get(store.profile));
 
 	let tabs: string[] = ['Character', 'Reforge', 'Actions'];
 	let currentTab: string = $state(tabs[0]);
@@ -42,6 +43,7 @@
 	store.modifiedStats.subscribe((value) => (stats = value));
 	store.actionQueue.subscribe((value) => (queue = value));
 	store.queueActive.subscribe((value) => (queueActive = value));
+	store.profile.subscribe((value) => (profile = value));
 </script>
 
 <title>Web-based Runescape-like Alpha</title>
@@ -51,9 +53,9 @@
 	<div class="relative flex h-full w-full flex-col items-start justify-start">
 		<nav class="flex h-min w-full items-center justify-evenly border-b-2 border-zinc-600 p-2">
 			<Queue {queue} running={queueActive} />
-			{#if user}
+			{#if profile}
 				<div class="flex grow items-start justify-end">
-					<ProfileDropdown {user} />
+					<ProfileDropdown {profile} />
 				</div>
 			{:else}
 				<LoginButton onclick={() => (loginModalOpen = true)} />
@@ -64,7 +66,7 @@
 			<ActionModal />
 			<Chat {user} />
 		{/if}
-		<main class="flex grow items-start justify-start w-full">
+		<main class="flex w-full grow items-start justify-start">
 			<aside class="flex h-full shrink flex-col border-r-4 border-zinc-600">
 				{#each tabs as tab}
 					<button
@@ -75,7 +77,7 @@
 					</button>
 				{/each}
 			</aside>
-			<div class="h-full grow w-full">
+			<div class="h-full w-full grow">
 				{#if currentTab === 'Character'}
 					{#if inventory && equipment}
 						<CharacterMenu {inventory} {equipment} {stats} />
