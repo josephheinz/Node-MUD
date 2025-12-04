@@ -9,6 +9,7 @@
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
 	import NumberInput from '../NumberInput.svelte';
+	import dayjs from 'dayjs';
 
 	let action: string = $state(get(store.actionModalData).action);
 	let amount: number = $state(1);
@@ -102,6 +103,7 @@
 </script>
 
 {#if loadedAction && isVisible}
+	{@const timeAmount: number = loadedAction.time * amount}
 	<div
 		class="absolute z-100 flex size-full items-center justify-center backdrop-blur-sm select-none"
 	>
@@ -119,7 +121,9 @@
 						{@const itemsPresent = inputsPresent[index].present}
 						<li class="flex items-center justify-between gap-2 pl-4">
 							<span class={itemsPresent < amount ? 'text-rose-400' : ''}
-								>{itemsPresent}/{amount}</span
+								>{numeral(itemsPresent).format('0,0[.]0a')}/{numeral(amount).format(
+									'0,0[.]0a'
+								)}</span
 							>
 							<ItemHover {item} />
 						</li>
@@ -136,14 +140,22 @@
 						{@const chanceDecimal = chance ? 1 / (chance as number) : 1}
 						{@const chancePercent = numeral(chanceDecimal).format('0[.][0000]%')}
 						<li class="flex items-center justify-between gap-2 pl-4">
-							<span>{min != max ? `${min} - ${max}` : `${max}`}</span>
+							<span
+								>{min != max
+									? `${numeral(min).format('0,0[.]0a')} - ${numeral(max).format('0,0[.]0a')}`
+									: `${numeral(max).format('0,0[.]0a')}`}</span
+							>
 							<ItemHover {item} />
 							<span>{chancePercent == '100%' ? '' : chancePercent}</span>
 						</li>
 					{/each}
 				</ul>
 			</div>
-			<span class="text-md"><b>Duration:</b> {numeral(loadedAction.time * amount).format("[00:][00:]00")}s</span>
+			<span class="text-md">
+				<b>Duration:</b>
+				{Math.floor(timeAmount / 3600)}h {Math.floor((timeAmount % 3600) / 60)}m {timeAmount %
+					60}s</span
+			>
 			<span><b>Amount: </b><NumberInput bind:value={amount} min={1} max={1000} step={1} /></span>
 			<button
 				class="m-auto cursor-pointer rounded-md border-2 border-indigo-700 bg-indigo-500 p-2 text-sm
