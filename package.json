@@ -36,7 +36,6 @@
 	},
 	"dependencies": {
 		"@supabase/supabase-js": "^2.57.2",
-		"dayjs": "^1.11.19",
 		"numeral": "^2.0.6",
 		"socket.io": "^4.8.1",
 		"socket.io-client": "^4.8.1",

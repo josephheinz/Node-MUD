@@ -9,7 +9,6 @@
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
 	import NumberInput from '../NumberInput.svelte';
-	import dayjs from 'dayjs';
 
 	let action: string = $state(get(store.actionModalData).action);
 	let amount: number = $state(1);
