@@ -94,7 +94,7 @@ export const actionCategories: Record<string, Array<string>> = {
 
 export const actionRegistry: Record<string, Action> = {};
 
-const actions = import.meta.glob('$lib/actions/*', { eager: true, as: 'raw' });
+const actions = import.meta.glob('$lib/actions/**/*', { eager: true, as: 'raw' });
 
 for (const action in actions) {
 	const id = action

@@ -187,7 +187,7 @@ export function getItem(id: string): Item | null {
 
 export const itemRegistry: Record<string, Item> = {};
 
-const items = import.meta.glob("$lib/items/*", { eager: true, as: "raw" });
+const items = import.meta.glob("$lib/items/**/*", { eager: true, as: "raw" });
 
 for (const item in items) {
     const id = item.split("/").pop()!.replace(/\.[^/.]+$/, '');
