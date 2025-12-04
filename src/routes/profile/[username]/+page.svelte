@@ -62,7 +62,7 @@
 					Last Online: {lastOnline.toLocaleDateString()}
 				</p>
 				{#if profile.accolades && profile.accolades.length}
-					<div class="m-auto grid grid-cols-4 gap-2 px-2 py-4">
+					<div class="m-auto grid w-full grid-cols-4 gap-2 px-2 py-4">
 						{#each profile.accolades as accolade, index}
 							{@const accRef = AccoladeReferences[accolade]}
 							<!--We do not mention the grid positioning-->

@@ -162,7 +162,7 @@
 				</div>
 				<hr class="my-2 text-zinc-500" />
 				<button
-					class="cursor-pointer rounded-md border-2 border-indigo-800 bg-indigo-500 px-2 py-1 hover:bg-indigo-600"
+					class="cursor-pointer rounded-md border-2 border-indigo-800 bg-indigo-500 px-4 py-2 hover:bg-indigo-600 text-sm"
 					onclick={updateProfile}>Update</button
 				>
 			</div>

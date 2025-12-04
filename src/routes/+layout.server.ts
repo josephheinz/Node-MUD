@@ -153,5 +153,5 @@ export async function load({ cookies, fetch }) {
 			console.error(error);
 		});
 
-	return { profile, inventory, equipment, stats, queue, started };
+	return { profile, inventory, equipment, stats, queue, started, user };
 }

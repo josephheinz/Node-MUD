@@ -41,7 +41,7 @@
 			alt="Profile"
 			class="h-12 rounded-full"
 		/>
-		<div class="flex flex-col items-start justify-between">
+		<div class="flex flex-col items-start justify-between grow">
 			<b>{displayName}</b>
 			<span class="text-zinc-400">@{profile.username}</span>
 		</div>
