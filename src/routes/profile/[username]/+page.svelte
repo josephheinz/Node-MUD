@@ -49,7 +49,7 @@
 				<!-- svelte-ignore a11y_img_redundant_alt -->
 				<img
 					src={profile.profile_picture ?? '/images/blank_pfp.webp'}
-					class="aspect-square h-24 rounded-lg border-4 border-zinc-600"
+					class="aspect-square h-24 rounded-lg border-4 border-zinc-600 object-cover"
 					alt="Profile Picture"
 				/>
 
@@ -62,7 +62,7 @@
 					Last Online: {lastOnline.toLocaleDateString()}
 				</p>
 				{#if profile.accolades && profile.accolades.length}
-					<div class="m-auto grid grid-cols-4 gap-2 px-2 py-4">
+					<div class="m-auto grid w-full grid-cols-4 gap-2 px-2 py-4">
 						{#each profile.accolades as accolade, index}
 							{@const accRef = AccoladeReferences[accolade]}
 							<!--We do not mention the grid positioning-->

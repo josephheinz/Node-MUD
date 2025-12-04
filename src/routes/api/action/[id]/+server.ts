@@ -11,6 +11,7 @@ import { getItem } from '$lib/types/item';
  * @param params - Route parameters; must include `id` (the player's id used for authorization and data lookup)
  * @param cookies - Request cookies; must include the `supabase.session` cookie used to refresh and validate the session
  * @returns An HTTP JSON response. On success (200) returns `queue` (updated queue array), `started` (timestamp or null), and `inventory` (updated Item[]). If no action row is found returns `{ queue: undefined, started: undefined }` with 404. Session-related errors return an appropriate 4xx response.
+ */ 
 export async function GET({ params, cookies }) {
 	const { id } = params;
 

@@ -18,6 +18,7 @@
 		store.inventory.set(inv);
 		store.equipment.set(eq);
 		store.user.set($page.data.user ?? null);
+		store.profile.set($page.data.profile);
 		store.baseStats.set($page.data.stats ?? { ...Stats });
 		store.modifiedStats.set(getModifiedStats(get(store.baseStats), get(store.equipment)));
 		store.actionQueue.set($page.data.queue);

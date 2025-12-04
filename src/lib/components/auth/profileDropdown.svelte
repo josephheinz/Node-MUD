@@ -1,12 +1,12 @@
 <script lang="ts">
 	import Fa from 'svelte-fa';
 	import { faRightFromBracket, faUser, faGear } from '@fortawesome/free-solid-svg-icons';
-	import type { User } from '@supabase/supabase-js';
-	let { user }: { user: User } = $props();
+	import type { Profile } from '$lib/store';
+
+	let { profile }: { profile: Profile } = $props();
 
 	let opened = $state(false);
-	let displayName =
-		user.user_metadata?.full_name ?? user.user_metadata?.display_name ?? user.email?.split('@')[0];
+	let displayName = profile.display_name ?? profile.username;
 
 	async function signout() {
 		let trySignOut = await fetch('/api/auth/signout', {
@@ -37,11 +37,14 @@
 		onclick={() => (opened = !opened)}
 	>
 		<img
-			src={user.user_metadata?.avatar_url ?? '/images/blank_pfp.webp'}
+			src={profile.profile_picture ?? '/images/blank_pfp.webp'}
 			alt="Profile"
 			class="h-12 rounded-full"
 		/>
-		<b>{displayName}</b>
+		<div class="flex flex-col items-start justify-between grow">
+			<b>{displayName}</b>
+			<span class="text-zinc-400">@{profile.username}</span>
+		</div>
 	</button>
 
 	<!-- Dropdown menu -->
@@ -51,13 +54,13 @@
 			class="absolute w-48 rounded-b-md border-2 border-t-0 border-zinc-700 bg-zinc-800 shadow-lg"
 		>
 			<a
-				href="/profile/{user.user_metadata?.full_name}"
+				href="/profile/{profile.username}"
 				role="menuitem"
 				class="flex w-full cursor-pointer items-center justify-start gap-2 px-4 py-2 text-left hover:bg-zinc-500"
 				><Fa icon={faUser} /> Profile
 			</a>
 			<a
-				href="/profile/{user.user_metadata?.full_name}/settings"
+				href="/profile/{profile.username}/settings"
 				role="menuitem"
 				class="flex w-full cursor-pointer items-center justify-start gap-2 px-4 py-2 text-left hover:bg-zinc-500"
 				><Fa icon={faGear} /> Settings

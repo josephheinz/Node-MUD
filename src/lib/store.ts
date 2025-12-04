@@ -1,26 +1,43 @@
-import { writable } from "svelte/store";
-import type { Item } from "./types/item";
-import { Stats, type StatList } from "./types/stats";
-import type { User } from "@supabase/supabase-js";
-import type { Equipment } from "./types/equipment";
-import { deepClone } from "./utils/general";
-import type { Action } from "./types/action";
+import { writable } from 'svelte/store';
+import type { Item } from './types/item';
+import { Stats, type StatList } from './types/stats';
+import type { User } from '@supabase/supabase-js';
+import type { Equipment } from './types/equipment';
+import { deepClone } from './utils/general';
+import type { Action } from './types/action';
+
+export type Profile = {
+	id: string;
+	username: string;
+	joined_at: Date;
+	last_logged_in: Date;
+	profile_picture: string;
+	display_name: string;
+	accolades: string[];
+};
 
 export const user = writable<User>();
+export const profile = writable<Profile>();
 export const inventory = writable<Item[]>();
 export const equipment = writable<Equipment>();
 export const baseStats = writable<StatList>(deepClone<StatList>(Stats));
 export const modifiedStats = writable<StatList>(deepClone<StatList>(Stats));
-export const actionQueue = writable<{
-    action: Action;
-    amount: number;
-}[]>([]);
+export const actionQueue = writable<
+	{
+		action: Action;
+		amount: number;
+	}[]
+>([]);
 
 export const queueStart = writable<number | null>();
 export const queueEnd = writable<number | null>();
 export const queueActive = writable<boolean>(false);
 
-export const chatMessage = writable<string>("");
+export const chatMessage = writable<string>('');
 export const chatItemLinkTable = writable<Record<number, Item>>({});
 
-export const actionModalData = writable<{ action: string; visible: boolean; amount: number }>({ action: "", visible: false, amount: 1 });
+export const actionModalData = writable<{ action: string; visible: boolean; amount: number }>({
+	action: '',
+	visible: false,
+	amount: 1
+});
