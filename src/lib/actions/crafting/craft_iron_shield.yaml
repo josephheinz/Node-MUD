@@ -1,8 +1,8 @@
 - id: craft_iron_shield
   name: Craft Iron Shield
   icon:
-    image: "/images/items/checkedShield.svg"
-    color: "#bdbdbd"
+    image: '/images/items/armor/craftable/kiteShield.svg'
+    color: '#bdbdbd'
   inputs:
     ids:
       - iron_bar

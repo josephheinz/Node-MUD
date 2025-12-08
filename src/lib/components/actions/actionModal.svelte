@@ -9,6 +9,8 @@
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
 	import NumberInput from '../NumberInput.svelte';
+	import type { SkillKey } from '$lib/types/skills';
+	import { capitalizeFirstLetter } from '$lib/utils/general';
 
 	let action: string = $state(get(store.actionModalData).action);
 	let amount: number = $state(1);
@@ -45,6 +47,15 @@
 				})
 				.filter(Boolean) as { item: Item; min: number; max: number; chance?: number }[]) ?? []
 		);
+	});
+
+	let loadedOutputsXp = $derived.by<Array<{ skill: string; amount: number }>>(() => {
+		if (!loadedAction || !loadedAction.outputs.xp) return [];
+
+		return Object.entries(loadedAction.outputs.xp).map(([skill, amount]) => ({
+			skill,
+			amount
+		}));
 	});
 
 	let inputsPresent = $derived.by(() => getInventoryCounts(inventory, loadedInputs));
@@ -146,6 +157,12 @@
 							>
 							<ItemHover {item} />
 							<span>{chancePercent == '100%' ? '' : chancePercent}</span>
+						</li>
+					{/each}
+					{#each loadedOutputsXp as { skill, amount }}
+						<li class="flex items-center justify-start gap-2 pl-4">
+							<img src="/images/experienceStar.svg" alt="xp star" class="inline-block h-4 w-4" />
+							<span>{numeral(amount).format('0,0[.]0a')} {capitalizeFirstLetter(skill)} XP</span>
 						</li>
 					{/each}
 				</ul>

@@ -1,4 +1,5 @@
 import { parse } from 'yaml';
+import { type SkillKey } from './skills';
 
 export type ActionInput = {
 	ids: string[];
@@ -14,6 +15,7 @@ export type ChanceItem = {
 
 export type ActionOutput = {
 	items: ChanceItem[];
+	xp?: Record<SkillKey, number>;
 };
 
 export type Action = {
@@ -45,7 +47,7 @@ export function parseYAMLToAction(yamlString: string): Action {
 	return {
 		name: action.name,
 		inputs: action.inputs,
-		outputs: { items: action.outputs },
+		outputs: { items: action.outputs, xp: (action.xp as Record<SkillKey, number>) ?? undefined },
 		time: action.time,
 		icon: { image: action.icon.image, color: action.icon.color }
 	};
@@ -88,7 +90,7 @@ export type ActionCategory = keyof typeof actionCategories;
 
 export const actionCategories: Record<string, Array<string>> = {
 	Mining: ['mine_iron_ore', 'mine_gold_ore', 'mine_titanium_ore'],
-	Crafting: ['craft_iron_sword', 'craft_gold_sword', 'craft_titanium_sword',"craft_iron_shield"],
+	Crafting: ['craft_iron_sword', 'craft_gold_sword', 'craft_titanium_sword', "craft_iron_shield"],
 	Smelt: ['smelt_iron_bar', 'smelt_gold_bar', 'smelt_titanium_bar', 'smelt_hardened_titanium_bar']
 };
 

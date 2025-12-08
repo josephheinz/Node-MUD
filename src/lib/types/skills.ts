@@ -13,3 +13,33 @@ export const PlayerSkills: Record<SkillKey, Skill> = {
     "Mining": { name: "Mining", xp: 0 },
     "Crafting": { name: "Crafting", xp: 0 }
 };
+
+export function xpForLevel(level: number): number {
+    return (
+        90 * level * level +
+        250 * level +
+        1000 +
+        120 * Math.pow(1.055, level)
+    );
+}
+
+export function xpToLevel(xp: number): number {
+    for (let lvl = 1; lvl < XP_TABLE.length; lvl++) {
+        if (xp < XP_TABLE[lvl]) return lvl - 1;
+    }
+    return XP_TABLE.length - 1;
+}
+
+
+function buildXPTable(maxLevel = 120): Array<number> {
+    const table = [0];
+    let cumulative = 0;
+
+    for (let lvl = 1; lvl <= maxLevel; lvl++) {
+        cumulative += xpForLevel(lvl);
+        table[lvl] = cumulative;
+    }
+    return table;
+}
+
+export const XP_TABLE = buildXPTable(120);
