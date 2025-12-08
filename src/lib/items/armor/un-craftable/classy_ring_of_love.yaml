@@ -2,7 +2,7 @@
   name: Classy Ring of Love
   icon:
     ascii: "𓋪"
-    image: "/images/items/bigDiamondRing.svg"
+    image: "/images/items/armor/un-craftable/classyRingOfLove.svg"
   rarity: Rare
   modifiers:
     - type: Equippable

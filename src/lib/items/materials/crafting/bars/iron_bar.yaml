@@ -1,8 +1,8 @@
 - id: iron_bar
   name: Iron Bar
   icon:
-    ascii: "="
-    image: "/images/items/metalBar.svg"
+    ascii: '='
+    image: '/images/items/materials/crafting/bars/ironBar.svg'
   rarity: Common
   modifiers:
     - type: Stackable

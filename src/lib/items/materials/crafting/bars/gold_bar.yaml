@@ -1,8 +1,8 @@
 - id: gold_bar
   name: Gold Bar
   icon:
-    ascii: "="
-    image: "/images/items/metalBar.svg"
+    ascii: '='
+    image: '/images/items/materials/crafting/bars/goldBar.svg'
   rarity: Common
   modifiers:
     - type: Stackable

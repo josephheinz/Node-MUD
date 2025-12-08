@@ -2,7 +2,7 @@
   name: Bling Chain
   icon:
     ascii: "𓋩"
-    image: "/images/items/gemPendant.svg"
+    image: "/images/items/armor/craftable/blingChain.svg"
   rarity: Legendary
   modifiers:
     - type: Equippable

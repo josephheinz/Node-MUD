@@ -2,7 +2,7 @@
   name: Dragonscale Chestplate
   icon:
     ascii: "⬓"
-    image: "/images/items/scaleMail.svg"
+    image: "/images/items/armor/craftable/dragonscaleChestplate.svg"
   rarity: Epic
   stats:
     defense: 50

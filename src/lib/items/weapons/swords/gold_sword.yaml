@@ -2,7 +2,7 @@
   name: Gold Sword
   icon:
     ascii: "𐕣"
-    image: "/images/items/sword.svg"
+    image: "/images/items/weapons/swords/goldSword.svg"
   rarity: Uncommon
   stats:
     damage: 10

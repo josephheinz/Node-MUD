@@ -1,8 +1,8 @@
 - id: hardened_titanium_bar
   name: Hardened Titanium Bar
   icon:
-    ascii: "="
-    image: "/images/items/iBeam.svg"
+    ascii: '='
+    image: 'images/items/materials/crafting/bars/hardenedTitaniumBar.svg'
   rarity: Rare
   modifiers:
     - type: Stackable

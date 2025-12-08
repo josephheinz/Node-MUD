@@ -1,0 +1,10 @@
+- id: donut
+  name: Donut
+  icon:
+    ascii: "o"
+    image: "/images/items/donut.svg"
+  rarity: Common
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 1000

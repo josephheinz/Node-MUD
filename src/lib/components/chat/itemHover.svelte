@@ -25,7 +25,12 @@
 
 {#snippet icon()}
 	{#if item.icon.image}
-		<div
+		<img
+			src={item.icon.image}
+			alt={item.name + "'s image"}
+			class="inline-block h-4 w-4"
+		/>
+		<!-- <div
 			class="inline-block h-4 w-4 bg-current"
 			style="
 		-webkit-mask: url({item.icon.image}) no-repeat center;
@@ -34,7 +39,7 @@
 		mask-size: contain;
 		background: {item.rarity};
 	"
-		></div>
+		></div> -->
 	{:else}
 		<span class="ascii-item text-4xl select-none" style="color:{item?.rarity};"
 			>{item?.icon?.ascii}</span
