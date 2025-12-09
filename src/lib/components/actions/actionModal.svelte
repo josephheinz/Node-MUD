@@ -49,12 +49,12 @@
 		);
 	});
 
-	let loadedOutputsXp = $derived.by<Array<{ skill: string; amount: number }>>(() => {
+	let loadedOutputsXp = $derived.by<Array<{ skill: string; xpamount: number }>>(() => {
 		if (!loadedAction || !loadedAction.outputs.xp) return [];
 
-		return Object.entries(loadedAction.outputs.xp).map(([skill, amount]) => ({
+		return Object.entries(loadedAction.outputs.xp).map(([skill, xpamount]) => ({
 			skill,
-			amount
+			xpamount: xpamount * amount
 		}));
 	});
 
@@ -159,10 +159,10 @@
 							<span>{chancePercent == '100%' ? '' : chancePercent}</span>
 						</li>
 					{/each}
-					{#each loadedOutputsXp as { skill, amount }}
+					{#each loadedOutputsXp as { skill, xpamount }}
 						<li class="flex items-center justify-start gap-2 pl-4">
 							<img src="/images/experienceStar.svg" alt="xp star" class="inline-block h-4 w-4" />
-							<span>{numeral(amount).format('0,0[.]0a')} {capitalizeFirstLetter(skill)} XP</span>
+							<span>{numeral(xpamount).format('0,0[.]0a')} {skill} XP</span>
 						</li>
 					{/each}
 				</ul>

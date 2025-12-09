@@ -11,6 +11,7 @@
 	let { children } = $props();
 
 	import { onMount } from 'svelte';
+	import { PlayerSkills } from '$lib/types/skills';
 	onMount(() => {
 		const inv = hydrateInventory($page.data.inventory);
 		const eq = hydrateEquipment($page.data.equipment);
@@ -21,6 +22,7 @@
 		store.profile.set($page.data.profile);
 		store.baseStats.set($page.data.stats ?? { ...Stats });
 		store.modifiedStats.set(getModifiedStats(get(store.baseStats), get(store.equipment)));
+		store.skills.set($page.data.skills ?? { ...PlayerSkills });
 		store.actionQueue.set($page.data.queue);
 		store.queueStart.set(new Date($page.data.started).getTime());
 	});

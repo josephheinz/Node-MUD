@@ -5,6 +5,7 @@ import type { User } from '@supabase/supabase-js';
 import type { Equipment } from './types/equipment';
 import { deepClone } from './utils/general';
 import type { Action } from './types/action';
+import { PlayerSkills, type Skill, type SkillKey } from './types/skills';
 
 export type Profile = {
 	id: string;
@@ -22,6 +23,7 @@ export const inventory = writable<Item[]>();
 export const equipment = writable<Equipment>();
 export const baseStats = writable<StatList>(deepClone<StatList>(Stats));
 export const modifiedStats = writable<StatList>(deepClone<StatList>(Stats));
+export const skills = writable<Record<SkillKey, Skill>>(deepClone(PlayerSkills));
 export const actionQueue = writable<
 	{
 		action: Action;

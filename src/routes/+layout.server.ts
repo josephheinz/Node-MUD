@@ -3,6 +3,7 @@ import { type Item } from '$lib/types/item.js';
 import { Stats } from '$lib/types/stats.js';
 import { EmptyEquipment } from '$lib/types/equipment';
 import type { DBQueueAction } from '$lib/types/action.js';
+import { PlayerSkills } from '$lib/types/skills.js';
 
 /**
  * Load the current authenticated user (if any) and assemble their inventory, equipment, stats, action queue, and queue start time for page initialization.
@@ -26,7 +27,8 @@ export async function load({ cookies, fetch }) {
 			inventory: [],
 			equipment: EmptyEquipment,
 			stats: Stats,
-			queue: []
+			queue: [],
+			skills: {}
 		};
 	}
 
@@ -153,5 +155,27 @@ export async function load({ cookies, fetch }) {
 			console.error(error);
 		});
 
-	return { profile, inventory, equipment, stats, queue, started, user };
+	let skills = { ...PlayerSkills };
+
+	const loadSkills = await fetch(`/api/skills/${userId}`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	})
+		.then(async (response) => {
+			let responseJson = await response.json();
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+			return responseJson;
+		})
+		.then(async (data) => {
+			skills = data.skills;
+		})
+		.catch((error) => {
+			console.error(error);
+		});
+
+	return { profile, inventory, equipment, stats, queue, started, user, skills };
 }

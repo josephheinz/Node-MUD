@@ -1,5 +1,6 @@
 import { parse } from 'yaml';
 import { type SkillKey } from './skills';
+import { capitalizeFirstLetter } from '$lib/utils/general';
 
 export type ActionInput = {
 	ids: string[];
@@ -36,6 +37,17 @@ export type DBQueueAction = {
 	amount: number;
 };
 
+function normalizeXpKeys(xp: Record<string, number>): Record<SkillKey, number> {
+	const out: Record<string, number> = {};
+
+	for (const [key, value] of Object.entries(xp)) {
+		out[capitalizeFirstLetter(key)] = value;
+	}
+
+	return out as Record<SkillKey, number>;
+}
+
+
 /**
  * Create an Action object from a YAML string describing one or more actions by using the first document.
  *
@@ -44,14 +56,26 @@ export type DBQueueAction = {
  */
 export function parseYAMLToAction(yamlString: string): Action {
 	let action = parse(yamlString)[0];
+
+	const xp = action.xp
+		? normalizeXpKeys(action.xp)
+		: undefined;
+
 	return {
 		name: action.name,
 		inputs: action.inputs,
-		outputs: { items: action.outputs, xp: (action.xp as Record<SkillKey, number>) ?? undefined },
+		outputs: {
+			items: action.outputs,
+			xp
+		},
 		time: action.time,
-		icon: { image: action.icon.image, color: action.icon.color }
+		icon: {
+			image: action.icon.image,
+			color: action.icon.color
+		}
 	};
 }
+
 
 /**
  * Retrieve an action by its registry identifier.

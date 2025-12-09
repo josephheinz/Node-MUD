@@ -15,6 +15,8 @@
 	import Queue from '$lib/components/actions/queue.svelte';
 	import ActionSelect from '$lib/components/actions/actionSelect.svelte';
 	import ActionModal from '$lib/components/actions/actionModal.svelte';
+	import type { Skill, SkillKey } from '$lib/types/skills';
+	import { onMount } from 'svelte';
 
 	let loginModalOpen = $state(false);
 
@@ -22,6 +24,7 @@
 	let inventory = $state<Item[]>(get(store.inventory));
 	let equipment = $state<Equipment>(get(store.equipment));
 	let stats = $state<StatList>(get(store.modifiedStats)); // not base because base only gets updated when character upgrades are made
+	let skills = $state<Record<SkillKey, Skill>>(get(store.skills));
 	let queue = $state<DBQueueAction[]>(get(store.actionQueue));
 	let queueActive = $state<boolean>(get(store.queueActive));
 	let profile = $state<store.Profile>(get(store.profile));
@@ -44,6 +47,11 @@
 	store.actionQueue.subscribe((value) => (queue = value));
 	store.queueActive.subscribe((value) => (queueActive = value));
 	store.profile.subscribe((value) => (profile = value));
+	store.skills.subscribe((value) => (skills = value));
+
+	onMount(() => {
+		console.log(skills);
+	});
 </script>
 
 <title>Web-based Runescape-like Alpha</title>
