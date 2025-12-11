@@ -1,5 +1,5 @@
 import { parse } from 'yaml';
-import { xpForLevel, type Skill, type SkillKey } from './skills';
+import { cumulativeXPForLevel, xpForLevel, type Skill, type SkillKey } from './skills';
 import { capitalizeFirstLetter } from '$lib/utils/general';
 
 export type ActionInput = {
@@ -61,7 +61,7 @@ export function parseYAMLToAction(yamlString: string): Action {
 	const requirement = action.req
 		? {
 				name: action.req.skill,
-				xp: action.req.level
+				xp: cumulativeXPForLevel(action.req.level)
 			}
 		: undefined;
 

@@ -15,7 +15,7 @@
 	{#each categoryArray as actionName, index}
 		{@const action: TypeAction | null = getAction(actionName)}
 		<!--Yikes, just checks whether or not the player's current level is higher than the required level-->
-		{@const usuable: boolean = action ? (action.requirement ? xpToLevel(skills[action.requirement.name as SkillKey].xp) >= action.requirement.xp : true) : false}
+		{@const usuable: boolean = action ? (action.requirement ? xpToLevel(skills[action.requirement.name as SkillKey].xp) >= xpToLevel(action.requirement.xp) : true) : false}
 		{#if action}
 			<!-- 			<span>{usuable}</span>
  -->
