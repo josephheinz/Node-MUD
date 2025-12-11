@@ -186,7 +186,7 @@ export async function POST({ request, params, cookies }) {
 		: null;
 
 	if (skillAction && dbAction.action.requirement) {
-		if (xpToLevel(skillAction.xp) <= xpToLevel(dbAction.action.requirement.xp)) {
+		if (xpToLevel(skillAction.xp) < xpToLevel(dbAction.action.requirement.xp)) {
 			throw new Error(
 				`Player's ${skillAction.name} skill's level is not high enough: ${xpToLevel(skillAction.xp)}/${xpToLevel(dbAction.action.requirement.xp)}`
 			);

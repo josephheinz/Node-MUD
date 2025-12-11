@@ -13,4 +13,6 @@
     - id: titanium_ore
       min: 3
       max: 5
+  xp:
+    mining: 75
   time: 10

@@ -41,4 +41,4 @@ export function cumulativeXPForLevel(level: number): number {
 }
 
 export const XP_TABLE = buildXPTable(120);
-console.log(XP_TABLE)
+console.log(xpForLevel(120))

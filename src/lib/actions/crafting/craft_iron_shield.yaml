@@ -3,6 +3,9 @@
   icon:
     image: '/images/items/armor/craftable/kiteShield.svg'
     color: '#bdbdbd'
+  req:
+    skill: 'Crafting'
+    level: 5
   inputs:
     ids:
       - iron_bar
