@@ -3,7 +3,7 @@
 	import Action from './action.svelte';
 	import * as store from '$lib/store';
 	import { get } from 'svelte/store';
-	import { cumulativeXPForLevel, xpToLevel, type Skill, type SkillKey } from '$lib/types/skills';
+	import { xpToLevel, type Skill, type SkillKey } from '$lib/types/skills';
 
 	let { category = $bindable() }: { category: string } = $props();
 	const categoryArray = $derived(actionCategories[category] ?? []);
@@ -17,8 +17,6 @@
 		<!--Yikes, just checks whether or not the player's current level is higher than the required level-->
 		{@const usuable: boolean = action ? (action.requirement ? xpToLevel(skills[action.requirement.name as SkillKey].xp) >= xpToLevel(action.requirement.xp) : true) : false}
 		{#if action}
-			<!-- 			<span>{usuable}</span>
- -->
 			<Action
 				{usuable}
 				action={actionName}
