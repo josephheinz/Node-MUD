@@ -20,7 +20,7 @@ export function xpForLevel(level: number): number {
 
 export function xpToLevel(xp: number): number {
 	for (let lvl = 1; lvl < XP_TABLE.length; lvl++) {
-		if (xp < XP_TABLE[lvl]) return lvl - 1;
+		if (xp < XP_TABLE[lvl]) return lvl;
 	}
 	return XP_TABLE.length - 1;
 }
@@ -36,4 +36,9 @@ function buildXPTable(maxLevel = 120): Array<number> {
 	return table;
 }
 
+export function cumulativeXPForLevel(level: number): number {
+	return XP_TABLE[Math.max(0, level - 1)];
+}
+
 export const XP_TABLE = buildXPTable(120);
+console.log(xpToLevel(0));

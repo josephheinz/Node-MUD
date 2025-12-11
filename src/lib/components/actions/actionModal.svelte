@@ -9,8 +9,7 @@
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
 	import NumberInput from '../NumberInput.svelte';
-	import type { SkillKey } from '$lib/types/skills';
-	import { capitalizeFirstLetter } from '$lib/utils/general';
+	import { cumulativeXPForLevel, xpToLevel, type Skill, type SkillKey } from '$lib/types/skills';
 
 	let action: string = $state(get(store.actionModalData).action);
 	let amount: number = $state(1);
@@ -18,6 +17,8 @@
 	let isVisible: boolean = $state(get(store.actionModalData).visible);
 
 	let loadedAction: Action | null = $derived(getAction(action));
+
+	let skills: Record<SkillKey, Skill> = get(store.skills);
 
 	let loadedInputs = $derived.by(() => {
 		if (!loadedAction) return [];
@@ -103,6 +104,8 @@
 			});
 	}
 
+	let actionSkill: Skill = $derived(skills[loadedAction?.requirement?.name as SkillKey]);
+
 	store.actionModalData.subscribe((value) => {
 		action = value.action;
 		isVisible = value.visible;
@@ -110,6 +113,7 @@
 	});
 
 	store.inventory.subscribe((value) => (inventory = value));
+	store.skills.subscribe((value) => (skills = value));
 </script>
 
 {#if loadedAction && isVisible}
@@ -124,6 +128,12 @@
 				><Fa icon={faX} /></button
 			>
 			<h1 class="w-full text-center text-xl font-bold">{loadedAction?.name ?? 'Loading'}</h1>
+			{#if loadedAction.requirement}
+				<span
+					class={xpToLevel(actionSkill.xp) >= loadedAction.requirement.xp ? '' : 'text-rose-400'}
+					>Requires Level {loadedAction.requirement.xp} {loadedAction.requirement.name}</span
+				>
+			{/if}
 			<div>
 				<h1 class="text-center text-lg font-semibold">Inputs:</h1>
 				<ul>
