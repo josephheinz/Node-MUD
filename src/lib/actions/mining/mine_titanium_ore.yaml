@@ -1,8 +1,11 @@
 - id: mine_titanium_ore
   name: Mine Titanium Ore
   icon:
-    image: "/images/actions/miner.svg"
-    color: "#bdbdbd"
+    image: '/images/actions/miner.svg'
+    color: '#bdbdbd'
+  req:
+    skill: 'Mining'
+    level: 10
   inputs:
     ids:
     amounts:

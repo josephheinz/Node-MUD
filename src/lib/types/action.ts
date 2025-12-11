@@ -1,5 +1,5 @@
 import { parse } from 'yaml';
-import { type SkillKey } from './skills';
+import { xpForLevel, type Skill, type SkillKey } from './skills';
 import { capitalizeFirstLetter } from '$lib/utils/general';
 
 export type ActionInput = {
@@ -25,6 +25,7 @@ export type Action = {
 	outputs: ActionOutput;
 	time: number;
 	icon: ActionIcon;
+	requirement?: Skill;
 };
 
 export type ActionIcon = {
@@ -47,7 +48,6 @@ function normalizeXpKeys(xp: Record<string, number>): Record<SkillKey, number> {
 	return out as Record<SkillKey, number>;
 }
 
-
 /**
  * Create an Action object from a YAML string describing one or more actions by using the first document.
  *
@@ -57,8 +57,12 @@ function normalizeXpKeys(xp: Record<string, number>): Record<SkillKey, number> {
 export function parseYAMLToAction(yamlString: string): Action {
 	let action = parse(yamlString)[0];
 
-	const xp = action.xp
-		? normalizeXpKeys(action.xp)
+	const xp = action.xp ? normalizeXpKeys(action.xp) : undefined;
+	const requirement = action.req
+		? {
+				name: action.req.skill,
+				xp: action.req.level
+			}
 		: undefined;
 
 	return {
@@ -72,10 +76,10 @@ export function parseYAMLToAction(yamlString: string): Action {
 		icon: {
 			image: action.icon.image,
 			color: action.icon.color
-		}
+		},
+		requirement
 	};
 }
-
 
 /**
  * Retrieve an action by its registry identifier.
@@ -114,7 +118,7 @@ export type ActionCategory = keyof typeof actionCategories;
 
 export const actionCategories: Record<string, Array<string>> = {
 	Mining: ['mine_iron_ore', 'mine_gold_ore', 'mine_titanium_ore'],
-	Crafting: ['craft_iron_sword', 'craft_gold_sword', 'craft_titanium_sword', "craft_iron_shield"],
+	Crafting: ['craft_iron_sword', 'craft_gold_sword', 'craft_titanium_sword', 'craft_iron_shield'],
 	Smelt: ['smelt_iron_bar', 'smelt_gold_bar', 'smelt_titanium_bar', 'smelt_hardened_titanium_bar']
 };
 
