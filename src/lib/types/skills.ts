@@ -15,7 +15,7 @@ export const PlayerSkills: Record<SkillKey, Skill> = {
 };
 
 export function xpForLevel(level: number): number {
-	return 90 * level * level + 250 * level + 1000 + 120 * Math.pow(1.055, level);
+	return Math.round(90 * level * level + 250 * level + 1000 + 120 * Math.pow(1.055, level));
 }
 
 export function xpToLevel(xp: number): number {
@@ -31,7 +31,7 @@ function buildXPTable(maxLevel = 120): Array<number> {
 
 	for (let lvl = 1; lvl <= maxLevel; lvl++) {
 		cumulative += xpForLevel(lvl);
-		table[lvl] = Math.round(cumulative);
+		table[lvl] = cumulative;
 	}
 	return table;
 }
@@ -41,3 +41,4 @@ export function cumulativeXPForLevel(level: number): number {
 }
 
 export const XP_TABLE = buildXPTable(120);
+console.log(XP_TABLE)

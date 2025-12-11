@@ -26,6 +26,9 @@
 					<span class="text-center text-2xl font-black">{xpToLevel(skill.xp)}</span>
 					<ProgressBar max={xpReqForLevel} value={xpOutOfCurrentLevel} />
 					<span
+						title={`${numeral(xpOutOfCurrentLevel).format('0,0[.]00A')} / ${numeral(
+							xpReqForLevel
+						).format('0,0[.]00A')} to get to level ${xpToLevel(skill.xp) + 1}`}
 						>{numeral(xpOutOfCurrentLevel).format('0,0[.]00a')} / {numeral(xpReqForLevel).format(
 							'0,0[.]00a'
 						)}</span
