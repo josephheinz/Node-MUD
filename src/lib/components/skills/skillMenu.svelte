@@ -14,7 +14,7 @@
 
 <main class="flex h-full w-full items-start justify-start p-4 select-none">
 	<div
-		class="flex flex-col items-start justify-start gap-2 rounded-md border-2 border-zinc-600 bg-zinc-700 p-2"
+		class="flex flex-col items-start justify-start gap-2 rounded-md border-2 border-zinc-700 bg-zinc-800 p-2"
 	>
 		<h1 class="text-2xl font-semibold">Your Skills</h1>
 		<div class="grid w-full grow grid-cols-3 grid-rows-3 gap-2">
