@@ -2,7 +2,7 @@
   name: Titanium Bar
   icon:
     ascii: "="
-    image: "/images/items/metalBar.svg"
+    image: "/images/items/materials/crafting/bars/titaniumBar.svg"
   rarity: Rare
   modifiers:
     - type: Stackable

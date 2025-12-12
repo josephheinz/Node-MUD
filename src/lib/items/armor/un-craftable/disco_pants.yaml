@@ -1,8 +1,8 @@
 - id: disco_pants
   name: Disco Pants
   icon:
-    ascii: "𓂻"
-    image: "/images/items/trousers.svg"
+    ascii: '𓂻'
+    image: '/images/items/armor/un-craftable/discoPants.svg'
   rarity: Mythic
   modifiers:
     - type: Equippable

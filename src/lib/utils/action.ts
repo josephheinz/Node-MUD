@@ -1,6 +1,9 @@
 import type { StackableModifier } from "$lib/modifiers/basicModifiers";
+import { skills } from "$lib/store";
 import { type Action, type DBQueueAction, type ChanceItem, rollChance, rollValue, actionCategories } from "$lib/types/action";
 import type { Item } from "$lib/types/item";
+import { PlayerSkills, type SkillKey } from "$lib/types/skills";
+import { deepClone } from "./general";
 import { loadDbItem, tryStackItemInInventory } from "./item";
 
 /**
@@ -99,6 +102,11 @@ export function removeInputsFromInventory(
 }
 
 
+const emptyXpOutput: Record<SkillKey, number> = {
+    "Mining": 0,
+    "Crafting": 0
+}
+
 /**
  * Process queued actions relative to a start time, producing items for completed steps and updating the queue.
  *
@@ -106,15 +114,15 @@ export function removeInputsFromInventory(
  * @param started_at - Start timestamp used to calculate elapsed processing time for the queue.
  * @returns An object with `outputs`, the items produced by any completed action steps, and `queue`, the updated queue after processing.
  */
-export function processQueue(queue: DBQueueAction[], started_at: Date): { outputs: Item[]; queue: DBQueueAction[] } {
+export function processQueue(queue: DBQueueAction[], started_at: Date): { outputs: { items: Item[], xp: Record<SkillKey, number> }; queue: DBQueueAction[] } {
     const completion = checkQueueCompletion(queue, started_at);
 
-    let outputs: Item[] = [];
+    let outputs: { items: Item[], xp: Record<SkillKey, number> } = { items: [], xp: deepClone(emptyXpOutput) };
 
     if (completion.status === "Complete") {
         queue.forEach((action: DBQueueAction) => {
             for (let i = 0; i < action.amount; i++) {
-                outputs = [...outputs, ...completeAction(action.action)];
+                outputs = { items: [...outputs.items, ...completeAction(action.action).items], xp: { ...outputs.xp, ...completeAction(action.action).xp } };
             }
         });
         queue.length = 0;
@@ -130,7 +138,7 @@ export function processQueue(queue: DBQueueAction[], started_at: Date): { output
             action.amount--;
             if (action.amount <= 0) queue.shift();
 
-            outputs = [...outputs, ...completeAction(action.action)];
+            outputs = { items: [...outputs.items, ...completeAction(action.action).items], xp: { ...outputs.xp, ...completeAction(action.action).xp } };
         }
     }
 
@@ -143,19 +151,27 @@ export function processQueue(queue: DBQueueAction[], started_at: Date): { output
  * @param action - The action whose configured ChanceItems will be rolled to determine produced items and amounts.
  * @returns An array of produced Items; successful chance rolls yield one or more Items (stacked when possible). 
  */
-export function completeAction(action: Action): Item[] {
-    let outputs: Item[] = [];
+export function completeAction(action: Action): { items: Item[], xp: Record<SkillKey, number> } {
+    let outputs: { items: Item[], xp: Record<SkillKey, number> } = {
+        items: [], xp: deepClone(emptyXpOutput)
+    };
 
     action.outputs.items.forEach((item: ChanceItem) => {
         if (rollChance(item)) {
             const amount: number = rollValue(item);
             for (let i = 0; i < amount; i++) {
                 const loadedItem: Item = loadDbItem({ id: item.id });
-                outputs = tryStackItemInInventory(loadedItem, outputs);
+                outputs.items = tryStackItemInInventory(loadedItem, outputs.items);
             }
             ///outputs.push(...Array(amount).fill(loadedItem));
         }
     });
+
+    if (action.outputs.xp) {
+        Object.entries(action.outputs.xp).forEach(([skill, value]) => {
+            outputs.xp[skill as SkillKey] += value;
+        });
+    }
 
     return outputs;
 }

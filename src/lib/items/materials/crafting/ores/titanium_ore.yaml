@@ -1,8 +1,8 @@
 - id: titanium_ore
   name: Titanium Ore
   icon:
-    ascii: "🪨"
-    image: "/images/items/ore.svg"
+    ascii: '🪨'
+    image: '/images/items/materials/crafting/ores/titaniumOre.svg'
   rarity: Uncommon
   modifiers:
     - type: Stackable

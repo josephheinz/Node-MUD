@@ -3,6 +3,9 @@
   icon:
     image: "/images/actions/miner.svg"
     color: "#bdbdbd"
+  req:
+    skill: 'Mining'
+    level: 1
   inputs:
     ids:
     amounts:
@@ -10,4 +13,6 @@
     - id: iron_ore
       min: 3
       max: 5
+  xp:
+    mining: 20
   time: 5

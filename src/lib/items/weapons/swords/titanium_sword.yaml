@@ -2,7 +2,7 @@
   name: Titanium Sword
   icon:
     ascii: "𐕣"
-    image: "/images/items/sword.svg"
+    image: "/images/items/weapons/swords/titaniumSword.svg"
   rarity: Rare
   stats:
     damage: 25

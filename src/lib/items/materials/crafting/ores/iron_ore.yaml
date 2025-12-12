@@ -2,7 +2,7 @@
   name: Iron Ore
   icon:
     ascii: "🪨"
-    image: "/images/items/ore.svg"
+    image: "/images/items/materials/crafting/ores/ironOre.svg"
   rarity: Common
   modifiers:
     - type: Stackable

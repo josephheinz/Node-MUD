@@ -39,7 +39,7 @@
 		<img
 			src={profile.profile_picture ?? '/images/blank_pfp.webp'}
 			alt="Profile"
-			class="h-12 rounded-full"
+			class="h-12 rounded-full aspect-square"
 		/>
 		<div class="flex flex-col items-start justify-between grow">
 			<b>{displayName}</b>

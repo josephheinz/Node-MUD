@@ -4,6 +4,7 @@ import type { DBItem, Item } from '$lib/types/item';
 import { getInventoryCounts, processQueue, removeInputsFromInventory } from '$lib/utils/action.js';
 import { encodeDbItem, hydrateInventory, tryStackItemInInventory } from '$lib/utils/item.js';
 import { getItem } from '$lib/types/item';
+import { xpToLevel, type Skill, type SkillKey } from '$lib/types/skills.js';
 
 /**
  * Validate the user's session, process their action queue (applying completed outputs to inventory), persist any inventory and queue updates, and return the current queue state and inventory.
@@ -11,7 +12,7 @@ import { getItem } from '$lib/types/item';
  * @param params - Route parameters; must include `id` (the player's id used for authorization and data lookup)
  * @param cookies - Request cookies; must include the `supabase.session` cookie used to refresh and validate the session
  * @returns An HTTP JSON response. On success (200) returns `queue` (updated queue array), `started` (timestamp or null), and `inventory` (updated Item[]). If no action row is found returns `{ queue: undefined, started: undefined }` with 404. Session-related errors return an appropriate 4xx response.
- */ 
+ */
 export async function GET({ params, cookies }) {
 	const { id } = params;
 
@@ -46,16 +47,23 @@ export async function GET({ params, cookies }) {
 		const { data: invData, error: invError } = await supabase
 			.from('inventories')
 			.select('inventory_data')
-			.eq('player_id', id);
-
+			.eq('player_id', id)
+			.single();
 		if (invError) throw new Error(invError.message);
 
+		const { data: skillData, error: skillError } = await supabase
+			.from('skills')
+			.select('skills_data')
+			.eq('player_id', id)
+			.single();
+		if (skillError) throw new Error(skillError.message);
+
 		// Inventory is an array of Item objects
-		const inventory: Item[] = hydrateInventory(invData[0].inventory_data);
+		const inventory: Item[] = hydrateInventory(invData.inventory_data);
 
 		// Combining old inventory with new outputs from the queue
 		let updatedInv: Item[] = [...inventory];
-		processedQueue.outputs.forEach((output: Item) => {
+		processedQueue.outputs.items.forEach((output: Item) => {
 			updatedInv = tryStackItemInInventory(output, updatedInv);
 		});
 		let updatedDBInv: DBItem[] = [];
@@ -65,6 +73,10 @@ export async function GET({ params, cookies }) {
 		});
 
 		const updatedQueue: DBQueueAction[] = processedQueue.queue;
+
+		Object.entries(processedQueue.outputs.xp).forEach(([skill, value]) => {
+			skillData.skills_data[skill as SkillKey].xp += value;
+		});
 
 		if (data[0].started_at != null && updatedQueue.length <= 0) {
 			const { error: updateStartErr } = await supabase
@@ -88,6 +100,12 @@ export async function GET({ params, cookies }) {
 			.eq('player_id', id);
 		if (updateInvErr) throw new Error(updateInvErr.message);
 
+		const { error: updateSkillsErr } = await supabase
+			.from('skills')
+			.update({ skills_data: skillData.skills_data })
+			.eq('player_id', id);
+		if (updateSkillsErr) throw new Error(updateSkillsErr.message);
+
 		const { data: updateQueueData, error: updateQueueErr } = await supabase
 			.from('actions')
 			.update({ queue: updatedQueue })
@@ -96,7 +114,12 @@ export async function GET({ params, cookies }) {
 		if (updateQueueErr) throw new Error(updateQueueErr.message);
 
 		return Response.json(
-			{ queue: updatedQueue, started: updateQueueData[0].started_at, inventory: updatedInv },
+			{
+				queue: updatedQueue,
+				started: updateQueueData[0].started_at,
+				inventory: updatedInv,
+				skills: skillData.skills_data
+			},
 			{ status: 200 }
 		);
 	}
@@ -147,15 +170,38 @@ export async function POST({ request, params, cookies }) {
 
 	const dbAction: DBQueueAction = { action, amount };
 
+	const { data: skillData, error: skillErr } = await supabase
+		.from('skills')
+		.select('skills_data')
+		.eq('player_id', id)
+		.single();
+
+	if (!skillData)
+		throw new Error('Player does not have skills initialized, so skill checks cannot be done');
+
+	const skillAction: Skill | null = dbAction.action.requirement
+		? (skillData.skills_data as Record<SkillKey, Skill>)[
+				dbAction.action.requirement.name as SkillKey
+			]
+		: null;
+
+	if (skillAction && dbAction.action.requirement) {
+		if (xpToLevel(skillAction.xp) < xpToLevel(dbAction.action.requirement.xp)) {
+			throw new Error(
+				`Player's ${skillAction.name} skill's level is not high enough: ${xpToLevel(skillAction.xp)}/${xpToLevel(dbAction.action.requirement.xp)}`
+			);
+		}
+	}
+
 	const { data: invData, error: invErr } = await supabase
 		.from('inventories')
 		.select('inventory_data')
-		.eq('player_id', id);
+		.eq('player_id', id)
+		.single();
 
-	if (!invData || invData.length <= 0)
-		throw new Error('Player does not have an inventory, so inputs cannot be taken out');
+	if (!invData) throw new Error('Player does not have an inventory, so inputs cannot be taken out');
 
-	const inventory: Item[] = hydrateInventory(invData[0].inventory_data);
+	const inventory: Item[] = hydrateInventory(invData.inventory_data);
 
 	let loadedInputs: { item: Item; amount: number }[] = [];
 

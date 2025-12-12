@@ -15,6 +15,9 @@
 	import Queue from '$lib/components/actions/queue.svelte';
 	import ActionSelect from '$lib/components/actions/actionSelect.svelte';
 	import ActionModal from '$lib/components/actions/actionModal.svelte';
+	import type { Skill, SkillKey } from '$lib/types/skills';
+	import { onMount } from 'svelte';
+	import SkillMenu from '$lib/components/skills/skillMenu.svelte';
 
 	let loginModalOpen = $state(false);
 
@@ -22,11 +25,12 @@
 	let inventory = $state<Item[]>(get(store.inventory));
 	let equipment = $state<Equipment>(get(store.equipment));
 	let stats = $state<StatList>(get(store.modifiedStats)); // not base because base only gets updated when character upgrades are made
+	let skills = $state<Record<SkillKey, Skill>>(get(store.skills));
 	let queue = $state<DBQueueAction[]>(get(store.actionQueue));
 	let queueActive = $state<boolean>(get(store.queueActive));
 	let profile = $state<store.Profile>(get(store.profile));
 
-	let tabs: string[] = ['Character', 'Reforge', 'Actions'];
+	let tabs: string[] = ['Character', 'Reforge', 'Actions', 'Skills'];
 	let currentTab: string = $state(tabs[0]);
 
 	store.inventory.subscribe((value) => {
@@ -44,6 +48,11 @@
 	store.actionQueue.subscribe((value) => (queue = value));
 	store.queueActive.subscribe((value) => (queueActive = value));
 	store.profile.subscribe((value) => (profile = value));
+	store.skills.subscribe((value) => (skills = value));
+
+	onMount(() => {
+		console.log(skills);
+	});
 </script>
 
 <title>Web-based Runescape-like Alpha</title>
@@ -62,10 +71,6 @@
 				<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
 			{/if}
 		</nav>
-		{#if user}
-			<ActionModal />
-			<Chat {user} />
-		{/if}
 		<main class="flex w-full grow items-start justify-start">
 			<aside class="flex h-full shrink flex-col border-r-4 border-zinc-600">
 				{#each tabs as tab}
@@ -86,8 +91,14 @@
 					<Reforger item={undefined} {equipment} {inventory} />
 				{:else if currentTab === 'Actions'}
 					<ActionSelect categories={Object.keys(actionCategories)} />
+				{:else if currentTab === 'Skills'}
+					<SkillMenu {skills} />
 				{/if}
 			</div>
 		</main>
+		{#if user}
+			<ActionModal />
+			<Chat {user} />
+		{/if}
 	</div>
 </div>

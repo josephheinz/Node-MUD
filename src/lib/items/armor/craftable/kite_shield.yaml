@@ -2,7 +2,7 @@
   name: Kite Shield
   icon:
     ascii: "⛨"
-    image: "/images/items/checkedShield.svg"
+    image: "/images/items/armor/craftable/kiteShield.svg"
   rarity: Common
   stats:
     defense: 10

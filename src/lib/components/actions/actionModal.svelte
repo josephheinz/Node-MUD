@@ -9,6 +9,7 @@
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
 	import NumberInput from '../NumberInput.svelte';
+	import { xpToLevel, type Skill, type SkillKey } from '$lib/types/skills';
 
 	let action: string = $state(get(store.actionModalData).action);
 	let amount: number = $state(1);
@@ -16,6 +17,8 @@
 	let isVisible: boolean = $state(get(store.actionModalData).visible);
 
 	let loadedAction: Action | null = $derived(getAction(action));
+
+	let skills: Record<SkillKey, Skill> = get(store.skills);
 
 	let loadedInputs = $derived.by(() => {
 		if (!loadedAction) return [];
@@ -47,11 +50,25 @@
 		);
 	});
 
+	let loadedOutputsXp = $derived.by<Array<{ skill: string; xpamount: number }>>(() => {
+		if (!loadedAction || !loadedAction.outputs.xp) return [];
+
+		return Object.entries(loadedAction.outputs.xp).map(([skill, xpamount]) => ({
+			skill,
+			xpamount: xpamount * amount
+		}));
+	});
+
 	let inputsPresent = $derived.by(() => getInventoryCounts(inventory, loadedInputs));
 
-	let canAct = $derived.by(() =>
-		loadedInputs.every((_, i) => inputsPresent[i].present >= inputsPresent[i].required)
-	);
+	let canAct = $derived.by(() => {
+		return (
+			loadedInputs.every((_, i) => inputsPresent[i].present >= inputsPresent[i].required) &&
+			(loadedAction?.requirement
+				? xpToLevel(actionSkill.xp) >= xpToLevel(loadedAction?.requirement?.xp)
+				: true)
+		);
+	});
 
 	async function addToQueue() {
 		loadedInputs.forEach((_, index) => {
@@ -92,6 +109,8 @@
 			});
 	}
 
+	let actionSkill: Skill = $derived(skills[loadedAction?.requirement?.name as SkillKey]);
+
 	store.actionModalData.subscribe((value) => {
 		action = value.action;
 		isVisible = value.visible;
@@ -99,6 +118,7 @@
 	});
 
 	store.inventory.subscribe((value) => (inventory = value));
+	store.skills.subscribe((value) => (skills = value));
 </script>
 
 {#if loadedAction && isVisible}
@@ -113,6 +133,15 @@
 				><Fa icon={faX} /></button
 			>
 			<h1 class="w-full text-center text-xl font-bold">{loadedAction?.name ?? 'Loading'}</h1>
+			{#if loadedAction.requirement}
+				<span
+					class={xpToLevel(actionSkill.xp) >= xpToLevel(loadedAction.requirement.xp)
+						? ''
+						: 'text-rose-400'}
+					>Requires Level {xpToLevel(loadedAction.requirement.xp)}
+					{loadedAction.requirement.name}</span
+				>
+			{/if}
 			<div>
 				<h1 class="text-center text-lg font-semibold">Inputs:</h1>
 				<ul>
@@ -146,6 +175,12 @@
 							>
 							<ItemHover {item} />
 							<span>{chancePercent == '100%' ? '' : chancePercent}</span>
+						</li>
+					{/each}
+					{#each loadedOutputsXp as { skill, xpamount }}
+						<li class="flex items-center justify-start gap-2 pl-4">
+							<img src="/images/experienceStar.svg" alt="xp star" class="inline-block h-4 w-4" />
+							<span>{numeral(xpamount).format('0,0[.]0a')} {skill} XP</span>
 						</li>
 					{/each}
 				</ul>

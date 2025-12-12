@@ -1,4 +1,6 @@
 import { parse } from 'yaml';
+import { cumulativeXPForLevel, xpForLevel, type Skill, type SkillKey } from './skills';
+import { capitalizeFirstLetter } from '$lib/utils/general';
 
 export type ActionInput = {
 	ids: string[];
@@ -14,6 +16,7 @@ export type ChanceItem = {
 
 export type ActionOutput = {
 	items: ChanceItem[];
+	xp?: Record<SkillKey, number>;
 };
 
 export type Action = {
@@ -22,6 +25,7 @@ export type Action = {
 	outputs: ActionOutput;
 	time: number;
 	icon: ActionIcon;
+	requirement?: Skill;
 };
 
 export type ActionIcon = {
@@ -34,6 +38,16 @@ export type DBQueueAction = {
 	amount: number;
 };
 
+function normalizeXpKeys(xp: Record<string, number>): Record<SkillKey, number> {
+	const out: Record<string, number> = {};
+
+	for (const [key, value] of Object.entries(xp)) {
+		out[capitalizeFirstLetter(key)] = value;
+	}
+
+	return out as Record<SkillKey, number>;
+}
+
 /**
  * Create an Action object from a YAML string describing one or more actions by using the first document.
  *
@@ -42,12 +56,28 @@ export type DBQueueAction = {
  */
 export function parseYAMLToAction(yamlString: string): Action {
 	let action = parse(yamlString)[0];
+
+	const xp = action.xp ? normalizeXpKeys(action.xp) : undefined;
+	const requirement = action.req
+		? {
+				name: action.req.skill,
+				xp: cumulativeXPForLevel(action.req.level)
+			}
+		: undefined;
+
 	return {
 		name: action.name,
 		inputs: action.inputs,
-		outputs: { items: action.outputs },
+		outputs: {
+			items: action.outputs,
+			xp
+		},
 		time: action.time,
-		icon: { image: action.icon.image, color: action.icon.color }
+		icon: {
+			image: action.icon.image,
+			color: action.icon.color
+		},
+		requirement
 	};
 }
 
@@ -88,7 +118,7 @@ export type ActionCategory = keyof typeof actionCategories;
 
 export const actionCategories: Record<string, Array<string>> = {
 	Mining: ['mine_iron_ore', 'mine_gold_ore', 'mine_titanium_ore'],
-	Crafting: ['craft_iron_sword', 'craft_gold_sword', 'craft_titanium_sword',"craft_iron_shield"],
+	Crafting: ['craft_iron_sword', 'craft_gold_sword', 'craft_titanium_sword', 'craft_iron_shield'],
 	Smelt: ['smelt_iron_bar', 'smelt_gold_bar', 'smelt_titanium_bar', 'smelt_hardened_titanium_bar']
 };
 

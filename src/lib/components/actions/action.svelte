@@ -1,21 +1,26 @@
 <script lang="ts">
 	import { getAction, type Action } from '$lib/types/action';
 
-	let { action, onclick: onclickfunc }: { action: string; onclick: (action: string) => void } =
-		$props();
+	let {
+		action,
+		onclick: onclickfunc,
+		usuable
+	}: { action: string; onclick: (action: string) => void; usuable: boolean } = $props();
 
 	let loadedAction: Action | null = $derived(getAction(action));
 </script>
 
 {#if loadedAction}
 	<button
-		class="flex aspect-1/1 cursor-pointer flex-col items-center justify-start gap-2 rounded-md border-2 border-zinc-700 bg-zinc-800 p-4"
+		class={`flex aspect-1/1 cursor-pointer flex-col items-center justify-start gap-2 rounded-md border-2 border-zinc-700 bg-zinc-800 p-4
+		${usuable === false ? 'opacity-50' : ''}
+		`}
 		onclick={() => {
 			onclickfunc(action);
 		}}
 	>
 		<div
-			class="aspect-1/1 bg-current w-1/2"
+			class="aspect-1/1 w-1/2 bg-current"
 			style="
 		-webkit-mask: url({loadedAction.icon.image}) no-repeat center;
 		mask: url({loadedAction.icon.image}) no-repeat center;

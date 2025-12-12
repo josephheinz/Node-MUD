@@ -3,6 +3,9 @@
   icon:
     image: "/images/actions/foundryBucket.svg"
     color: "#bdbdbd"
+  req:
+    skill: 'Crafting'
+    level: 5
   inputs:
     ids:
       - gold_ore
@@ -12,4 +15,6 @@
     - id: gold_bar
       min: 1
       max: 1
-  time: 10
+  xp:
+    crafting: 50
+  time: 7.5

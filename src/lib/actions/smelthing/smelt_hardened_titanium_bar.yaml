@@ -3,6 +3,9 @@
   icon:
     image: "/images/actions/foundryBucket.svg"
     color: "#bdbdbd"
+  req:
+    skill: 'Crafting'
+    level: 15
   inputs:
     ids:
       - titanium_bar
@@ -14,4 +17,6 @@
     - id: hardened_titanium_bar
       min: 1
       max: 1
-  time: 20
+  xp:
+    crafting: 75
+  time: 15
