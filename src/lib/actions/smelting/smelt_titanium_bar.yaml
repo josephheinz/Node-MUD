@@ -1,20 +1,20 @@
-- id: smelt_gold_bar
-  name: Smelt Gold Bar
+- id: smelt_titanium_bar
+  name: Smelt Titanium Bar
   icon:
     image: "/images/actions/foundryBucket.svg"
     color: "#bdbdbd"
   req:
     skill: 'Crafting'
-    level: 5
+    level: 10
   inputs:
     ids:
-      - gold_ore
+      - titanium_ore
     amounts:
       - 2
   outputs:
-    - id: gold_bar
+    - id: titanium_bar
       min: 1
       max: 1
   xp:
-    crafting: 50
-  time: 7.5
+    crafting: 15
+  time: 10

@@ -19,12 +19,17 @@
 		<h1 class="text-2xl font-semibold">Your Skills</h1>
 		<div class="grid w-full grow grid-cols-3 grid-rows-3 gap-2">
 			{#each Object.values(skills) as skill}
-				{@const xpReqForLevel: number = xpForLevel(xpToLevel(skill.xp))}
-				{@const xpOutOfCurrentLevel: number = skill.xp - cumulativeXPForLevel(xpToLevel(skill.xp) - 1)}
+				{@const xpReqForLevel: number = xpForLevel(xpToLevel(skill.xp) + 1)}
+				{@const xpOutOfCurrentLevel: number = skill.xp - cumulativeXPForLevel(xpToLevel(skill.xp))}
 				<div class="flex aspect-square flex-col items-center justify-start p-2">
-					<h2 class="text-lg font-medium">{skill.name}</h2>
-					<span class="text-center text-2xl font-black">{xpToLevel(skill.xp)}</span>
-					<ProgressBar max={xpReqForLevel} value={xpOutOfCurrentLevel} />
+					<h2 class="text-lg font-medium">
+						{skill.name}
+					</h2>
+					<span
+						class="text-center text-2xl font-black"
+						title={`Total XP: ${numeral(skill.xp).format('0,0[.]00A')}`}>{xpToLevel(skill.xp)}</span
+					>
+					<ProgressBar max={xpReqForLevel} value={Math.min(xpOutOfCurrentLevel, xpReqForLevel)} />
 					<span
 						title={`${numeral(xpOutOfCurrentLevel).format('0,0[.]00A')} / ${numeral(
 							xpReqForLevel

@@ -1,20 +1,22 @@
-- id: smelt_iron_bar
-  name: Smelt Iron Bar
+- id: smelt_hardened_titanium_bar
+  name: Smelt Hardened Titanium Bar
   icon:
     image: "/images/actions/foundryBucket.svg"
     color: "#bdbdbd"
   req:
     skill: 'Crafting'
-    level: 1
+    level: 15
   inputs:
     ids:
-      - iron_ore
+      - titanium_bar
+      - iron_bar
     amounts:
+      - 1
       - 2
   outputs:
-    - id: iron_bar
+    - id: hardened_titanium_bar
       min: 1
       max: 1
   xp:
     crafting: 20
-  time: 5
+  time: 15

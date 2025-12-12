@@ -1,0 +1,20 @@
+- id: smelt_gold_bar
+  name: Smelt Gold Bar
+  icon:
+    image: "/images/actions/foundryBucket.svg"
+    color: "#bdbdbd"
+  req:
+    skill: 'Crafting'
+    level: 5
+  inputs:
+    ids:
+      - gold_ore
+    amounts:
+      - 2
+  outputs:
+    - id: gold_bar
+      min: 1
+      max: 1
+  xp:
+    crafting: 7.5
+  time: 7.5
