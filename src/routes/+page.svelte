@@ -92,7 +92,7 @@
 				{:else if currentTab === 'Actions'}
 					<ActionSelect categories={Object.keys(actionCategories)} />
 				{:else if currentTab === 'Skills'}
-					<SkillMenu {skills} />
+					<SkillMenu bind:skills />
 				{/if}
 			</div>
 		</main>

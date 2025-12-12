@@ -73,6 +73,9 @@
 			if (data.inventory) {
 				store.inventory.set(data.inventory);
 			}
+			if (data.skills) {
+				store.skills.set(data.skills);
+			}
 
 			const shouldContinue = data.queue && data.queue.length > 0;
 
