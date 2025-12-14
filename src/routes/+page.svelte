@@ -16,10 +16,11 @@
 	import ActionSelect from '$lib/components/actions/actionSelect.svelte';
 	import ActionModal from '$lib/components/actions/actionModal.svelte';
 	import type { Skill, SkillKey } from '$lib/types/skills';
-	import { onMount } from 'svelte';
 	import SkillMenu from '$lib/components/skills/skillMenu.svelte';
+	import QueueModal from '$lib/components/actions/queueModal.svelte';
 
 	let loginModalOpen = $state(false);
+	let queueModalOpen = $state(false);
 
 	let user = $state<User>(get(store.user));
 	let inventory = $state<Item[]>(get(store.inventory));
@@ -49,10 +50,6 @@
 	store.queueActive.subscribe((value) => (queueActive = value));
 	store.profile.subscribe((value) => (profile = value));
 	store.skills.subscribe((value) => (skills = value));
-
-	onMount(() => {
-		console.log(skills);
-	});
 </script>
 
 <title>Web-based Runescape-like Alpha</title>
@@ -62,7 +59,7 @@
 	{#if profile}
 		<div class="relative flex h-full w-full flex-col items-start justify-start">
 			<nav class="flex h-min w-full items-center justify-evenly border-b-2 border-zinc-600 p-2">
-				<Queue {queue} running={queueActive} />
+				<Queue {queue} running={queueActive} bind:queueModalOpen />
 				<div class="flex grow items-start justify-end">
 					<ProfileDropdown {profile} />
 				</div>
@@ -95,6 +92,11 @@
 			{#if user}
 				<ActionModal />
 				<Chat {user} />
+				<QueueModal
+					bind:queue
+					bind:open={queueModalOpen}
+					onClose={() => (queueModalOpen = false)}
+				/>
 			{/if}
 		</div>
 	{:else}

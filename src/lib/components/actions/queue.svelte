@@ -4,7 +4,11 @@
 	import ProgressBar from './progressBar.svelte';
 	import * as store from '$lib/store';
 
-	let { queue: initialQueue, running }: { queue: DBQueueAction[]; running: boolean } = $props();
+	let {
+		queue: initialQueue,
+		running,
+		queueModalOpen = $bindable()
+	}: { queue: DBQueueAction[]; running: boolean; queueModalOpen: boolean } = $props();
 
 	let queue: DBQueueAction[] = $state(initialQueue);
 
@@ -121,7 +125,10 @@
 	});
 </script>
 
-<div class="size-fit rounded-md border-2 border-zinc-700 bg-zinc-800 p-2 select-none">
+<button
+	class="size-fit cursor-pointer rounded-md border-2 border-zinc-700 bg-zinc-800 p-2"
+	onclick={() => (queueModalOpen = true)}
+>
 	<h1 class="inline-block text-lg font-semibold">Action Queue</h1>
 	<br />
 	<div class="w-48">
@@ -141,4 +148,4 @@
 			</h2>
 		</div>
 	{/if}
-</div>
+</button>

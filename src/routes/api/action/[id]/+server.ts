@@ -262,3 +262,41 @@ export async function POST({ request, params, cookies }) {
 
 	return Response.json({ queue: setData[0].queue, inventory: updatedInventory }, { status: 200 });
 }
+
+export async function PUT({ request, params, cookies }) {
+	const { id } = params;
+	const { updatedQueue }: { updatedQueue: DBQueueAction[] } = await request.json();
+
+	console.log(updatedQueue);
+	// Load supabase session
+	const sessionCookie = cookies.get('supabase.session');
+	if (!sessionCookie) {
+		return Response.json({}, { status: 404, statusText: 'No session found' });
+	}
+
+	let sessionParsed: any;
+	try {
+		sessionParsed = JSON.parse(sessionCookie);
+	} catch {
+		return Response.json({}, { status: 400, statusText: 'Invalid session cookie' });
+	}
+
+	const refresh_token = sessionParsed.refresh_token;
+	const { data: user_data, error: user_error } = await supabase.auth.refreshSession({
+		refresh_token
+	});
+
+	if (user_error || !user_data?.user || user_data.user.id !== id) {
+		return Response.json({}, { status: 401, statusText: 'Unauthorized' });
+	}
+
+	const { data, error } = await supabase
+		.from('actions')
+		.update({ queue: updatedQueue })
+		.eq('player_id', id)
+		.select()
+		.single();
+	if (error) throw new Error(error.message);
+
+	return Response.json({ queue: data.queue }, { status: 200 });
+}
