@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { type Item } from '$lib/types/item';
+	import { getItemData, type Item } from '$lib/types/item';
 	import { type Equipment, EmptyEquipment, Reforge } from '$lib/types/equipment';
 	import ItemRenderer from './itemRenderer.svelte';
 	import ItemSelectMenu from './itemSelectMenu.svelte';
@@ -50,7 +50,7 @@
 
 <!--Menu to reforge an item-->
 <div
-	class="m-2 flex aspect-square h-72 flex-col items-center justify-center gap-8 rounded-md border-2 border-zinc-700 bg-zinc-800 p-8"
+	class="m-2 flex aspect-square h-72 flex-col items-center justify-around gap-2 rounded-md border-2 border-zinc-700 bg-zinc-800 p-8"
 >
 	<h1 class="text-2xl font-bold">Reforge Items</h1>
 	{#if selectedItem}
@@ -62,6 +62,7 @@
 			>
 				<ItemRenderer item={selectedItem} equippable={false} />
 			</button>
+			<span>{getItemData(selectedItem).title}</span>
 		{/key}
 	{:else}
 		<button
