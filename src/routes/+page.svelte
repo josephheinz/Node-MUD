@@ -59,46 +59,48 @@
 <!--Subject to change-->
 
 <div class="z-0 flex h-full items-start justify-start">
-	<div class="relative flex h-full w-full flex-col items-start justify-start">
-		<nav class="flex h-min w-full items-center justify-evenly border-b-2 border-zinc-600 p-2">
-			<Queue {queue} running={queueActive} />
-			{#if profile}
+	{#if profile}
+		<div class="relative flex h-full w-full flex-col items-start justify-start">
+			<nav class="flex h-min w-full items-center justify-evenly border-b-2 border-zinc-600 p-2">
+				<Queue {queue} running={queueActive} />
 				<div class="flex grow items-start justify-end">
 					<ProfileDropdown {profile} />
 				</div>
-			{:else}
-				<LoginButton onclick={() => (loginModalOpen = true)} />
-				<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
-			{/if}
-		</nav>
-		<main class="flex w-full grow items-start justify-start">
-			<aside class="flex h-full shrink flex-col border-r-4 border-zinc-600">
-				{#each tabs as tab}
-					<button
-						class="text-md cursor-pointer p-6 font-semibold hover:bg-zinc-500"
-						onclick={() => (currentTab = tab)}
-					>
-						{tab}
-					</button>
-				{/each}
-			</aside>
-			<div class="h-full w-full grow">
-				{#if currentTab === 'Character'}
-					{#if inventory && equipment}
-						<CharacterMenu {inventory} {equipment} {stats} />
+			</nav>
+			<main class="flex w-full grow items-start justify-start">
+				<aside class="flex h-full shrink flex-col border-r-4 border-zinc-600">
+					{#each tabs as tab}
+						<button
+							class="text-md cursor-pointer p-6 font-semibold hover:bg-zinc-500"
+							onclick={() => (currentTab = tab)}
+						>
+							{tab}
+						</button>
+					{/each}
+				</aside>
+				<div class="h-full w-full grow">
+					{#if currentTab === 'Character'}
+						{#if inventory && equipment}
+							<CharacterMenu {inventory} {equipment} {stats} />
+						{/if}
+					{:else if currentTab === 'Reforge'}
+						<Reforger item={undefined} {equipment} {inventory} />
+					{:else if currentTab === 'Actions'}
+						<ActionSelect categories={Object.keys(actionCategories)} />
+					{:else if currentTab === 'Skills'}
+						<SkillMenu bind:skills />
 					{/if}
-				{:else if currentTab === 'Reforge'}
-					<Reforger item={undefined} {equipment} {inventory} />
-				{:else if currentTab === 'Actions'}
-					<ActionSelect categories={Object.keys(actionCategories)} />
-				{:else if currentTab === 'Skills'}
-					<SkillMenu bind:skills />
-				{/if}
-			</div>
-		</main>
-		{#if user}
-			<ActionModal />
-			<Chat {user} />
-		{/if}
-	</div>
+				</div>
+			</main>
+			{#if user}
+				<ActionModal />
+				<Chat {user} />
+			{/if}
+		</div>
+	{:else}
+		<div class="flex size-full items-center justify-center">
+			<LoginButton onclick={() => (loginModalOpen = true)} />
+			<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
+		</div>
+	{/if}
 </div>

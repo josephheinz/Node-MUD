@@ -15,7 +15,7 @@ class SocketStore {
   connect() {
     if (this.socket?.connected) return;
 
-    this.socket = io({
+    this.socket = io(window.location.origin, {
       path: '/api/socketio',
       transports: ['websocket', 'polling']
     });
