@@ -137,7 +137,7 @@ export async function GET({ params, cookies }) {
 export async function POST({ request, params, cookies }) {
 	const { id } = params;
 	const { actionID, amount }: { actionID: string; amount: number } = await request.json();
-	console.log(amount);
+
 	// Load supabase session
 	const sessionCookie = cookies.get('supabase.session');
 	if (!sessionCookie) {
@@ -267,7 +267,6 @@ export async function PUT({ request, params, cookies }) {
 	const { id } = params;
 	const { updatedQueue }: { updatedQueue: DBQueueAction[] } = await request.json();
 
-	console.log(updatedQueue);
 	// Load supabase session
 	const sessionCookie = cookies.get('supabase.session');
 	if (!sessionCookie) {

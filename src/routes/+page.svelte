@@ -18,6 +18,7 @@
 	import type { Skill, SkillKey } from '$lib/types/skills';
 	import SkillMenu from '$lib/components/skills/skillMenu.svelte';
 	import QueueModal from '$lib/components/actions/queueModal.svelte';
+	import Enhancer from '$lib/components/enhancer.svelte';
 
 	let loginModalOpen = $state(false);
 	let queueModalOpen = $state(false);
@@ -31,7 +32,7 @@
 	let queueActive = $state<boolean>(get(store.queueActive));
 	let profile = $state<store.Profile>(get(store.profile));
 
-	let tabs: string[] = ['Character', 'Reforge', 'Actions', 'Skills'];
+	let tabs: string[] = ['Character', 'Reforge', 'Actions', 'Skills', 'Enhancer'];
 	let currentTab: string = $state(tabs[0]);
 
 	store.inventory.subscribe((value) => {
@@ -52,57 +53,64 @@
 	store.skills.subscribe((value) => (skills = value));
 </script>
 
-<title>Web-based Runescape-like Alpha</title>
+<title>Web-based Runescape-like Alpha (Mason Was Here)</title>
 <!--Subject to change-->
 
 <div class="z-0 flex h-full items-start justify-start">
 	{#if profile}
-		<div class="relative flex h-full w-full flex-col items-start justify-start">
-			<nav class="flex h-min w-full items-center justify-evenly border-b-2 border-zinc-600 p-2">
-				<Queue {queue} running={queueActive} bind:queueModalOpen />
-				<div class="flex grow items-start justify-end">
-					<ProfileDropdown {profile} />
-				</div>
-			</nav>
-			<main class="flex w-full grow items-start justify-start">
-				<aside class="flex h-full shrink flex-col border-r-4 border-zinc-600">
-					{#each tabs as tab}
-						<button
-							class="text-md cursor-pointer p-6 font-semibold hover:bg-zinc-500"
-							onclick={() => (currentTab = tab)}
-						>
-							{tab}
-						</button>
-					{/each}
-				</aside>
-				<div class="h-full w-full grow">
-					{#if currentTab === 'Character'}
-						{#if inventory && equipment}
-							<CharacterMenu {inventory} {equipment} {stats} />
-						{/if}
-					{:else if currentTab === 'Reforge'}
-						<Reforger item={undefined} {equipment} {inventory} />
-					{:else if currentTab === 'Actions'}
-						<ActionSelect categories={Object.keys(actionCategories)} />
-					{:else if currentTab === 'Skills'}
-						<SkillMenu bind:skills />
-					{/if}
-				</div>
-			</main>
-			{#if user}
-				<ActionModal />
-				<Chat {user} />
-				<QueueModal
-					bind:queue
-					bind:open={queueModalOpen}
-					onClose={() => (queueModalOpen = false)}
-				/>
-			{/if}
-		</div>
+		{@render loggedInHomepage()}
 	{:else}
-		<div class="flex size-full items-center justify-center">
-			<LoginButton onclick={() => (loginModalOpen = true)} />
-			<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
-		</div>
+		{@render loggedOutHomepage()}
 	{/if}
 </div>
+
+{#snippet loggedInHomepage()}
+	<div class="relative flex h-full w-full flex-col items-start justify-start">
+		<nav class="flex h-min w-full items-center justify-evenly border-b-2 border-zinc-600 p-2">
+			<Queue {queue} running={queueActive} bind:queueModalOpen />
+			<div class="flex grow items-start justify-end">
+				<ProfileDropdown {profile} />
+			</div>
+		</nav>
+		<main class="flex w-full grow items-start justify-start">
+			<aside class="flex h-full shrink flex-col border-r-4 border-zinc-600">
+				{#each tabs as tab}
+					<button
+						class="ignore text-md cursor-pointer p-6 font-semibold hover:bg-zinc-500"
+						onclick={() => (currentTab = tab)}
+					>
+						{tab}
+					</button>
+				{/each}
+			</aside>
+			<div class="h-full w-full grow">
+				{#if currentTab === 'Character'}
+					{#if inventory && equipment}
+						<CharacterMenu {inventory} {equipment} {stats} />
+					{/if}
+				{:else if currentTab === 'Reforge'}
+					<Reforger item={undefined} {equipment} {inventory} />
+				{:else if currentTab === 'Actions'}
+					<ActionSelect categories={Object.keys(actionCategories)} />
+				{:else if currentTab === 'Skills'}
+					<SkillMenu bind:skills />
+				{:else if currentTab === 'Enhancer'}
+					<Enhancer />
+				{/if}
+			</div>
+		</main>
+		{#if user}
+			<ActionModal />
+			<Chat {user} />
+			<QueueModal bind:queue bind:open={queueModalOpen} onClose={() => (queueModalOpen = false)} />
+		{/if}
+	</div>
+{/snippet}
+
+{#snippet loggedOutHomepage()}
+	<div class="flex size-full flex-col items-center justify-center gap-8">
+		<h1 class="text-5xl font-black select-none">Game Name In Progress</h1>
+		<LoginButton onclick={() => (loginModalOpen = true)} />
+		<LoginModal bind:open={loginModalOpen} onClose={() => (loginModalOpen = false)} />
+	</div>
+{/snippet}

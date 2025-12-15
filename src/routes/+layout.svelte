@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import "../ui.css"
 	import * as store from '$lib/store';
 	import { hydrateEquipment } from '$lib/types/equipment';
 	import { getModifiedStats, Stats } from '$lib/types/stats';
@@ -11,7 +11,6 @@
 	let { children } = $props();
 
 	import { onMount } from 'svelte';
-	import { PlayerSkills } from '$lib/types/skills';
 	onMount(() => {
 		const inv = hydrateInventory($page.data.inventory);
 		const eq = hydrateEquipment($page.data.equipment);
@@ -29,7 +28,7 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<link rel="icon" href="/images/items/weapons/swords/ironSword.svg" />
 </svelte:head>
 
 <div class="h-full w-full bg-zinc-900 text-white">

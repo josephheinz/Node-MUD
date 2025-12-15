@@ -19,15 +19,15 @@
 	<div class="flex w-full items-center justify-around">
 		<button
 			onclick={() => (tab = 'inventory')}
-			class="cursor-pointer {tab == 'inventory' ? 'border-b-2 border-white' : ''}">Inventory</button
+			class="ignore cursor-pointer {tab == 'inventory' ? 'border-b-2 border-white' : ''}">Inventory</button
 		>
 		<button
 			onclick={() => (tab = 'equipment')}
-			class="cursor-pointer {tab == 'equipment' ? 'border-b-2 border-white' : ''}">Equipment</button
+			class="ignore cursor-pointer {tab == 'equipment' ? 'border-b-2 border-white' : ''}">Equipment</button
 		>
 		<button
 			onclick={() => (tab = 'stats')}
-			class="cursor-pointer {tab == 'stats' ? 'border-b-2 border-white' : ''}">Stats</button
+			class="ignore cursor-pointer {tab == 'stats' ? 'border-b-2 border-white' : ''}">Stats</button
 		>
 	</div>
 	<br />
