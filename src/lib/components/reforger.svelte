@@ -59,6 +59,7 @@
 				onclick={(e) => {
 					toggleItem(undefined);
 				}}
+				class="ignore"
 			>
 				<ItemRenderer item={selectedItem} equippable={false} />
 			</button>

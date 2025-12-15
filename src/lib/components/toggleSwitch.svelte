@@ -17,8 +17,9 @@
 	type="button"
 	role="switch"
 	aria-checked={value}
+	aria-label="Check"
 	on:click={handleToggle}
-	class={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200
+	class={`ignore relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200
 		${value ? 'bg-green-500' : 'bg-gray-300'}`}>
 	<span
 		class={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200

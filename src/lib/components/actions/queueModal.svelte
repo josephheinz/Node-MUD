@@ -49,7 +49,7 @@
 		<div
 			class="relative flex size-1/3 flex-col items-start justify-stretch rounded-md border-2 border-zinc-700 bg-zinc-800 p-3"
 		>
-			<button onclick={onClose} class="absolute top-2 right-2 cursor-pointer"
+			<button onclick={onClose} class="ignore absolute top-2 right-2 cursor-pointer"
 				><Fa icon={faX} /></button
 			>
 			<h1 class="text-xl font-semibold">Your Queue</h1>

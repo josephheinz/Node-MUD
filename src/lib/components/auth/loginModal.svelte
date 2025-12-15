@@ -89,14 +89,14 @@
 		>
 			<nav class="relative flex w-full items-center justify-around">
 				<button
-					class="cursor-pointer border-b-2 border-zinc-900 transition-all hover:border-white"
+					class="ignore cursor-pointer border-b-2 border-zinc-900 transition-all hover:border-white"
 					onclick={() => (signupVisible = true)}>Sign Up</button
 				>
 				<button
-					class="cursor-pointer border-b-2 border-zinc-900 transition-all hover:border-white"
+					class="ignore cursor-pointer border-b-2 border-zinc-900 transition-all hover:border-white"
 					onclick={() => (signupVisible = false)}>Login</button
 				>
-				<button onclick={onClose} class="absolute right-2 cursor-pointer">
+				<button onclick={onClose} class="ignore absolute right-2 cursor-pointer">
 					<Fa icon={faXmark} />
 				</button>
 			</nav>
@@ -107,7 +107,7 @@
 					type="email"
 					name="Email"
 					id="email"
-					class="mb-2 h-8 w-full rounded-sm border-2 border-zinc-700 bg-zinc-900 p-1 text-white focus:outline-zinc-500"
+					class="w-full"
 					placeholder="example@example.com"
 				/>
 				<br />
@@ -116,7 +116,7 @@
 					type="password"
 					name="Password"
 					id="password"
-					class="mb-2 h-8 w-full rounded-sm border-2 border-zinc-700 bg-zinc-900 p-1 text-white focus:outline-zinc-500"
+					class="w-full"
 					placeholder="Abc123!"
 				/>
 				{#if signupVisible}
@@ -125,20 +125,18 @@
 						type="password"
 						name="Password-repeat"
 						id="password-repeat"
-						class="mb-2 h-8 w-full rounded-sm border-2 border-zinc-700 bg-zinc-900 p-1 text-white focus:outline-zinc-500"
 						placeholder="Abc123!"
+						class="w-full"
 					/>
 					<p id="error-text" class="text-red-500">{errorText}</p>
 					<button
 						onclick={signup}
-						class="my-2 cursor-pointer rounded-md border-2 border-zinc-700 bg-zinc-900 px-4 py-2 text-white hover:border-zinc-300"
 						>Sign Up</button
 					>
 				{:else}
 					<p id="error-text" class="text-red-500">{errorText}</p>
 					<button
 						onclick={login}
-						class="my-2 cursor-pointer rounded-md border-2 border-zinc-700 bg-zinc-900 px-4 py-2 text-white hover:border-zinc-300"
 						>Login</button
 					>
 				{/if}

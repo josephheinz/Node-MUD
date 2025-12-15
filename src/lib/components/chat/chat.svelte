@@ -79,15 +79,14 @@
 		<div class="flex h-min w-full items-center justify-around gap-2">
 			<input
 				type="text"
-				class="h-min grow border-2 border-zinc-500 bg-zinc-600 p-2 text-xs transition-all outline-none hover:border-zinc-400 focus:border-zinc-400 focus:ring-0 focus:outline-hidden"
+				class="h-min grow border-zinc-600 bg-zinc-700 text-xs"
 				bind:value={message}
 				oninput={onInput}
 				onkeydown={(e) => e.key === 'Enter' && sendMessage(message, username, itemLinkTable)}
 				placeholder="Type a message..."
 			/>
-			<button
-				class="cursor-pointer rounded-md border-2 border-indigo-700 bg-indigo-500 px-4 py-2 text-xs"
-				onclick={() => sendMessage(message, username, itemLinkTable)}>Send</button
+			<button class="primary text-xs" onclick={() => sendMessage(message, username, itemLinkTable)}
+				>Send</button
 			>
 		</div>
 	{/if}

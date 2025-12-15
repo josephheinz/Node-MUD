@@ -10,7 +10,7 @@
 	<aside class="h-full shrink border-r-2 border-zinc-600">
 		{#each categories as category}
 			<button
-				class="flex w-full cursor-pointer items-center justify-center p-6 hover:bg-zinc-500"
+				class="ignore flex w-full cursor-pointer items-center justify-center p-6 hover:bg-zinc-500"
 				onclick={() => {
 					selectedCategory = category;
 				}}

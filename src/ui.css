@@ -2,6 +2,18 @@
 
 @layer components {
 	button:not(.ignore) {
-		@apply m-2 rounded-md border-2 border-zinc-500 bg-zinc-600 px-4 py-2 cursor-pointer;
+		@apply m-2 cursor-pointer rounded-md border-2 border-zinc-600 bg-zinc-700 px-4 py-2;
+	}
+
+	button.primary {
+		@apply cursor-pointer rounded-md border-2 border-indigo-700 bg-indigo-500 px-4 py-2;
+	}
+
+	input:not(.ignore)[type="text"] {
+		@apply rounded-md border-2 border-zinc-700 bg-zinc-800 transition-all outline-none invalid:border-rose-600 focus:ring-0 focus:outline-none;
+	}
+
+	input:not(.ignore)[type="url"] {
+		@apply rounded-md border-2 border-zinc-700 bg-zinc-800 transition-all outline-none invalid:border-rose-600 focus:ring-0 focus:outline-none;
 	}
 }

@@ -146,7 +146,6 @@
 							type="url"
 							bind:value={profilePictureValue}
 							placeholder="https://example.com/example.png"
-							class="rounded-md border-2 border-zinc-700 bg-zinc-800 transition-all outline-none invalid:border-rose-600 focus:ring-0 focus:outline-none"
 						/>
 					</div>
 				</div>
@@ -157,14 +156,10 @@
 						type="text"
 						bind:value={displayNameValue}
 						placeholder={profile.display_name ?? profile.username}
-						class="rounded-md border-2 border-zinc-700 bg-zinc-800 transition-all outline-none invalid:border-rose-600 focus:ring-0 focus:outline-none"
 					/>
 				</div>
 				<hr class="my-2 text-zinc-500" />
-				<button
-					class="cursor-pointer rounded-md border-2 border-indigo-800 bg-indigo-500 px-4 py-2 hover:bg-indigo-600 text-sm"
-					onclick={updateProfile}>Update</button
-				>
+				<button class="primary text-sm" onclick={updateProfile}>Update</button>
 			</div>
 		</section>
 	</main>

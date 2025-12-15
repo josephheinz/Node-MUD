@@ -31,7 +31,7 @@
 	<div class="inline-grid grid-cols-5 gap-2">
 		{#each allItems as item (item.uid)}
 			{#if filter(item)}
-				<button onclick={() => selectItem(item)}>
+				<button onclick={() => selectItem(item)} class="ignore">
 					<ItemRenderer {item} equippable={false} />
 				</button>
 			{/if}

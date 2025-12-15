@@ -129,7 +129,7 @@
 		<div
 			class="h-content w-content relative flex flex-col items-center justify-center gap-4 rounded-md border-2 border-zinc-700 bg-zinc-800 px-8 py-4"
 		>
-			<button class="absolute top-2 right-2 cursor-pointer" onclick={() => (isVisible = false)}
+			<button class="ignore absolute top-2 right-2 cursor-pointer" onclick={() => (isVisible = false)}
 				><Fa icon={faX} /></button
 			>
 			<h1 class="w-full text-center text-xl font-bold">{loadedAction?.name ?? 'Loading'}</h1>
