@@ -5,7 +5,8 @@ import { escapeRegExp } from "./general";
 import Fa from "svelte-fa";
 import type { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { faSquareWebAwesome } from "@fortawesome/free-brands-svg-icons";
-import { faMedal } from "@fortawesome/free-solid-svg-icons";
+import { faCode, faMedal } from "@fortawesome/free-solid-svg-icons";
+import { supabase } from "$lib/auth/supabaseClient";
 
 /**
  * Append an item reference token to a chat message and register the item in the provided link table.
@@ -31,9 +32,13 @@ export const AccoladeReferences: Record<string, { icon: IconDefinition, color: s
         icon: faSquareWebAwesome,
         color: "#4287f5"
     },
-    "vip": {
+    "VIP": {
         color: "#00ff00",
         icon: faMedal
+    },
+    "Beta-Tester": {
+        color: "#cf3708",
+        icon: faCode
     }
 };
 
@@ -157,4 +162,16 @@ export function extractItemsFromMessage(message: string): (string | Item)[] {
     }
 
     return result;
+}
+
+export async function getAccoladesForUser(username: string): Promise<Array<keyof typeof AccoladeReferences>> {
+    const { data, error } = await supabase
+        .from("profiles")
+        .select("accolades")
+        .eq("username", username)
+        .single();
+
+    if (error) throw new Error(error.message);
+
+    return data.accolades;
 }
