@@ -9,6 +9,7 @@
 	import * as store from '$lib/store';
 	import { sendMessage } from '$lib/utils/chat';
 	import Heading from '../generic/heading.svelte';
+	import FlexColContainer from '../generic/flexContainers/flexColContainer.svelte';
 
 	let { user }: { user: User } = $props();
 
@@ -62,9 +63,7 @@
 	});
 </script>
 
-<div
-	class="relative bottom-0 flex h-1/4 w-full flex-col items-center justify-stretch border-2 border-zinc-700 bg-zinc-800 p-2"
->
+<FlexColContainer class="relative bottom-0 m-0 h-1/4 w-full items-center justify-stretch">
 	{#if !connected}
 		<div class="flex h-full w-full items-center justify-center">
 			<Heading>Connecting to chat...</Heading>
@@ -91,4 +90,4 @@
 			>
 		</div>
 	{/if}
-</div>
+</FlexColContainer>

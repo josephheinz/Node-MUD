@@ -11,6 +11,7 @@
 	import NumberInput from '../NumberInput.svelte';
 	import { xpToLevel, type Skill, type SkillKey } from '$lib/types/skills';
 	import { formatNumber } from '$lib/utils/general';
+	import FlexColContainer from '../generic/flexContainers/flexColContainer.svelte';
 
 	let action: string = $state(get(store.actionModalData).action);
 	let amount: number = $state(1);
@@ -127,8 +128,8 @@
 	<div
 		class="absolute z-100 flex size-full items-center justify-center backdrop-blur-sm select-none"
 	>
-		<div
-			class="h-content w-content relative flex flex-col items-center justify-center gap-4 rounded-md border-2 border-zinc-700 bg-zinc-800 px-8 py-4"
+		<FlexColContainer
+			class="size-content relative items-center justify-center gap-4 px-8 py-4"
 		>
 			<button
 				class="ignore absolute top-2 right-2 cursor-pointer"
@@ -201,6 +202,6 @@
 			>
 				Add to Queue
 			</button>
-		</div>
+		</FlexColContainer>
 	</div>
 {/if}

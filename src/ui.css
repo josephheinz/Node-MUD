@@ -9,11 +9,10 @@
 		@apply cursor-pointer rounded-md border-2 border-indigo-700 bg-indigo-500 px-4 py-2;
 	}
 
-	input:not(.ignore)[type="text"] {
-		@apply rounded-md border-2 border-zinc-700 bg-zinc-800 transition-all outline-none invalid:border-rose-600 focus:ring-0 focus:outline-none;
-	}
-
-	input:not(.ignore)[type="url"] {
+	input:not(.ignore)[type='text'],
+	input:not(.ignore)[type='url'],
+	input:not(.ignore)[type='email'],
+	input:not(.ignore)[type='password'] {
 		@apply rounded-md border-2 border-zinc-700 bg-zinc-800 transition-all outline-none invalid:border-rose-600 focus:ring-0 focus:outline-none;
 	}
 }

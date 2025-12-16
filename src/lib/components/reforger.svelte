@@ -7,6 +7,8 @@
 	import { deepClone } from '$lib/utils/general';
 	import Container from './generic/container.svelte';
 	import Heading from './generic/heading.svelte';
+	import FlexColContainer from './generic/flexContainers/flexColContainer.svelte';
+	import SquareTextButton from './generic/squareTextButton.svelte';
 
 	const {
 		item,
@@ -51,7 +53,7 @@
 </script>
 
 <!--Menu to reforge an item-->
-<Container class="aspect-square h-72 flex-col items-center justify-around p-8">
+<FlexColContainer class="aspect-square h-72 items-center justify-around p-8">
 	<Heading>Reforge Items</Heading>
 	{#if selectedItem}
 		{#key selectedItem}
@@ -66,13 +68,13 @@
 			<span>{getItemData(selectedItem).title}</span>
 		{/key}
 	{:else}
-		<button
+		<SquareTextButton
 			class="flex aspect-square h-16 w-16 flex-col items-center justify-center"
 			onclick={(e) => toggleSelectMenu(e)}
 		>
 			<span>Select</span>
 			<span>Item</span>
-		</button>
+		</SquareTextButton>
 	{/if}
 	<button
 		disabled={selectedItem == undefined}
@@ -83,7 +85,7 @@
 			? 'cursor-pointer hover:border-zinc-300 hover:bg-zinc-400 hover:text-zinc-900'
 			: 'cursor-not-allowed'}>Reforge</button
 	>
-</Container>
+</FlexColContainer>
 
 {#if selectMenuOpened}
 	<ItemSelectMenu

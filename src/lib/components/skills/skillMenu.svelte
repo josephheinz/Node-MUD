@@ -11,12 +11,13 @@
 	import Container from '../generic/container.svelte';
 	import Heading from '../generic/heading.svelte';
 	import { formatNumber } from '$lib/utils/general';
+	import FlexColContainer from '../generic/flexContainers/flexColContainer.svelte';
 
 	let { skills = $bindable() }: { skills: Record<SkillKey, Skill> } = $props();
 </script>
 
 <main class="flex h-full w-full items-start justify-start p-4 select-none">
-	<Container class=" flex-col items-start justify-start gap-2">
+	<FlexColContainer class="items-start justify-start">
 		<Heading>Your Skills</Heading>
 		<div class="grid w-full grow grid-cols-3 grid-rows-3 gap-2">
 			{#each Object.values(skills) as skill}
@@ -37,5 +38,5 @@
 				</div>
 			{/each}
 		</div>
-	</Container>
+	</FlexColContainer>
 </main>
