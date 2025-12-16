@@ -8,6 +8,7 @@
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
 	import { sendMessage } from '$lib/utils/chat';
+	import Heading from '../generic/heading.svelte';
 
 	let { user }: { user: User } = $props();
 
@@ -66,7 +67,7 @@
 >
 	{#if !connected}
 		<div class="flex h-full w-full items-center justify-center">
-			<h1 class="text-2xl font-bold">Connecting to chat...</h1>
+			<Heading>Connecting to chat...</Heading>
 		</div>
 	{:else}
 		<!-- Message history -->

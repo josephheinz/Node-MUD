@@ -8,15 +8,16 @@
 	} from '$lib/types/skills';
 	import numeral from 'numeral';
 	import ProgressBar from '../actions/progressBar.svelte';
+	import Container from '../generic/container.svelte';
+	import Heading from '../generic/heading.svelte';
+	import { formatNumber } from '$lib/utils/general';
 
 	let { skills = $bindable() }: { skills: Record<SkillKey, Skill> } = $props();
 </script>
 
 <main class="flex h-full w-full items-start justify-start p-4 select-none">
-	<div
-		class="flex flex-col items-start justify-start gap-2 rounded-md border-2 border-zinc-700 bg-zinc-800 p-2"
-	>
-		<h1 class="text-2xl font-semibold">Your Skills</h1>
+	<Container class=" flex-col items-start justify-start gap-2">
+		<Heading>Your Skills</Heading>
 		<div class="grid w-full grow grid-cols-3 grid-rows-3 gap-2">
 			{#each Object.values(skills) as skill}
 				{@const xpReqForLevel: number = xpForLevel(xpToLevel(skill.xp) + 1)}
@@ -25,21 +26,16 @@
 					<h2 class="text-lg font-medium">
 						{skill.name}
 					</h2>
-					<span
-						class="text-center text-2xl font-black"
-						title={`Total XP: ${numeral(skill.xp).format('0,0[.]00A')}`}>{xpToLevel(skill.xp)}</span
+					<Heading class="text-center font-black" title={`Total XP: ${formatNumber(skill.xp)}`}
+						>{xpToLevel(skill.xp)}</Heading
 					>
 					<ProgressBar max={xpReqForLevel} value={Math.min(xpOutOfCurrentLevel, xpReqForLevel)} />
 					<span
-						title={`${numeral(xpOutOfCurrentLevel).format('0,0[.]00A')} / ${numeral(
-							xpReqForLevel
-						).format('0,0[.]00A')} to get to level ${xpToLevel(skill.xp) + 1}`}
-						>{numeral(xpOutOfCurrentLevel).format('0,0[.]00a')} / {numeral(xpReqForLevel).format(
-							'0,0[.]00a'
-						)}</span
+						title={`${formatNumber(xpOutOfCurrentLevel)} / ${formatNumber(xpReqForLevel)} to get to level ${xpToLevel(skill.xp) + 1}`}
+						>{formatNumber(xpOutOfCurrentLevel)} / {formatNumber(xpReqForLevel)}</span
 					>
 				</div>
 			{/each}
 		</div>
-	</div>
+	</Container>
 </main>

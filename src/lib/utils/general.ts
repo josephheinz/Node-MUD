@@ -1,5 +1,6 @@
 import { EmptyEquipment, hydrateEquipment, type Equipment } from "$lib/types/equipment";
 import type { Item } from "$lib/types/item";
+import numeral from "numeral";
 import { hydrateInventory } from "./item";
 
 export function escapeRegExp(str: string) {
@@ -101,4 +102,8 @@ export async function getIdFromUsername(username: string): Promise<string> {
         });
 
     return id;
+}
+
+export function formatNumber(num: number): string {
+    return numeral(num).format('0,0[.]00A');
 }

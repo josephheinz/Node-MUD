@@ -10,6 +10,7 @@
 	import * as store from '$lib/store';
 	import NumberInput from '../NumberInput.svelte';
 	import { xpToLevel, type Skill, type SkillKey } from '$lib/types/skills';
+	import { formatNumber } from '$lib/utils/general';
 
 	let action: string = $state(get(store.actionModalData).action);
 	let amount: number = $state(1);
@@ -129,8 +130,9 @@
 		<div
 			class="h-content w-content relative flex flex-col items-center justify-center gap-4 rounded-md border-2 border-zinc-700 bg-zinc-800 px-8 py-4"
 		>
-			<button class="ignore absolute top-2 right-2 cursor-pointer" onclick={() => (isVisible = false)}
-				><Fa icon={faX} /></button
+			<button
+				class="ignore absolute top-2 right-2 cursor-pointer"
+				onclick={() => (isVisible = false)}><Fa icon={faX} /></button
 			>
 			<h1 class="w-full text-center text-xl font-bold">{loadedAction?.name ?? 'Loading'}</h1>
 			{#if loadedAction.requirement}
@@ -170,8 +172,8 @@
 						<li class="flex items-center justify-between gap-2 pl-4">
 							<span
 								>{min != max
-									? `${numeral(min).format('0,0[.]0a')} - ${numeral(max).format('0,0[.]0a')}`
-									: `${numeral(max).format('0,0[.]0a')}`}</span
+									? `${formatNumber(min)} - ${formatNumber(max)}`
+									: `${formatNumber(max)}`}</span
 							>
 							<ItemHover {item} />
 							<span>{chancePercent == '100%' ? '' : chancePercent}</span>
@@ -180,7 +182,7 @@
 					{#each loadedOutputsXp as { skill, xpamount }}
 						<li class="flex items-center justify-start gap-2 pl-4">
 							<img src="/images/experienceStar.svg" alt="xp star" class="inline-block h-4 w-4" />
-							<span>{numeral(xpamount).format('0,0[.]0a')} {skill} XP</span>
+							<span>{formatNumber(xpamount)} {skill} XP</span>
 						</li>
 					{/each}
 				</ul>

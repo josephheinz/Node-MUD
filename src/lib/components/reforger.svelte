@@ -5,6 +5,8 @@
 	import ItemSelectMenu from './itemSelectMenu.svelte';
 	import { ConglomerateItems, reviveModifiers } from '$lib/utils/item';
 	import { deepClone } from '$lib/utils/general';
+	import Container from './generic/container.svelte';
+	import Heading from './generic/heading.svelte';
 
 	const {
 		item,
@@ -49,10 +51,8 @@
 </script>
 
 <!--Menu to reforge an item-->
-<div
-	class="m-2 flex aspect-square h-72 flex-col items-center justify-around gap-2 rounded-md border-2 border-zinc-700 bg-zinc-800 p-8"
->
-	<h1 class="text-2xl font-bold">Reforge Items</h1>
+<Container class="aspect-square h-72 flex-col items-center justify-around p-8">
+	<Heading>Reforge Items</Heading>
 	{#if selectedItem}
 		{#key selectedItem}
 			<button
@@ -67,7 +67,7 @@
 		{/key}
 	{:else}
 		<button
-			class="flex aspect-square h-16 w-16 flex-col items-center justify-center rounded-lg border-2 border-zinc-500 bg-zinc-600 text-sm select-none"
+			class="flex aspect-square h-16 w-16 flex-col items-center justify-center"
 			onclick={(e) => toggleSelectMenu(e)}
 		>
 			<span>Select</span>
@@ -79,11 +79,11 @@
 		onclick={async () => {
 			if (selectedItem) await reforge(selectedItem);
 		}}
-		class="m-2 rounded-md border-2 border-zinc-500 bg-zinc-600 px-4 py-2 {selectedItem != undefined
+		class={selectedItem != undefined
 			? 'cursor-pointer hover:border-zinc-300 hover:bg-zinc-400 hover:text-zinc-900'
-			: 'cursor-not-allowed'}">Reforge</button
+			: 'cursor-not-allowed'}>Reforge</button
 	>
-</div>
+</Container>
 
 {#if selectMenuOpened}
 	<ItemSelectMenu

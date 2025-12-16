@@ -9,6 +9,7 @@
 	import { capitalizeAfterSpaces, capitalizeFirstLetter } from '$lib/utils/general';
 	import { AccoladeReferences } from '$lib/utils/chat';
 	import type { Profile } from '$lib/store';
+	import Heading from '$lib/components/generic/heading.svelte';
 
 	let profile: Profile | undefined = $state($page.data.profile);
 	let user: User | undefined = $page.data.user;
@@ -90,9 +91,9 @@
 					alt="Profile Picture"
 				/>
 
-				<h1 class="text-2xl font-semibold text-zinc-300">
+				<Heading class="font-semibold text-zinc-300">
 					{profile.display_name ?? profile.username}
-				</h1>
+				</Heading>
 				<h2 class="text-lg font-medium text-zinc-500">@{profile.username}</h2>
 				<p class="text-sm font-light text-zinc-500">Joined: {joinDate.toLocaleDateString()}</p>
 				<p class="text-sm font-light text-zinc-500">

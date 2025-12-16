@@ -9,6 +9,7 @@
 	import { determineSlot } from '$lib/utils/item';
 	import type { StackableModifier } from '$lib/modifiers/basicModifiers';
 	import numeral from 'numeral';
+	import { formatNumber } from '$lib/utils/general';
 
 	interface Props {
 		item: Item;
@@ -92,7 +93,7 @@
 	{/if}
 	{#if stackableModifier != undefined}
 		<span class="absolute right-1 bottom-0 font-semibold select-none"
-			>{numeral(stackableModifier.value).format('0,00a')}</span
+			>{formatNumber(stackableModifier.value)}</span
 		>
 	{/if}
 </div>

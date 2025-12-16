@@ -12,7 +12,7 @@
 
 {#if loadedAction}
 	<button
-		class={`flex aspect-1/1 cursor-pointer flex-col items-center justify-start gap-2 rounded-md border-2 border-zinc-700 bg-zinc-800 p-4
+		class={`flex aspect-1/1 cursor-pointer flex-col items-center justify-start gap-2 bg-zinc-800 p-4
 		${usuable === false ? 'opacity-50' : ''}
 		`}
 		onclick={() => {
