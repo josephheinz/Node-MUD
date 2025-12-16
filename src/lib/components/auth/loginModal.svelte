@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Fa from 'svelte-fa';
 	import { faXmark } from '@fortawesome/free-solid-svg-icons';
-	import Container from '../generic/container.svelte';
 	import FlexColContainer from '../generic/flexContainers/flexColContainer.svelte';
 
 	let { open = $bindable(true), onClose } = $props();

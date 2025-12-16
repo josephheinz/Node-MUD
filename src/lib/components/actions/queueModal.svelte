@@ -5,7 +5,6 @@
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
 	import FlexColContainer from '../generic/flexContainers/flexColContainer.svelte';
-	import FlexContainer from '../generic/flexContainers/flexContainer.svelte';
 
 	const {
 		queue = $bindable(),

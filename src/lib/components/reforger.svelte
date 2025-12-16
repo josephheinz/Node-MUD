@@ -5,7 +5,6 @@
 	import ItemSelectMenu from './itemSelectMenu.svelte';
 	import { ConglomerateItems, reviveModifiers } from '$lib/utils/item';
 	import { deepClone } from '$lib/utils/general';
-	import Container from './generic/container.svelte';
 	import Heading from './generic/heading.svelte';
 	import FlexColContainer from './generic/flexContainers/flexColContainer.svelte';
 	import SquareTextButton from './generic/squareTextButton.svelte';
