@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { type IItemModifier, type Item, getItemData } from '$lib/types/item';
+	import { type Item, getItemData } from '$lib/types/item';
 	import { tooltip } from './tooltip';
 	import { Equip, Unequip, type EquipmentSlot } from '$lib/types/equipment';
 	import { contextMenu, type ContextMenuItem } from './contextmenu';
@@ -8,7 +8,7 @@
 	import { linkToChat } from '$lib/utils/chat';
 	import { determineSlot } from '$lib/utils/item';
 	import type { StackableModifier } from '$lib/modifiers/basicModifiers';
-	import numeral from 'numeral';
+	import { formatNumber } from '$lib/utils/general';
 
 	interface Props {
 		item: Item;
@@ -92,7 +92,7 @@
 	{/if}
 	{#if stackableModifier != undefined}
 		<span class="absolute right-1 bottom-0 font-semibold select-none"
-			>{numeral(stackableModifier.value).format('0,00a')}</span
+			>{formatNumber(stackableModifier.value)}</span
 		>
 	{/if}
 </div>

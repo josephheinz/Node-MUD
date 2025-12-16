@@ -4,7 +4,7 @@ import { instantiateModifier } from "../modifiers/modifiersRegistry";
 import type { StatList } from "./stats";
 import { type EquipmentSlot } from "./equipment";
 import { determineSlot } from "$lib/utils/item";
-import { capitalizeFirstLetter } from "$lib/utils/general";
+import { capitalizeFirstLetter, formatNumber } from "$lib/utils/general";
 import type { ReforgeableModifier } from "$lib/modifiers/reforges";
 import type { StackableModifier } from "$lib/modifiers/basicModifiers";
 import numeral from "numeral";
@@ -129,7 +129,7 @@ export function getItemData(item: Item, equippable: boolean = true): ITooltipDat
     let stackString = "";
 
     if (stackableModifier != undefined) {
-        stackString = `Stack: ${numeral(stackableModifier.value).format("0,0a")} / ${numeral(stackableModifier.stack).format("0,0a")}</br>`;
+        stackString = `Stack: ${formatNumber(stackableModifier.value)} / ${formatNumber(stackableModifier.stack)}</br>`;
     }
 
     for (const key in stats) {

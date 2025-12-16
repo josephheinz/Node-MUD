@@ -2,6 +2,7 @@
 	import ItemRenderer from './itemRenderer.svelte';
 	import type { Item } from '$lib/types/item';
 	import { createEventDispatcher } from 'svelte';
+	import Container from './generic/container.svelte';
 
 	const {
 		allItems,
@@ -24,17 +25,17 @@
 	}
 </script>
 
-<div
-	class="absolute z-50 m-2 max-h-32 w-max max-w-96 overflow-y-auto rounded-lg border-2 border-zinc-700 bg-zinc-800 p-2 shadow-lg"
+<Container
+	class="absolute z-50 m-2 max-h-32 w-max max-w-96 overflow-y-auto"
 	style="top: {y}px; left: {x}px;"
 >
 	<div class="inline-grid grid-cols-5 gap-2">
 		{#each allItems as item (item.uid)}
 			{#if filter(item)}
-				<button onclick={() => selectItem(item)}>
+				<button onclick={() => selectItem(item)} class="ignore">
 					<ItemRenderer {item} equippable={false} />
 				</button>
 			{/if}
 		{/each}
 	</div>
-</div>
+</Container>

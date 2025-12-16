@@ -9,6 +9,7 @@
 	import { capitalizeAfterSpaces, capitalizeFirstLetter } from '$lib/utils/general';
 	import { AccoladeReferences } from '$lib/utils/chat';
 	import type { Profile } from '$lib/store';
+	import Heading from '$lib/components/generic/heading.svelte';
 
 	let profile: Profile | undefined = $state($page.data.profile);
 	let user: User | undefined = $page.data.user;
@@ -90,9 +91,9 @@
 					alt="Profile Picture"
 				/>
 
-				<h1 class="text-2xl font-semibold text-zinc-300">
+				<Heading class="font-semibold text-zinc-300">
 					{profile.display_name ?? profile.username}
-				</h1>
+				</Heading>
 				<h2 class="text-lg font-medium text-zinc-500">@{profile.username}</h2>
 				<p class="text-sm font-light text-zinc-500">Joined: {joinDate.toLocaleDateString()}</p>
 				<p class="text-sm font-light text-zinc-500">
@@ -146,7 +147,6 @@
 							type="url"
 							bind:value={profilePictureValue}
 							placeholder="https://example.com/example.png"
-							class="rounded-md border-2 border-zinc-700 bg-zinc-800 transition-all outline-none invalid:border-rose-600 focus:ring-0 focus:outline-none"
 						/>
 					</div>
 				</div>
@@ -157,14 +157,10 @@
 						type="text"
 						bind:value={displayNameValue}
 						placeholder={profile.display_name ?? profile.username}
-						class="rounded-md border-2 border-zinc-700 bg-zinc-800 transition-all outline-none invalid:border-rose-600 focus:ring-0 focus:outline-none"
 					/>
 				</div>
 				<hr class="my-2 text-zinc-500" />
-				<button
-					class="cursor-pointer rounded-md border-2 border-indigo-800 bg-indigo-500 px-4 py-2 hover:bg-indigo-600 text-sm"
-					onclick={updateProfile}>Update</button
-				>
+				<button class="primary text-sm" onclick={updateProfile}>Update</button>
 			</div>
 		</section>
 	</main>

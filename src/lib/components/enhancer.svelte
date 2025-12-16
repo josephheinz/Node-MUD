@@ -1,30 +1,23 @@
 <script lang="ts">
+	import FlexColContainer from './generic/flexContainers/flexColContainer.svelte';
+	import Heading from './generic/heading.svelte';
+	import SquareTextButton from './generic/squareTextButton.svelte';
 </script>
 
-<div
-	class="size-content m-2 flex inline-flex flex-col items-center justify-start rounded-md border-2 border-zinc-700 bg-zinc-800 p-2"
->
-	<h1 class="text-center text-2xl font-bold">Enhancer</h1>
-	<div class="grid grid-cols-3 grid-rows-2 gap-8 p-2 m-2">
-		<button
-			class="row-start-1 flex aspect-square h-16 w-16 flex-col items-center justify-center rounded-lg border-2 border-zinc-500 bg-zinc-600 text-sm select-none"
-		>
+<FlexColContainer class="inline-flex items-center justify-start">
+	<Heading class="text-center">Enhancer</Heading>
+	<div class="m-2 grid grid-cols-3 grid-rows-2 gap-8 p-2">
+		<SquareTextButton class="row-start-1" onclick={() => {}}>
 			<span>Select</span>
 			<span>Item</span>
-		</button>
-		<button
-			class="col-start-2 row-start-2 flex aspect-square h-16 w-16 flex-col items-center justify-center rounded-lg border-2 border-zinc-500 bg-zinc-600 text-sm select-none"
-		>
+		</SquareTextButton>
+		<SquareTextButton class="col-start-2 row-start-2" onclick={() => {}}>
 			<span>Output</span>
-		</button>
-		<button
-			class="col-start-3 row-start-1 flex aspect-square h-16 w-16 flex-col items-center justify-center rounded-lg border-2 border-zinc-500 bg-zinc-600 text-sm select-none"
-		>
+		</SquareTextButton>
+		<SquareTextButton class="col-start-3 row-start-1" onclick={() => {}}>
 			<span>Select</span>
 			<span>Enhancer</span>
-		</button>
+		</SquareTextButton>
 	</div>
-    <button>
-        Enhance
-    </button>
-</div>
+	<button> Enhance </button>
+</FlexColContainer>

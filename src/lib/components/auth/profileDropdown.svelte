@@ -29,7 +29,7 @@
 
 <div class="relative">
 	<button
-		class="flex items-start justify-around gap-2 {opened == true
+		class="ignore flex items-start justify-around gap-2 {opened == true
 			? 'rounded-t-md'
 			: 'rounded-md'} w-48 cursor-pointer border-2 border-zinc-700 bg-zinc-800 p-2"
 		aria-haspopup="menu"
@@ -67,7 +67,7 @@
 			</a>
 			<button
 				role="menuitem"
-				class="flex w-full cursor-pointer items-center justify-start gap-2 rounded-b-md px-4 py-2 text-left hover:bg-zinc-500"
+				class="ignore flex w-full cursor-pointer items-center justify-start gap-2 rounded-b-md px-4 py-2 text-left hover:bg-zinc-500"
 				onclick={signout}
 			>
 				<Fa icon={faRightFromBracket} /> Sign Out

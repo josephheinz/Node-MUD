@@ -74,6 +74,8 @@ export function contextMenu(node: HTMLElement, options: ContextMenuOptions) {
                     font-family: inherit;
                 `;
 
+                button.classList.add("ignore");
+
                 if (item.icon) {
                     const icon = document.createElement('i');
                     icon.className = item.icon;

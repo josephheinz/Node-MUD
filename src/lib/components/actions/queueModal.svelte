@@ -4,6 +4,7 @@
 	import Fa from 'svelte-fa';
 	import { get } from 'svelte/store';
 	import * as store from '$lib/store';
+	import FlexColContainer from '../generic/flexContainers/flexColContainer.svelte';
 
 	const {
 		queue = $bindable(),
@@ -46,10 +47,8 @@
 
 {#if open === true}
 	<div class="absolute flex size-full items-center justify-center backdrop-blur-sm">
-		<div
-			class="relative flex size-1/3 flex-col items-start justify-stretch rounded-md border-2 border-zinc-700 bg-zinc-800 p-3"
-		>
-			<button onclick={onClose} class="absolute top-2 right-2 cursor-pointer"
+		<FlexColContainer class="relative size-1/3 items-start justify-stretch">
+			<button onclick={onClose} class="ignore absolute top-2 right-2 cursor-pointer"
 				><Fa icon={faX} /></button
 			>
 			<h1 class="text-xl font-semibold">Your Queue</h1>
@@ -68,7 +67,7 @@
 					{/each}
 				</ul>
 			{/if}
-		</div>
+		</FlexColContainer>
 	</div>
 {/if}
 

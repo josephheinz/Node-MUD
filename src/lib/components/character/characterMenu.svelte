@@ -2,6 +2,7 @@
 	import type { Equipment } from '$lib/types/equipment';
 	import type { Item } from '$lib/types/item';
 	import type { StatList } from '$lib/types/stats';
+	import Container from '../generic/container.svelte';
 	import EquipmentDisplay from './equipmentDisplay.svelte';
 	import Inventory from './inventory.svelte';
 	import StatsDisplay from './statsDisplay.svelte';
@@ -15,15 +16,17 @@
 	let tab: 'inventory' | 'equipment' | 'stats' = $state('inventory');
 </script>
 
-<div class="m-2 w-max rounded-lg border-2 border-zinc-700 bg-zinc-800 p-2">
+<Container class="inline-block">
 	<div class="flex w-full items-center justify-around">
 		<button
 			onclick={() => (tab = 'inventory')}
-			class="ignore cursor-pointer {tab == 'inventory' ? 'border-b-2 border-white' : ''}">Inventory</button
+			class="ignore cursor-pointer {tab == 'inventory' ? 'border-b-2 border-white' : ''}"
+			>Inventory</button
 		>
 		<button
 			onclick={() => (tab = 'equipment')}
-			class="ignore cursor-pointer {tab == 'equipment' ? 'border-b-2 border-white' : ''}">Equipment</button
+			class="ignore cursor-pointer {tab == 'equipment' ? 'border-b-2 border-white' : ''}"
+			>Equipment</button
 		>
 		<button
 			onclick={() => (tab = 'stats')}
@@ -40,4 +43,4 @@
 			<StatsDisplay {stats} />
 		{/if}
 	</div>
-</div>
+</Container>

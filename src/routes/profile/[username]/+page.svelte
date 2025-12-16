@@ -11,6 +11,7 @@
 	import Fa from 'svelte-fa';
 	import type { IApiSettings } from './+layout.server';
 	import { AccoladeReferences } from '$lib/utils/chat';
+	import Heading from '$lib/components/generic/heading.svelte';
 
 	type Profile = {
 		id: string;
@@ -53,9 +54,9 @@
 					alt="Profile Picture"
 				/>
 
-				<h1 class="text-2xl font-semibold text-zinc-300">
+				<Heading class="font-semibold text-zinc-300">
 					{profile.display_name ?? profile.username}
-				</h1>
+				</Heading>
 				<h2 class="text-lg font-medium text-zinc-500">@{profile.username}</h2>
 				<p class="text-sm font-light text-zinc-500">Joined: {joinDate.toLocaleDateString()}</p>
 				<p class="text-sm font-light text-zinc-500">
