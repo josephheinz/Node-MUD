@@ -4,7 +4,7 @@ import { deepClone } from './general';
 import { get } from 'svelte/store';
 import * as store from '$lib/store';
 import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
-import type { StackableModifier } from '$lib/modifiers/basicModifiers';
+import type { EnhancerModifier, StackableModifier } from '$lib/modifiers/basicModifiers';
 import ItemHover from '$lib/components/chat/itemHover.svelte';
 
 /**
@@ -215,8 +215,8 @@ export function tryStackItemInInventory(item: Item, inventory: Item[]): Item[] {
 		(i) =>
 			i.id === item.id &&
 			(i.modifiers.find((m) => m.type === 'Stackable') as StackableModifier)?.value +
-				stackableModifier.value <
-				stackableModifier.stack
+			stackableModifier.value <
+			stackableModifier.stack
 	);
 
 	if (updatedStackIndex === -1) {
@@ -230,4 +230,18 @@ export function tryStackItemInInventory(item: Item, inventory: Item[]): Item[] {
 			stackableModifier.value;
 		return inventory;
 	}
+}
+
+export function previewEnhanceItem(item: Item | undefined, enhancer: Item | undefined): Item | undefined {
+	if (!item || !enhancer) return;
+
+	const enhancements: EnhancerModifier | null = enhancer.modifiers.find((m) => m.type === "Enhancer") as EnhancerModifier;
+	if (enhancements === null) throw new Error("Enhancer item does not actually have any enhancements");
+
+	const instantiatedEnhancements: IItemModifier[] = enhancements.enhancements.map(instantiateModifier);
+
+	let newItem: Item = deepClone(item);
+	newItem.modifiers = [...newItem.modifiers, ...instantiatedEnhancements];
+
+	return newItem;
 }
