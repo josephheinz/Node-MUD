@@ -2,7 +2,7 @@
 	import type { EnhancerModifier } from '$lib/modifiers/basicModifiers';
 	import type { ReforgeableModifier } from '$lib/modifiers/reforges';
 	import { EmptyEquipment, type Equipment } from '$lib/types/equipment';
-	import { getItemData, type Item } from '$lib/types/item';
+	import { type Item } from '$lib/types/item';
 	import { ConglomerateItems, previewEnhanceItem } from '$lib/utils/item';
 	import { type MouseEventHandler } from 'svelte/elements';
 	import FlexColContainer from './generic/flexContainers/flexColContainer.svelte';
@@ -83,6 +83,10 @@
 	let output: Item | undefined = $derived.by(() => {
 		return previewEnhanceItem(selectedItem, selectedEnhancer);
 	});
+
+	let enhanceButtonDisabled: boolean = $derived.by(() => {
+		return selectedEnhancer === undefined && selectedItem === undefined;
+	});
 </script>
 
 <FlexColContainer class="inline-flex items-center justify-start">
@@ -122,7 +126,7 @@
 			)}
 		</div>
 	</div>
-	<button> Enhance </button>
+	<button disabled={enhanceButtonDisabled}> Enhance </button>
 </FlexColContainer>
 
 {#if selectMenuOpened}

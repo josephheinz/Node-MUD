@@ -6,6 +6,7 @@ import * as store from '$lib/store';
 import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
 import type { EnhancerModifier, StackableModifier } from '$lib/modifiers/basicModifiers';
 import ItemHover from '$lib/components/chat/itemHover.svelte';
+import type { StarsModifier } from '$lib/modifiers/stars';
 
 /**
  * Combine inventory and equipped items into a single list with modifiers reinstantiated.
@@ -215,8 +216,8 @@ export function tryStackItemInInventory(item: Item, inventory: Item[]): Item[] {
 		(i) =>
 			i.id === item.id &&
 			(i.modifiers.find((m) => m.type === 'Stackable') as StackableModifier)?.value +
-			stackableModifier.value <
-			stackableModifier.stack
+				stackableModifier.value <
+				stackableModifier.stack
 	);
 
 	if (updatedStackIndex === -1) {
@@ -232,16 +233,36 @@ export function tryStackItemInInventory(item: Item, inventory: Item[]): Item[] {
 	}
 }
 
-export function previewEnhanceItem(item: Item | undefined, enhancer: Item | undefined): Item | undefined {
+export function previewEnhanceItem(
+	item: Item | undefined,
+	enhancer: Item | undefined
+): Item | undefined {
 	if (!item || !enhancer) return;
 
-	const enhancements: EnhancerModifier | null = enhancer.modifiers.find((m) => m.type === "Enhancer") as EnhancerModifier;
-	if (enhancements === null) throw new Error("Enhancer item does not actually have any enhancements");
+	const enhancements = enhancer.modifiers.find((m) => m.type === 'Enhancer') as
+		| EnhancerModifier
+		| undefined;
+	if (!enhancements) throw new Error('Enhancer item does not actually have any enhancements');
 
-	const instantiatedEnhancements: IItemModifier[] = enhancements.enhancements.map(instantiateModifier);
+	const instantiated = enhancements.enhancements.map(instantiateModifier);
 
-	let newItem: Item = deepClone(item);
-	newItem.modifiers = [...newItem.modifiers, ...instantiatedEnhancements];
+	const newItem: Item = deepClone(item);
+	newItem.modifiers = reviveModifiers(newItem.modifiers);
+
+	for (const mod of instantiated) {
+		if (mod.type === 'Stars') {
+			const existing: StarsModifier | null = newItem.modifiers.find(
+				(m): m is StarsModifier => m.type === 'Stars'
+			) as StarsModifier;
+
+			if (existing) {
+				existing.stars += (mod as StarsModifier).stars;
+				continue;
+			}
+		}
+
+		newItem.modifiers.push(mod);
+	}
 
 	return newItem;
 }
