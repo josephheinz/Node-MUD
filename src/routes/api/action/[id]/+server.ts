@@ -38,12 +38,16 @@ export async function GET({ params, cookies }) {
 		return Response.json({}, { status: 401, statusText: 'Unauthorized' });
 	}
 
-	const { data, error } = await supabase.from('actions').select('*').eq('player_id', id);
+	const { data, error } = await supabase
+		.from('actions')
+		.select('*')
+		.eq('player_id', id)
+		.single();
 
 	if (error) throw new Error(error.message);
 
-	if (data.length == 1) {
-		const processedQueue = processQueue(data[0].queue, data[0].started_at);
+	if (data) {
+		const processedQueue = processQueue(data.queue, data.started_at);
 		const { data: invData, error: invError } = await supabase
 			.from('inventories')
 			.select('inventory_data')
@@ -78,14 +82,14 @@ export async function GET({ params, cookies }) {
 			skillData.skills_data[skill as SkillKey].xp += value;
 		});
 
-		if (data[0].started_at != null && updatedQueue.length <= 0) {
+		if (data.started_at != null && updatedQueue.length <= 0) {
 			const { error: updateStartErr } = await supabase
 				.from('actions')
 				.update({ started_at: null })
 				.eq('player_id', id);
 
 			if (updateStartErr) throw new Error(updateStartErr.message);
-		} else if (data[0].started_at != null && updatedQueue.length >= 1) {
+		} else if (data.started_at != null && updatedQueue.length >= 1) {
 			const { error: updateStartErr } = await supabase
 				.from('actions')
 				.update({ started_at: new Date(Date.now()) })
@@ -110,13 +114,14 @@ export async function GET({ params, cookies }) {
 			.from('actions')
 			.update({ queue: updatedQueue })
 			.eq('player_id', id)
-			.select('*');
+			.select('*')
+			.single();
 		if (updateQueueErr) throw new Error(updateQueueErr.message);
 
 		return Response.json(
 			{
 				queue: updatedQueue,
-				started: updateQueueData[0].started_at,
+				started: updateQueueData.started_at,
 				inventory: updatedInv,
 				skills: skillData.skills_data
 			},
@@ -136,7 +141,9 @@ export async function GET({ params, cookies }) {
  */
 export async function POST({ request, params, cookies }) {
 	const { id } = params;
-	const { actionID, amount }: { actionID: string; amount: number } = await request.json();
+	const { actionID, amount: postAmount }: { actionID: string; amount: number } = await request.json();
+
+	const amount = Math.floor(postAmount);
 
 	// Load supabase session
 	const sessionCookie = cookies.get('supabase.session');
@@ -181,8 +188,8 @@ export async function POST({ request, params, cookies }) {
 
 	const skillAction: Skill | null = dbAction.action.requirement
 		? (skillData.skills_data as Record<SkillKey, Skill>)[
-				dbAction.action.requirement.name as SkillKey
-			]
+		dbAction.action.requirement.name as SkillKey
+		]
 		: null;
 
 	if (skillAction && dbAction.action.requirement) {

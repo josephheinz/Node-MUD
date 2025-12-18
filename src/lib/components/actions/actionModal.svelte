@@ -150,9 +150,7 @@
 						{@const itemsPresent = inputsPresent[index].present}
 						<li class="flex items-center justify-between gap-2 pl-4">
 							<span class={itemsPresent < amount ? 'text-rose-400' : ''}
-								>{numeral(itemsPresent).format('0,0[.]0a')}/{numeral(amount).format(
-									'0,0[.]0a'
-								)}</span
+								>{formatNumber(itemsPresent)}/{formatNumber(amount)}</span
 							>
 							<ItemHover {item} />
 						</li>

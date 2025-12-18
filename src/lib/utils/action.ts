@@ -107,6 +107,16 @@ const emptyXpOutput: Record<SkillKey, number> = {
     "Crafting": 0
 }
 
+function addXp(
+    target: Record<SkillKey, number>,
+    source: Record<SkillKey, number>
+) {
+    for (const skill in source) {
+        target[skill as SkillKey] += source[skill as SkillKey];
+    }
+}
+
+
 /**
  * Process queued actions relative to a start time, producing items for completed steps and updating the queue.
  *
@@ -122,7 +132,10 @@ export function processQueue(queue: DBQueueAction[], started_at: Date): { output
     if (completion.status === "Complete") {
         queue.forEach((action: DBQueueAction) => {
             for (let i = 0; i < action.amount; i++) {
-                outputs = { items: [...outputs.items, ...completeAction(action.action).items], xp: { ...outputs.xp, ...completeAction(action.action).xp } };
+                const result = completeAction(action.action);
+
+                outputs.items.push(...result.items);
+                addXp(outputs.xp, result.xp);
             }
         });
         queue.length = 0;

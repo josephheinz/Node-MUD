@@ -1,4 +1,5 @@
 import { type IItemModifier } from '$lib/types/item';
+import { reviveModifiers } from '$lib/utils/item';
 import type { ReforgeGroup } from './reforges';
 
 export class EquippableModifier implements IItemModifier {
@@ -31,6 +32,25 @@ export class EnhancerModifier implements IItemModifier {
 	) { }
 
 	modifyDescription(baseDesc: string): string {
-		return ``;
+		let enhancesListString = '';
+		let enhancementsListString = '';
+
+		const revivedEnhancements = reviveModifiers(this.enhancements);
+
+		if (this.enhances.includes("any")) enhancesListString = "Anything";
+		else {
+			this.enhances.forEach((e, index) => {
+				enhancesListString += e;
+				if (index != this.enhances.length - 1) enhancesListString += ", ";
+			})
+		}
+
+		revivedEnhancements.forEach((e, index) => {
+			enhancementsListString += e.displayName ?? e.type;
+			if (index != revivedEnhancements.length - 1) enhancementsListString += ", ";
+
+		});
+
+		return `Adds: ${enhancementsListString} to ${enhancesListString}`;
 	}
 }

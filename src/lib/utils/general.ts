@@ -105,5 +105,5 @@ export async function getIdFromUsername(username: string): Promise<string> {
 }
 
 export function formatNumber(num: number): string {
-    return numeral(num).format('0,0[.]00A');
+    return numeral(num).format('0,0[.][00]A');
 }

@@ -8,7 +8,9 @@
 	const totalSlots = Math.max(inventory.length, baseSlots);
 </script>
 
-<div class="m-2 inline-grid h-full w-full max-w-96 grid-cols-5 gap-2">
+<div
+	class="m-2 inline-grid aspect-square h-full w-full max-w-96 grid-cols-5 gap-2 overflow-y-scroll"
+>
 	{#each Array(totalSlots) as _, index (inventory[index]?.uid ?? `empty-${index}`)}
 		{@const item = inventory[index]}
 		{#if item}

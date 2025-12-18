@@ -75,7 +75,7 @@
 	<div class="flex w-full items-center justify-between">
 		<span class="ml-2 select-none">{action.action.name} x{action.amount}</span>
 		<button
-			class="cursor-pointer text-rose-400"
+			class="cursor-pointer text-rose-400 ignore"
 			onclick={async () => {
 				await popFromQueue(index);
 			}}><Fa icon={faTrash} /></button
