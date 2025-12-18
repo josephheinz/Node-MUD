@@ -7,6 +7,7 @@ import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
 import type { EnhancerModifier, StackableModifier } from '$lib/modifiers/basicModifiers';
 import ItemHover from '$lib/components/chat/itemHover.svelte';
 import type { StarsModifier } from '$lib/modifiers/stars';
+import type { ReforgeModifier } from '$lib/modifiers/reforges';
 
 /**
  * Combine inventory and equipped items into a single list with modifiers reinstantiated.
@@ -233,11 +234,8 @@ export function tryStackItemInInventory(item: Item, inventory: Item[]): Item[] {
 	}
 }
 
-export function previewEnhanceItem(
-	item: Item | undefined,
-	enhancer: Item | undefined
-): Item | undefined {
-	if (!item || !enhancer) return;
+export function previewEnhanceItem(item: Item, enhancer: Item): Item {
+	if (!item || !enhancer) throw new Error("Item or enhancer are undefined");
 
 	const enhancements = enhancer.modifiers.find((m) => m.type === 'Enhancer') as
 		| EnhancerModifier
@@ -259,6 +257,12 @@ export function previewEnhanceItem(
 				existing.stars += (mod as StarsModifier).stars;
 				continue;
 			}
+		} else if (mod.type === 'Reforge') {
+			const existing: number = newItem.modifiers.findIndex(
+				(m): m is ReforgeModifier => m.type === 'Reforge'
+			);
+
+			newItem.modifiers.splice(existing, 1);
 		}
 
 		newItem.modifiers.push(mod);

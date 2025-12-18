@@ -16,9 +16,7 @@
 	}: { item: Item | undefined; equipment?: Equipment; inventory?: Item[] } = $props();
 
 	let selectedItem: Item | undefined = $state<Item | undefined>(item);
-	let selectedItemInventoryId: number = inventory.findIndex(
-		(item) => item.uid === selectedItem?.uid
-	);
+	
 	let selectMenuOpened: boolean = $state(false);
 	let selectMenu: ItemSelectMenu;
 	let mouseX: number = $state(0);

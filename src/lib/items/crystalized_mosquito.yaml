@@ -1,0 +1,13 @@
+- id: crystalized_mosquito
+  name: Crystalized Mosquito
+  icon:
+    ascii: "o"
+    image: "/images/items/crystalizedMosquito.svg"
+  rarity: Rare
+  modifiers:
+    - type: Enhancer
+      enhances:
+        - Sword
+      enhancements:
+        - type: Reforge
+          reforge: Crystalized

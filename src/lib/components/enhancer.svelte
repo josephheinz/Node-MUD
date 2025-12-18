@@ -1,15 +1,16 @@
 <script lang="ts">
 	import type { EnhancerModifier } from '$lib/modifiers/basicModifiers';
 	import type { ReforgeableModifier } from '$lib/modifiers/reforges';
-	import { EmptyEquipment, type Equipment } from '$lib/types/equipment';
+	import { EmptyEquipment, Enhance, type Equipment } from '$lib/types/equipment';
 	import { type Item } from '$lib/types/item';
-	import { ConglomerateItems, previewEnhanceItem } from '$lib/utils/item';
+	import { ConglomerateItems, previewEnhanceItem, reviveModifiers } from '$lib/utils/item';
 	import { type MouseEventHandler } from 'svelte/elements';
 	import FlexColContainer from './generic/flexContainers/flexColContainer.svelte';
 	import Heading from './generic/heading.svelte';
 	import SquareTextButton from './generic/squareTextButton.svelte';
 	import ItemRenderer from './itemRenderer.svelte';
 	import ItemSelectMenu from './itemSelectMenu.svelte';
+	import { deepClone } from '$lib/utils/general';
 
 	const {
 		item,
@@ -24,18 +25,38 @@
 	} = $props();
 
 	function reforgeableFilter(item: Item): boolean {
-		return item.modifiers.some((mod) => mod.type === 'Reforgeable');
+		if (!selectedItem && !selectedEnhancer) {
+			return item.modifiers.some((mod) => mod.type === 'Reforgeable');
+		} else if (!selectedItem && selectedEnhancer) {
+			const enhancerReforgeGroups: string[] = (
+				selectedEnhancer.modifiers.find((m) => m.type === 'Enhancer') as EnhancerModifier
+			).enhances;
+
+			return item.modifiers.some(
+				(mod) =>
+					mod.type === 'Reforgeable' &&
+					(enhancerReforgeGroups.includes((mod as ReforgeableModifier).group) ||
+						enhancerReforgeGroups.includes('any'))
+			);
+		} else {
+			return false;
+		}
 	}
 
 	function enhancerFilter(item: Item): boolean {
-		const affectedReforgeGroup: ReforgeableModifier = selectedItem?.modifiers.find(
-			(mod) => mod.type === 'Reforgeable'
-		) as ReforgeableModifier;
-		return item.modifiers.some(
-			(mod) =>
-				mod.type === 'Enhancer' &&
-				(mod as EnhancerModifier).enhances.includes(affectedReforgeGroup.group)
-		);
+		if (selectedItem && !selectedEnhancer) {
+			const affectedReforgeGroup: ReforgeableModifier = selectedItem?.modifiers.find(
+				(mod) => mod.type === 'Reforgeable'
+			) as ReforgeableModifier;
+			return item.modifiers.some(
+				(mod) =>
+					mod.type === 'Enhancer' &&
+					((mod as EnhancerModifier).enhances.includes(affectedReforgeGroup.group) ||
+						(mod as EnhancerModifier).enhances.includes('any'))
+			);
+		} else {
+			return item.modifiers.some((mod) => mod.type === 'Enhancer');
+		}
 	}
 
 	let selectMenuOpened: boolean = $state(false);
@@ -68,25 +89,36 @@
 	}
 
 	let selectedItem: Item | undefined = $state<Item | undefined>(item);
-	let selectedItemInventoryId: number = inventory.findIndex(
-		(item) => item.uid === selectedItem?.uid
-	);
-
 	let selectedEnhancer: Item | undefined = $state(enhancer);
-	let selectedEnhancerInventoryId: number = inventory.findIndex(
-		(item) => item.uid === selectedEnhancer?.uid
-	);
 
 	let filter: (item: Item) => boolean = $state(reforgeableFilter);
 	let onselect: (item: CustomEvent) => void = $state(selectItem);
 
 	let output: Item | undefined = $derived.by(() => {
-		return previewEnhanceItem(selectedItem, selectedEnhancer);
+		if (selectedItem != undefined && selectedEnhancer != undefined) {
+			return previewEnhanceItem(selectedItem, selectedEnhancer);
+		}
 	});
 
 	let enhanceButtonDisabled: boolean = $derived.by(() => {
 		return selectedEnhancer === undefined && selectedItem === undefined;
 	});
+
+	async function enhance(item: Item, enhancer: Item) {
+		try {
+			const newItem: Item | null = await Enhance(item, enhancer);
+
+			if (newItem) {
+				selectedItem = undefined;
+				selectedEnhancer = undefined;
+
+				output = deepClone<Item>(newItem) ?? newItem;
+				output.modifiers = reviveModifiers(newItem.modifiers);
+			}
+		} catch (err) {
+			console.error(err);
+		}
+	}
 </script>
 
 <FlexColContainer class="inline-flex items-center justify-start">
@@ -105,9 +137,16 @@
 			)}
 		</div>
 		{#if output}
-			<div class="col-start-2 row-start-2 flex items-center justify-center p-2">
+			<button
+				class="ignore col-start-2 row-start-2 flex items-center justify-center p-2"
+				onclick={(e) => {
+					if (!selectedEnhancer && !selectedItem && output) {
+						output = undefined;
+					}
+				}}
+			>
 				<ItemRenderer item={output} equippable={false} />
-			</div>
+			</button>
 		{:else}
 			<SquareTextButton class="col-start-2 row-start-2" onclick={(e) => {}}>
 				<span>Output</span>
@@ -126,7 +165,14 @@
 			)}
 		</div>
 	</div>
-	<button disabled={enhanceButtonDisabled}> Enhance </button>
+	<button
+		disabled={enhanceButtonDisabled}
+		onclick={async () => {
+			if (selectedItem && selectedEnhancer) await enhance(selectedItem, selectedEnhancer);
+		}}
+	>
+		Enhance
+	</button>
 </FlexColContainer>
 
 {#if selectMenuOpened}
