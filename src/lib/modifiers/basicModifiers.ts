@@ -29,4 +29,8 @@ export class EnhancerModifier implements IItemModifier {
 		public enhances: ReforgeGroup[],
 		public enhancements: IItemModifier[]
 	) { }
+
+	modifyDescription(baseDesc: string): string {
+		return ``;
+	}
 }

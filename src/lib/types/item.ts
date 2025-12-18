@@ -66,7 +66,8 @@ export function parseYAMLToItem(yamlString: string): Item {
 			image: item.icon.image
 		},
 		modifiers,
-		baseStats: item.stats
+		baseStats: item.stats,
+		desc: item.description
 	};
 }
 
@@ -145,7 +146,7 @@ export function getItemData(item: Item, equippable: boolean = true): ITooltipDat
 
 	return {
 		title: itemName,
-		body: `${stackString}${equipMsg}${statsString}${itemDesc}<br/>${descriptor}`
+		body: `${stackString}${equipMsg}${statsString}<i>${itemDesc}</i><br/>${descriptor}`
 	};
 }
 

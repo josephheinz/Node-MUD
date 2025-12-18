@@ -63,7 +63,7 @@
 	});
 </script>
 
-<FlexColContainer class="relative bottom-0 m-0 h-1/4 w-full items-center justify-stretch">
+<FlexColContainer class="relative bottom-0 -m-4 h-1/4 w-full items-center justify-stretch">
 	{#if !connected}
 		<div class="flex h-full w-full items-center justify-center">
 			<Heading>Connecting to chat...</Heading>
