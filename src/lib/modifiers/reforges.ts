@@ -10,11 +10,13 @@ export class ReforgeModifier implements IItemModifier {
 	type = 'Reforge';
 	public reforge: IReforge;
 	statChanges?: StatList;
+	displayName?: string | undefined;
 
 	constructor(reforge: IReforge | string) {
 		if (typeof reforge === 'string') this.reforge = Reforges[reforge];
 		else this.reforge = reforge;
 		this.statChanges = this.reforge.stats;
+		this.displayName = `${this.reforge.name} Reforge`;
 	}
 
 	modifyName(baseName: string): string {
@@ -37,7 +39,7 @@ export class ReforgeModifier implements IItemModifier {
 export class ReforgeableModifier implements IItemModifier {
 	type = 'Reforgeable';
 
-	constructor(public group: ReforgeGroup) {}
+	constructor(public group: ReforgeGroup) { }
 }
 
 export const Reforges: Record<string, IReforge> = {

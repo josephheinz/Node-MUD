@@ -12,7 +12,7 @@ export function tooltip(element: HTMLElement, data: ITooltipData) {
 
         div = document.createElement('div');
         div.dataset.svelteTooltip = "true";
-        div.innerHTML = `<b>${title}</b><br/><hr style="color:oklch(55.2% 0.016 285.938);"/><span>${data.body}</span>`;
+        div.innerHTML = `<b>${title}</b><br/><hr style="color:oklch(55.2% 0.016 285.938);"/><span style="max-width:300px;">${data.body}</span>`;
         Object.assign(div.style, {
             border: "1px solid oklch(44.2% 0.017 285.786)",
             boxShadow: "1px 1px 1px oklch(44.2% 0.017 285.786)",

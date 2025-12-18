@@ -7,7 +7,6 @@ import { determineSlot } from '$lib/utils/item';
 import { capitalizeFirstLetter, formatNumber } from '$lib/utils/general';
 import type { ReforgeableModifier } from '$lib/modifiers/reforges';
 import type { StackableModifier } from '$lib/modifiers/basicModifiers';
-import numeral from 'numeral';
 
 export type RarityKey = keyof typeof Rarity;
 
@@ -146,7 +145,7 @@ export function getItemData(item: Item, equippable: boolean = true): ITooltipDat
 
 	return {
 		title: itemName,
-		body: `${stackString}${equipMsg}${statsString}<i>${itemDesc}</i><br/>${descriptor}`
+		body: `${stackString}${equipMsg}${statsString}${itemDesc}<br/>${descriptor}`
 	};
 }
 
@@ -171,7 +170,7 @@ export function getDisplayName(item: Item): string {
  * @returns The final description string with each modifier's `modifyDescription` applied sequentially
  */
 export function getDisplayDescription(item: Item): string {
-	const base = item.desc ?? '';
+	const base = item.desc ? `<i>${item.desc}</i>` : '';
 	return (
 		item.modifiers?.reduce(
 			(desc, mod) => (mod.modifyDescription ? mod.modifyDescription(desc) : desc),
