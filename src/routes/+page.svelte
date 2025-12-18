@@ -95,7 +95,7 @@
 				{:else if currentTab === 'Skills'}
 					<SkillMenu bind:skills />
 				{:else if currentTab === 'Enhancer'}
-					<Enhancer />
+					<Enhancer item={undefined} enhancer={undefined} {equipment} {inventory} />
 				{/if}
 			</div>
 		</main>

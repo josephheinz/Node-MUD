@@ -12,12 +12,17 @@
 
 	interface Props {
 		item: Item;
-		pclass?: string;
+		class?: string;
 		equippedSlot?: EquipmentSlot;
 		equippable?: boolean;
 	}
 
-	const { item, pclass = '', equippedSlot = undefined, equippable = true }: Props = $props();
+	const {
+		item,
+		class: userClass = '',
+		equippedSlot = undefined,
+		equippable = true
+	}: Props = $props();
 
 	function handleClick() {
 		if (equippedSlot && equippable) {
@@ -64,7 +69,7 @@
 </script>
 
 <div
-	class="relative flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-600 p-2 {pclass}"
+	class="relative flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-600 p-2 {userClass}"
 	style="border:2px solid {item?.rarity};"
 	title=""
 	use:tooltip={getItemData(item as Item, equippable)}

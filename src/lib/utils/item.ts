@@ -4,8 +4,10 @@ import { deepClone } from './general';
 import { get } from 'svelte/store';
 import * as store from '$lib/store';
 import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
-import type { StackableModifier } from '$lib/modifiers/basicModifiers';
+import type { EnhancerModifier, StackableModifier } from '$lib/modifiers/basicModifiers';
 import ItemHover from '$lib/components/chat/itemHover.svelte';
+import type { StarsModifier } from '$lib/modifiers/stars';
+import type { ReforgeModifier } from '$lib/modifiers/reforges';
 
 /**
  * Combine inventory and equipped items into a single list with modifiers reinstantiated.
@@ -230,4 +232,41 @@ export function tryStackItemInInventory(item: Item, inventory: Item[]): Item[] {
 			stackableModifier.value;
 		return inventory;
 	}
+}
+
+export function previewEnhanceItem(item: Item, enhancer: Item): Item {
+	if (!item || !enhancer) throw new Error("Item or enhancer are undefined");
+
+	const enhancements = enhancer.modifiers.find((m) => m.type === 'Enhancer') as
+		| EnhancerModifier
+		| undefined;
+	if (!enhancements) throw new Error('Enhancer item does not actually have any enhancements');
+
+	const instantiated = enhancements.enhancements.map(instantiateModifier);
+
+	const newItem: Item = deepClone(item);
+	newItem.modifiers = reviveModifiers(newItem.modifiers);
+
+	for (const mod of instantiated) {
+		if (mod.type === 'Stars') {
+			const existing: StarsModifier | null = newItem.modifiers.find(
+				(m): m is StarsModifier => m.type === 'Stars'
+			) as StarsModifier;
+
+			if (existing) {
+				existing.stars += (mod as StarsModifier).stars;
+				continue;
+			}
+		} else if (mod.type === 'Reforge') {
+			const existing: number = newItem.modifiers.findIndex(
+				(m): m is ReforgeModifier => m.type === 'Reforge'
+			);
+
+			newItem.modifiers.splice(existing, 1);
+		}
+
+		newItem.modifiers.push(mod);
+	}
+
+	return newItem;
 }

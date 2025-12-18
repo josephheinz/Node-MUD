@@ -1,0 +1,12 @@
+- id: snake_egg
+  name: Snake Egg
+  icon:
+    ascii: "o"
+    image: "/images/items/snakeEgg.svg"
+  rarity: Uncommon
+  modifiers:
+    - type: Enhancer
+      enhances:
+        - Sword
+      enhancements:
+        - type: Caduceus

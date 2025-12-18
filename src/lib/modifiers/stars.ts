@@ -3,7 +3,7 @@ import { type IItemModifier } from "$lib/types/item";
 export class StarsModifier implements IItemModifier {
     type = "Stars";
 
-    constructor(private stars: number) { }
+    constructor(public stars: number) { }
 
     modifyName(baseName: string): string {
         let leftoverStars: number | null = null;

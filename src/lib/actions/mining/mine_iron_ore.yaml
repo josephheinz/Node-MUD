@@ -4,7 +4,7 @@
     image: "/images/actions/miner.svg"
     color: "#bdbdbd"
   req:
-    skill: 'Mining'
+    skill: "Mining"
     level: 1
   inputs:
     ids:

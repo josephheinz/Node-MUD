@@ -1,0 +1,13 @@
+- id: falling_star
+  name: Falling Star
+  icon:
+    ascii: "x"
+    image: "/images/items/fallingStar.svg"
+  rarity: Rare
+  modifiers:
+    - type: Enhancer
+      enhances:
+        - any
+      enhancements:
+        - type: Stars
+          stars: 1
