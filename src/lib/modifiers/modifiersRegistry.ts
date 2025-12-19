@@ -3,6 +3,7 @@ import { ReforgeModifier, ReforgeableModifier } from './reforges';
 import { StarsModifier } from './stars';
 import { CaduceusModifier } from './special';
 import { EnhancerModifier, EquippableModifier, StackableModifier } from './basicModifiers';
+import { EnchantmentModifier } from './enchantments';
 
 export const modifierRegistry: Record<
 	string,
@@ -14,7 +15,8 @@ export const modifierRegistry: Record<
 	Reforge: ReforgeModifier,
 	Stars: StarsModifier,
 	Caduceus: CaduceusModifier,
-	Enhancer: EnhancerModifier
+	Enhancer: EnhancerModifier,
+	Enchantment: EnchantmentModifier
 };
 
 /**

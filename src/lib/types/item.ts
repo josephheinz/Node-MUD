@@ -85,7 +85,7 @@ export function computeItemStats(
 	]);
 
 	for (const key of statKeys) {
-		const base = baseStats[key] ?? 0;
+		let base = baseStats[key] ?? 0;
 
 		let modTotal = 0;
 		let reforgeTotal = 0;
@@ -95,6 +95,7 @@ export function computeItemStats(
 			const val = mod.statChanges[key] ?? 0;
 			if (mod.type === 'Reforge') reforgeTotal += val;
 			else modTotal += val;
+			base += val;
 		}
 
 		stats[key] = { base, modifiers: modTotal, reforges: reforgeTotal };
