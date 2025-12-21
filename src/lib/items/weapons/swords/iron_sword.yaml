@@ -2,7 +2,7 @@
   name: Iron Sword
   icon:
     ascii: "𐕣"
-    image: "/images/items/weapons/swords/ironSword.svg"
+    image: "/images/items/weapons/swords/ironSword.png"
   rarity: Common
   stats:
     damage: 5

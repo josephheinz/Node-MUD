@@ -2,7 +2,7 @@
   name: Gold Bar
   icon:
     ascii: '='
-    image: '/images/items/materials/crafting/bars/goldBar.svg'
+    image: '/images/items/materials/crafting/bars/goldBar.png'
   rarity: Common
   modifiers:
     - type: Stackable

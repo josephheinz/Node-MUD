@@ -69,7 +69,7 @@
 </script>
 
 <div
-	class="relative flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-600 p-2 {userClass}"
+	class=" relative flex size-16 items-center justify-center rounded-lg bg-zinc-600 p-2 {userClass}"
 	style="border:2px solid {item?.rarity};"
 	title=""
 	use:tooltip={getItemData(item as Item, equippable)}
@@ -79,17 +79,11 @@
 	tabindex="0"
 >
 	{#if item.icon.image}
-		<img src={item.icon.image} alt={item.name + "'s image"} class="h-full w-full" />
-		<!-- <div
-			class="h-full w-full bg-current"
-			style="
-		-webkit-mask: url({item.icon.image}) no-repeat center;
-		mask: url({item.icon.image}) no-repeat center;
-		-webkit-mask-size: contain;
-		mask-size: contain;
-		background: {item.rarity};
-	"
-		></div> -->
+		<img
+			src={item.icon.image}
+			alt={item.name + "'s image"}
+			class="image-rendering-pixelated size-full"
+		/>
 	{:else}
 		<span class="ascii-item text-4xl select-none" style="color:{item?.rarity};"
 			>{item?.icon?.ascii}</span
