@@ -1,4 +1,4 @@
-import { type IItemModifier } from '$lib/types/item';
+import { type HashableModifier, type IItemModifier } from '$lib/types/item';
 import type { StatList } from '$lib/types/stats';
 
 export interface IReforge {
@@ -6,7 +6,7 @@ export interface IReforge {
 	stats?: StatList;
 }
 
-export class ReforgeModifier implements IItemModifier {
+export class ReforgeModifier implements IItemModifier, HashableModifier {
 	type = 'Reforge';
 	public reforge: IReforge;
 	statChanges?: StatList;
@@ -34,12 +34,30 @@ export class ReforgeModifier implements IItemModifier {
 	static fromJSON(json: any) {
 		return new ReforgeModifier(json.reforge);
 	}
+
+	hash(): string {
+		return `${this.type}:${this.reforge.name}`;
+	}
+
+	static fromHash(hash: string): ReforgeModifier {
+		const [, name] = hash.split(':');
+		return new ReforgeModifier(name);
+	}
 }
 
 export class ReforgeableModifier implements IItemModifier {
 	type = 'Reforgeable';
 
-	constructor(public group: ReforgeGroup) { }
+	constructor(public group: ReforgeGroup) {}
+
+	hash(): string {
+		return `${this.type}:${this.type}`;
+	}
+
+	static fromHash(hash: string): ReforgeableModifier {
+		const [, group] = hash.split(':');
+		return new ReforgeableModifier(group as ReforgeGroup);
+	}
 }
 
 export const Reforges: Record<string, IReforge> = {
