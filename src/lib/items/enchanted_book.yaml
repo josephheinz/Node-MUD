@@ -1,0 +1,20 @@
+- id: enchanted_book
+  name: Enchanted Book
+  icon:
+    ascii: 'B'
+    image: '/images/items/purpleBook.png'
+  rarity: Common
+  modifiers:
+    - type: Enhancer
+      enhances:
+        - any
+      enhancements:
+        - type: Enchantment
+          enchantments:
+            - name: Sharp
+              level: 1
+              maxLevel: 7
+              applies:
+                - Sword
+    - type: Reforgeable
+      group: Enchanted Book

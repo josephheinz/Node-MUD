@@ -32,11 +32,13 @@
 				selectedEnhancer.modifiers.find((m) => m.type === 'Enhancer') as EnhancerModifier
 			).enhances;
 
-			return item.modifiers.some(
-				(mod) =>
-					mod.type === 'Reforgeable' &&
-					(enhancerReforgeGroups.includes((mod as ReforgeableModifier).group) ||
-						enhancerReforgeGroups.includes('any'))
+			return (
+				item.modifiers.some(
+					(mod) =>
+						mod.type === 'Reforgeable' &&
+						(enhancerReforgeGroups.includes((mod as ReforgeableModifier).group) ||
+							enhancerReforgeGroups.includes('any'))
+				) && item.uid != selectedEnhancer.uid
 			);
 		} else {
 			return false;
@@ -48,11 +50,13 @@
 			const affectedReforgeGroup: ReforgeableModifier = selectedItem?.modifiers.find(
 				(mod) => mod.type === 'Reforgeable'
 			) as ReforgeableModifier;
-			return item.modifiers.some(
-				(mod) =>
-					mod.type === 'Enhancer' &&
-					((mod as EnhancerModifier).enhances.includes(affectedReforgeGroup.group) ||
-						(mod as EnhancerModifier).enhances.includes('any'))
+			return (
+				item.modifiers.some(
+					(mod) =>
+						mod.type === 'Enhancer' &&
+						((mod as EnhancerModifier).enhances.includes(affectedReforgeGroup.group) ||
+							(mod as EnhancerModifier).enhances.includes('any'))
+				) && item.uid != selectedItem.uid
 			);
 		} else {
 			return item.modifiers.some((mod) => mod.type === 'Enhancer');
