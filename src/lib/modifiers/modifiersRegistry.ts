@@ -5,9 +5,13 @@ import { CaduceusModifier } from './special';
 import { EnhancerModifier, EquippableModifier, StackableModifier } from './basicModifiers';
 import { EnchantmentModifier } from './enchantments';
 
+export type ModifierDiff = {
+	type: IItemModifier['type'];
+} & Partial<Record<Exclude<keyof IItemModifier, 'type'>, unknown>>;
+
 export const modifierRegistry: Record<
 	string,
-	{ new(...args: any[]): IItemModifier; type?: string; fromJSON?: (raw: any) => IItemModifier }
+	{ new (...args: any[]): IItemModifier; type?: string; fromJSON?: (raw: any) => IItemModifier }
 > = {
 	Stackable: StackableModifier,
 	Equippable: EquippableModifier,
@@ -40,4 +44,8 @@ export function instantiateModifier(raw: any): IItemModifier {
 	delete args.type;
 
 	return new ModClass(...Object.values(args));
+}
+
+export function cloneModifier<T extends IItemModifier>(mod: T): T {
+	return Object.assign(Object.create(Object.getPrototypeOf(mod)), mod);
 }

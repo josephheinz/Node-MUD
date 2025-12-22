@@ -1,9 +1,13 @@
 import { EmptyEquipment, type Equipment, type EquipmentSlot } from '$lib/types/equipment';
 import { itemRegistry, type DBItem, type IItemModifier, type Item } from '$lib/types/item';
-import { deepClone } from './general';
+import { deepClone, deepEqual } from './general';
 import { get } from 'svelte/store';
 import * as store from '$lib/store';
-import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
+import {
+	cloneModifier,
+	instantiateModifier,
+	type ModifierDiff
+} from '$lib/modifiers/modifiersRegistry';
 import type { EnhancerModifier, StackableModifier } from '$lib/modifiers/basicModifiers';
 import type { StarsModifier } from '$lib/modifiers/stars';
 import type { ReforgeableModifier, ReforgeGroup, ReforgeModifier } from '$lib/modifiers/reforges';
@@ -141,23 +145,32 @@ export function encodeDbItem(item: Item): DBItem {
 	for (const mod of item.modifiers ?? []) {
 		const baseMod = base.modifiers.find((b) => b.type === mod.type);
 
+		// brand new modifier
 		if (!baseMod) {
 			encodedMods.push(mod);
 			continue;
 		}
 
+		const fresh = cloneModifier(baseMod);
 		let changed = false;
-		const diff: any = { type: mod.type };
 
-		for (const key of Object.keys(mod) as (keyof IItemModifier)[]) {
-			if (mod[key] !== baseMod[key]) {
-				diff[key] = mod[key];
+		for (const key in mod) {
+			if (key === 'type') continue;
+
+			const k = key as keyof IItemModifier;
+
+			if (!deepEqual(mod[k], baseMod[k])) {
+				(fresh as any)[k] = mod[k];
 				changed = true;
 			}
 		}
 
-		if (changed) encodedMods.push(mod);
+		if (changed) encodedMods.push(fresh);
 	}
+
+	console.log(
+		JSON.stringify(itemRegistry['enchanted_book'].modifiers.find((m) => m.type === 'Enhancer'))
+	);
 
 	return { id: item.id, modifiers: encodedMods };
 }
@@ -245,7 +258,7 @@ export function previewEnhanceItem(item: Item, enhancer: Item): Item {
 	const instantiated = enhancements.enhancements.map(instantiateModifier);
 
 	const newItem: Item = deepClone(item);
-	newItem.modifiers = reviveModifiers(newItem.modifiers);
+	newItem.modifiers = reviveModifiers(deepClone(newItem.modifiers));
 
 	for (const mod of instantiated) {
 		if (mod.type === 'Stars') {
@@ -297,7 +310,9 @@ export function addEnchantments(item: Item, enchants: Enchantment[]): Item {
 			(e) => e.type === 'Enchantment'
 		) as EnchantmentModifier;
 
-		console.log(item.modifiers);
+		if (enhanceMod) {
+			enhanceMod.enhancements = enhanceMod.enhancements.map((e) => instantiateModifier(e));
+		}
 
 		if (enhanceMod && enchantEnhancement) {
 			let updatedEnchants: Enchantment[] = combineEnchantments(
