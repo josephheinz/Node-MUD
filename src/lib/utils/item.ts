@@ -13,8 +13,7 @@ import * as store from '$lib/store';
 import {
 	cloneModifier,
 	instantiateModifier,
-	instantiateModifierFromHash,
-	type ModifierDiff
+	instantiateModifierFromHash
 } from '$lib/modifiers/modifiersRegistry';
 import { EnhancerModifier, type StackableModifier } from '$lib/modifiers/basicModifiers';
 import type { StarsModifier } from '$lib/modifiers/stars';
@@ -116,11 +115,15 @@ export async function getItem(id: string): Promise<Item> {
 export function loadDbItem(dbItem: DBItem): Item {
 	const base = deepClone(itemRegistry[dbItem.id]);
 	if (!base) throw new Error(`Unknown item id: ${dbItem.id}`);
-	/* 
-	const dbMods = dbItem.modifiers ?? [];
+
+	const dbMods: (IItemModifier & HashableModifier)[] =
+		dbItem.modifiers != undefined && dbItem.modifiers.length > 0
+			? dbItem.modifiers.map(instantiateModifier)
+			: [];
 
 	// Keep base modifiers AND db modifiers.
-	let merged = [...base.modifiers];
+	let merged: (IItemModifier & HashableModifier)[] = [...base.modifiers];
+	console.log(dbMods, merged);
 
 	for (const mod of dbMods) {
 		const existingIndex = merged.findIndex((m) => m.type === mod.type);
@@ -132,11 +135,11 @@ export function loadDbItem(dbItem: DBItem): Item {
 	}
 
 	merged = reviveModifiers(merged);
- */
+
 	return {
 		...base,
 		uid: crypto.randomUUID(),
-		modifiers: dbItem.modifiers?.map((h) => instantiateModifier(h)) ?? []
+		modifiers: merged
 	};
 }
 

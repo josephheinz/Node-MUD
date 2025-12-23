@@ -19,6 +19,7 @@
 	import SkillMenu from '$lib/components/skills/skillMenu.svelte';
 	import QueueModal from '$lib/components/actions/queueModal.svelte';
 	import Enhancer from '$lib/components/enhancer.svelte';
+	import { onMount } from 'svelte';
 
 	let loginModalOpen = $state(false);
 	let queueModalOpen = $state(false);
@@ -51,6 +52,10 @@
 	store.queueActive.subscribe((value) => (queueActive = value));
 	store.profile.subscribe((value) => (profile = value));
 	store.skills.subscribe((value) => (skills = value));
+
+	onMount(() => {
+		console.log(inventory);
+	});
 </script>
 
 <title>Web-based Runescape-like Alpha (Mason Was Here)</title>

@@ -27,8 +27,8 @@ export class StackableModifier implements IItemModifier, HashableModifier {
 	value;
 
 	constructor(
-		public stack: number,
-		amount: number
+		amount: number,
+		public stack: number
 	) {
 		this.value = amount;
 	}

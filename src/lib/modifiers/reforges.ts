@@ -50,6 +50,10 @@ export class ReforgeableModifier implements IItemModifier {
 
 	constructor(public group: ReforgeGroup) {}
 
+	modifyDescription(baseDesc: string): string {
+		return `<span class="color:#333;">This item can be reforged</span></br>${baseDesc}`;
+	}
+
 	hash(): string {
 		return `${this.type}:${this.type}`;
 	}
