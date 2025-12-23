@@ -1,21 +1,26 @@
-import { supabase } from "$lib/auth/supabaseClient";
+import { supabase } from '$lib/auth/supabaseClient';
+import type { Equipment } from '$lib/types/equipment.js';
+import { ensureItemModifiers } from '$lib/utils/item';
 
 export async function GET({ params }) {
+	const { id } = params;
 
-    const { id } = params;
+	const { data, error } = await supabase
+		.from('inventories')
+		.select('equipment_data')
+		.eq('player_id', id)
+		.single();
 
-    const { data, error } = await supabase
-        .from("inventories")
-        .select("equipment_data")
-        .eq("player_id", id);
+	if (error) {
+		throw new Error(`${error.message}`);
+	}
 
-    if (error) {
-        throw new Error(`${error.message}`);
-    }
+	if (data) {
+		Object.values(data.equipment_data as Equipment).forEach((item) => {
+			if (item) ensureItemModifiers(item);
+		});
+		return Response.json({ equipment: data.equipment_data }, { status: 200 });
+	}
 
-    if (data.length == 1) {
-        return Response.json({ equipment: data[0].equipment_data }, { status: 200 });
-    }
-
-    return Response.json({ equipment: undefined }, { status: 404 });
+	return Response.json({ equipment: undefined }, { status: 404 });
 }

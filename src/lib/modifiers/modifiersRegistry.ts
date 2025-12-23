@@ -32,7 +32,7 @@ export const modifierRegistry: Record<
  * @returns An instantiated `IItemModifier` corresponding to `raw`
  * @throws Error if `raw.type` does not match any registered modifier
  */
-export function instantiateModifier(raw: any): IItemModifier {
+export function instantiateModifier(raw: any): IItemModifier & HashableModifier {
 	const ModClass = modifierRegistry[raw.type];
 	if (!ModClass) throw new Error(`Unknown modifier: ${raw.type}`);
 
@@ -43,7 +43,7 @@ export function instantiateModifier(raw: any): IItemModifier {
 }
 
 export function instantiateModifierFromHash(hash: string): IItemModifier & HashableModifier {
-	const [type] = hash.split(':');
+	const type = hash.split(':')[0];
 	const ModClass = modifierRegistry[type];
 	if (!ModClass) throw new Error(`Unknown modifier: ${type}`);
 	return ModClass.fromHash(hash);

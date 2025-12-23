@@ -1,21 +1,23 @@
-import { supabase } from "$lib/auth/supabaseClient";
+import { supabase } from '$lib/auth/supabaseClient';
+import { ensureItemModifiers } from '$lib/utils/item.js';
 
 export async function GET({ params }) {
+	const { id } = params;
 
-    const { id } = params;
+	const { data, error } = await supabase
+		.from('inventories')
+		.select('inventory_data')
+		.eq('player_id', id)
+		.single();
 
-    const { data, error } = await supabase
-        .from("inventories")
-        .select("inventory_data")
-        .eq("player_id", id);
+	if (error) {
+		throw new Error(`${error.message}`);
+	}
 
-    if (error) {
-        throw new Error(`${error.message}`);
-    }
+	if (data) {
+		const inventory = data.inventory_data.map(ensureItemModifiers);
+		return Response.json({ inventory }, { status: 200 });
+	}
 
-    if (data.length == 1) {
-        return Response.json({ inventory: data[0].inventory_data }, { status: 200 });
-    }
-
-    return Response.json({ inventory: undefined }, { status: 404 });
+	return Response.json({ inventory: undefined }, { status: 404 });
 }

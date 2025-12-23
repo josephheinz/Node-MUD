@@ -1,14 +1,22 @@
 import { EmptyEquipment, type Equipment, type EquipmentSlot } from '$lib/types/equipment';
-import { itemRegistry, type DBItem, type IItemModifier, type Item } from '$lib/types/item';
+import {
+	isHashableModifier,
+	itemRegistry,
+	type DBItem,
+	type HashableModifier,
+	type IItemModifier,
+	type Item
+} from '$lib/types/item';
 import { deepClone, deepEqual } from './general';
 import { get } from 'svelte/store';
 import * as store from '$lib/store';
 import {
 	cloneModifier,
 	instantiateModifier,
+	instantiateModifierFromHash,
 	type ModifierDiff
 } from '$lib/modifiers/modifiersRegistry';
-import type { EnhancerModifier, StackableModifier } from '$lib/modifiers/basicModifiers';
+import { EnhancerModifier, type StackableModifier } from '$lib/modifiers/basicModifiers';
 import type { StarsModifier } from '$lib/modifiers/stars';
 import type { ReforgeableModifier, ReforgeGroup, ReforgeModifier } from '$lib/modifiers/reforges';
 import { EnchantmentModifier, type Enchantment } from '$lib/modifiers/enchantments';
@@ -108,7 +116,7 @@ export async function getItem(id: string): Promise<Item> {
 export function loadDbItem(dbItem: DBItem): Item {
 	const base = deepClone(itemRegistry[dbItem.id]);
 	if (!base) throw new Error(`Unknown item id: ${dbItem.id}`);
-
+	/* 
 	const dbMods = dbItem.modifiers ?? [];
 
 	// Keep base modifiers AND db modifiers.
@@ -124,11 +132,11 @@ export function loadDbItem(dbItem: DBItem): Item {
 	}
 
 	merged = reviveModifiers(merged);
-
+ */
 	return {
 		...base,
 		uid: crypto.randomUUID(),
-		modifiers: merged as IItemModifier[]
+		modifiers: dbItem.modifiers?.map((h) => instantiateModifier(h)) ?? []
 	};
 }
 
@@ -172,7 +180,7 @@ export function encodeDbItem(item: Item): DBItem {
 		JSON.stringify(itemRegistry['enchanted_book'].modifiers.find((m) => m.type === 'Enhancer'))
 	);
 
-	return { id: item.id, modifiers: encodedMods };
+	return { id: item.id, modifiers: item.modifiers.map((m) => m.hash()) };
 }
 
 /**
@@ -192,14 +200,25 @@ export function hydrateInventory(inventory: DBItem[]): Item[] {
 	return hydratedInventory;
 }
 
-/**
- * Reinstantiates raw modifier objects into their concrete modifier instances.
- *
- * @param mods - Array of modifier data (possibly plain objects) to revive into instantiated modifiers
- * @returns An array of instantiated `IItemModifier` objects with runtime behavior restored
- */
-export function reviveModifiers(mods: IItemModifier[]): IItemModifier[] {
-	return mods.map((mod) => instantiateModifier(mod));
+export function reviveModifiers(
+	mods: (IItemModifier & HashableModifier)[]
+): (IItemModifier & HashableModifier)[] {
+	return mods.map((mod) => {
+		// If it's a hash string, instantiate from hash
+		if (typeof mod === 'string') {
+			return instantiateModifierFromHash(mod);
+		}
+
+		// Plain object from deepClone or DB JSON
+		const revived = instantiateModifier(mod) as IItemModifier & HashableModifier;
+
+		// Recursively revive nested modifiers for EnhancerModifier
+		if (revived instanceof EnhancerModifier && Array.isArray(revived.enhancements)) {
+			revived.enhancements = reviveModifiers(revived.enhancements);
+		}
+
+		return revived;
+	});
 }
 
 /**
@@ -389,4 +408,15 @@ export function combineEnchantments(
 	});
 
 	return updatedEnchants;
+}
+
+export function ensureItemModifiers(item: Item): Item {
+	if (!item.modifiers || item.modifiers.length === 0) return item;
+
+	// If ANY modifier is non-hashable, revive everything
+	if (item.modifiers.some((m) => !isHashableModifier(m))) {
+		item.modifiers = reviveModifiers(item.modifiers);
+	}
+
+	return item;
 }

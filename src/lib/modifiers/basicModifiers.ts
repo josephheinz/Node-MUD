@@ -40,7 +40,7 @@ export class StackableModifier implements IItemModifier, HashableModifier {
 	static fromHash(hash: string): StackableModifier {
 		const [, amount, stack] = hash.split(':');
 
-		return new StackableModifier(Number(stack), Number(amount));
+		return new StackableModifier(Number(amount), Number(stack));
 	}
 }
 
