@@ -55,7 +55,7 @@ export class ReforgeableModifier implements IItemModifier {
 	}
 
 	hash(): string {
-		return `${this.type}:${this.type}`;
+		return `${this.type}:${this.group}`;
 	}
 
 	static fromHash(hash: string): ReforgeableModifier {

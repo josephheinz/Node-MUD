@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.css';
-	import "../ui.css"
+	import '../ui.css';
 	import * as store from '$lib/store';
 	import { hydrateEquipment } from '$lib/types/equipment';
 	import { getModifiedStats, Stats } from '$lib/types/stats';

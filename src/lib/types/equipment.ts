@@ -2,7 +2,15 @@ import { type DBItem, type Item } from '$lib/types/item';
 import { getModifiedStats } from '$lib/types/stats';
 import * as store from '$lib/store';
 import { get } from 'svelte/store';
-import { determineSlot, encodeDbItem, hydrateInventory, loadDbItem } from '$lib/utils/item';
+import {
+	determineSlot,
+	encodeDbItem,
+	hydrateInventory,
+	loadDbItem,
+	reviveModifiers
+} from '$lib/utils/item';
+import { deepClone } from '$lib/utils/general';
+import { instantiateModifierFromHash } from '$lib/modifiers/modifiersRegistry';
 
 export type EquipmentSlot = keyof Equipment;
 
@@ -15,6 +23,17 @@ export type Equipment = {
 	necklace: Item | null;
 	ring: Item | null;
 	hands: Item | null;
+};
+
+export type DBEquipment = {
+	head: DBItem | null;
+	body: DBItem | null;
+	legs: DBItem | null;
+	offhand: DBItem | null;
+	mainhand: DBItem | null;
+	necklace: DBItem | null;
+	ring: DBItem | null;
+	hands: DBItem | null;
 };
 
 export const EmptyEquipment: Equipment = {
@@ -199,14 +218,22 @@ export function serializeEquipment(
 	return result;
 }
 
-export function hydrateEquipment(equipment: Object): Equipment {
-	const hydratedEquipment: Equipment = { ...EmptyEquipment };
+export function hydrateEquipment(dbEquipment: DBEquipment): Equipment {
+	const hydrated: Equipment = { ...EmptyEquipment };
 
-	for (const [slotKey, item] of Object.entries(equipment) as [EquipmentSlot, Item | null][]) {
-		if (!item) continue;
-		let loadedItem = loadDbItem(item);
-		hydratedEquipment[slotKey] = loadedItem;
-	}
+	// Iterate through each equipment slot
+	(Object.keys(dbEquipment) as EquipmentSlot[]).forEach((slot) => {
+		const dbItem = dbEquipment[slot];
+		if (!dbItem) return;
 
-	return hydratedEquipment;
+		// Copy DBItem to avoid mutating original
+		const item: Item = loadDbItem(dbItem);
+
+		// Restore modifier functions
+		item.modifiers = reviveModifiers(item.modifiers);
+
+		hydrated[slot] = item;
+	});
+
+	return hydrated;
 }

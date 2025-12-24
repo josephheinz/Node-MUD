@@ -118,12 +118,11 @@ export function loadDbItem(dbItem: DBItem): Item {
 
 	const dbMods: (IItemModifier & HashableModifier)[] =
 		dbItem.modifiers != undefined && dbItem.modifiers.length > 0
-			? dbItem.modifiers.map(instantiateModifier)
+			? dbItem.modifiers.map(instantiateModifierFromHash)
 			: [];
 
 	// Keep base modifiers AND db modifiers.
 	let merged: (IItemModifier & HashableModifier)[] = [...base.modifiers];
-	console.log(dbMods, merged);
 
 	for (const mod of dbMods) {
 		const existingIndex = merged.findIndex((m) => m.type === mod.type);
@@ -151,7 +150,7 @@ export function loadDbItem(dbItem: DBItem): Item {
  */
 export function encodeDbItem(item: Item): DBItem {
 	const base = itemRegistry[item.id];
-	const encodedMods: IItemModifier[] = [];
+	const encodedMods: (IItemModifier & HashableModifier)[] = [];
 
 	for (const mod of item.modifiers ?? []) {
 		const baseMod = base.modifiers.find((b) => b.type === mod.type);
@@ -179,11 +178,9 @@ export function encodeDbItem(item: Item): DBItem {
 		if (changed) encodedMods.push(fresh);
 	}
 
-	console.log(
-		JSON.stringify(itemRegistry['enchanted_book'].modifiers.find((m) => m.type === 'Enhancer'))
-	);
+	console.log(encodedMods);
 
-	return { id: item.id, modifiers: item.modifiers.map((m) => m.hash()) };
+	return { id: item.id, modifiers: encodedMods.map((m) => m.hash()) };
 }
 
 /**
@@ -356,7 +353,6 @@ export function addEnchantments(item: Item, enchants: Enchantment[]): Item {
 			});
 
 			item.modifiers.push(newEnchantMod);
-			console.log(item);
 
 			return item;
 		}
@@ -369,8 +365,6 @@ export function addEnchantments(item: Item, enchants: Enchantment[]): Item {
 	) as EnchantmentModifier;
 
 	if (itemEnchantMod) itemEnchantMod.enchantments = updatedEnchants;
-
-	console.log(item);
 
 	return item;
 }

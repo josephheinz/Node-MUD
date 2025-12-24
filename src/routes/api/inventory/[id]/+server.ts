@@ -15,7 +15,7 @@ export async function GET({ params }) {
 	}
 
 	if (data) {
-		const inventory = data.inventory_data.map(ensureItemModifiers);
+		const inventory = data.inventory_data;
 		return Response.json({ inventory }, { status: 200 });
 	}
 

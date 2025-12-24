@@ -45,12 +45,15 @@ export class StackableModifier implements IItemModifier, HashableModifier {
 }
 
 export class EnhancerModifier implements IItemModifier, HashableModifier {
-	type = 'Enhancer';
+	static type = 'Enhancer';
+	type;
 
 	constructor(
 		public enhances: ReforgeGroup[],
 		public enhancements: Array<IItemModifier & HashableModifier>
-	) {}
+	) {
+		this.type = EnhancerModifier.type;
+	}
 
 	modifyDescription(baseDesc: string): string {
 		let enhancesListString = '';
@@ -93,15 +96,36 @@ export class EnhancerModifier implements IItemModifier, HashableModifier {
 	}
 
 	static fromHash(hash: string): EnhancerModifier {
-		// Enhancer:sword,armor:[Stars:3|Enchantment:Sharp:2]
-		const [, rest] = hash.split(':');
-		const [enhancesRaw, innerRaw] = rest.split(':[');
+		// Remove "Enhancer:"
+		const rest = hash.slice(EnhancerModifier.type.length + 1);
+
+		// Split enhances vs inner block safely
+		const bracketIndex = rest.indexOf(':[');
+		if (bracketIndex === -1) throw new Error('Invalid Enhancer hash');
+
+		const enhancesRaw = rest.slice(0, bracketIndex);
+		const innerRaw = rest.slice(bracketIndex + 2, -1); // remove :[ and trailing ]
+
 		const enhances = enhancesRaw.split(',') as ReforgeGroup[];
 
-		const inner = innerRaw
-			.slice(0, -1)
-			.split('|')
-			.map((h) => instantiateModifierFromHash(h));
+		// Split inner modifiers SAFELY
+		const inner: (IItemModifier & HashableModifier)[] = [];
+		let depth = 0;
+		let buffer = '';
+
+		for (const char of innerRaw) {
+			if (char === '[') depth++;
+			if (char === ']') depth--;
+
+			if (char === '|' && depth === 0) {
+				inner.push(instantiateModifierFromHash(buffer));
+				buffer = '';
+			} else {
+				buffer += char;
+			}
+		}
+
+		if (buffer) inner.push(instantiateModifierFromHash(buffer));
 
 		return new EnhancerModifier(enhances, inner);
 	}

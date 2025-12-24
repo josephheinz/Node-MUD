@@ -46,7 +46,6 @@
 	}
 
 	function enhancerFilter(item: Item): boolean {
-		console.log(item);
 		if (selectedItem && !selectedEnhancer) {
 			const affectedReforgeGroup: ReforgeableModifier = selectedItem?.modifiers.find(
 				(mod) => mod.type === 'Reforgeable'
@@ -60,10 +59,7 @@
 				) && item.uid != selectedItem.uid
 			);
 		} else {
-			return item.modifiers.some((mod) => {
-				console.log(mod.type);
-				mod.type === 'Enhancer';
-			});
+			return item.modifiers.some((mod) => mod.type === 'Enhancer');
 		}
 	}
 

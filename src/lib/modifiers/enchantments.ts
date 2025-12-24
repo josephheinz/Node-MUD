@@ -4,6 +4,7 @@ import { toRoman } from '$lib/utils/general';
 import type { ReforgeGroup } from './reforges';
 
 export class EnchantmentModifier implements IItemModifier, HashableModifier {
+	static type = 'Enchantment';
 	type = 'Enchantment';
 
 	constructor(public enchantments: Enchantment[]) {}
@@ -30,17 +31,24 @@ export class EnchantmentModifier implements IItemModifier, HashableModifier {
 	hash(): string {
 		return `${this.type}:[${this.enchantments
 			.map((e) => `${e.name}:${e.level}:${e.maxLevel}:${e.applies.join(',')}`)
-			.join(',')}]`;
+			.join('][')}]`;
 	}
 
 	static fromHash(hash: string): EnchantmentModifier {
-		const json = JSON.parse(hash.slice(hash.indexOf(':[') + 1, -1));
-		const enchants = json.map((e: any) => ({
-			name: e.name,
-			level: e.level,
-			maxLevel: e.maxLevel,
-			applies: e.applies
-		}));
+		const inner = hash.slice(EnchantmentModifier.type.length + 2, -1);
+
+		const blocks = inner.split('][');
+
+		const enchants: Enchantment[] = blocks.map((e) => {
+			const [name, level, maxLevel, appliesRaw] = e.split(':');
+			return {
+				name,
+				level: Number(level),
+				maxLevel: Number(maxLevel),
+				applies: appliesRaw.split(',') as ReforgeGroup[]
+			};
+		});
+
 		return new EnchantmentModifier(enchants);
 	}
 }
