@@ -1,5 +1,5 @@
 import { supabase } from '$lib/auth/supabaseClient';
-import type { Equipment } from '$lib/types/equipment.js';
+import type { DBEquipment, Equipment } from '$lib/types/equipment.js';
 import { ensureItemModifiers } from '$lib/utils/item';
 
 export async function GET({ params }) {
@@ -16,9 +16,6 @@ export async function GET({ params }) {
 	}
 
 	if (data) {
-		Object.values(data.equipment_data as Equipment).forEach((item) => {
-			if (item) ensureItemModifiers(item);
-		});
 		return Response.json({ equipment: data.equipment_data }, { status: 200 });
 	}
 

@@ -96,36 +96,45 @@ export class EnhancerModifier implements IItemModifier, HashableModifier {
 	}
 
 	static fromHash(hash: string): EnhancerModifier {
-		// Remove "Enhancer:"
+		// Remove the "Enhancer:" prefix
 		const rest = hash.slice(EnhancerModifier.type.length + 1);
 
-		// Split enhances vs inner block safely
-		const bracketIndex = rest.indexOf(':[');
-		if (bracketIndex === -1) throw new Error('Invalid Enhancer hash');
+		// Find first occurrence of ":[" which separates enhances list from nested modifiers
+		const sepIndex = rest.indexOf(':[');
+		if (sepIndex === -1) throw new Error(`Invalid hash: ${hash}`);
 
-		const enhancesRaw = rest.slice(0, bracketIndex);
-		const innerRaw = rest.slice(bracketIndex + 2, -1); // remove :[ and trailing ]
+		const enhancesRaw = rest.slice(0, sepIndex);
+		const innerRaw = rest.slice(sepIndex + 2, -1); // skip ":[" and trailing "]"
 
 		const enhances = enhancesRaw.split(',') as ReforgeGroup[];
 
-		// Split inner modifiers SAFELY
+		// Bracket-aware split for nested modifiers
 		const inner: (IItemModifier & HashableModifier)[] = [];
-		let depth = 0;
 		let buffer = '';
+		let depth = 0;
 
-		for (const char of innerRaw) {
+		for (let i = 0; i < innerRaw.length; i++) {
+			const char = innerRaw[i];
 			if (char === '[') depth++;
 			if (char === ']') depth--;
 
 			if (char === '|' && depth === 0) {
-				inner.push(instantiateModifierFromHash(buffer));
+				const chunk = buffer.trim();
+				if (typeof chunk === 'string') {
+					inner.push(instantiateModifierFromHash(chunk));
+				} else if (typeof chunk === 'object') {
+					inner.push(chunk as IItemModifier & HashableModifier);
+				}
 				buffer = '';
 			} else {
 				buffer += char;
 			}
 		}
-
-		if (buffer) inner.push(instantiateModifierFromHash(buffer));
+		if (buffer) {
+			const chunk = buffer.trim();
+			if (typeof chunk === 'string') inner.push(instantiateModifierFromHash(chunk));
+			else if (typeof chunk === 'object') inner.push(chunk as IItemModifier & HashableModifier);
+		}
 
 		return new EnhancerModifier(enhances, inner);
 	}

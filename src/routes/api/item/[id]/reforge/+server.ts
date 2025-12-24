@@ -5,6 +5,7 @@ import type { InventoryRow } from '$lib/types.svelte';
 import { serializeEquipment, type Equipment, type EquipmentSlot } from '$lib/types/equipment';
 import type { DBItem, Item } from '$lib/types/item.js';
 import { encodeDbItem, loadDbItem } from '$lib/utils/item';
+import { hydrateEquipment } from '../../../../../lib/types/equipment';
 
 /**
  * Handle POST requests to reforge a player's item and persist the change to either inventory or equipment.
@@ -70,7 +71,7 @@ export async function POST({ request, params, cookies }) {
 	const { inventory_data, equipment_data } = data as InventoryRow;
 
 	const inventory: DBItem[] = inventory_data ?? [];
-	const equipment: Equipment = equipment_data ?? {};
+	const equipment: Equipment = hydrateEquipment(equipment_data) ?? {};
 
 	// Find item in inventory
 	const index = inventory.findIndex((i) => JSON.stringify(i) === JSON.stringify(dbItem));
@@ -168,7 +169,7 @@ export async function POST({ request, params, cookies }) {
 		return new Response(
 			JSON.stringify({
 				message: 'Item reforged',
-				serializedEquipment: serializeEquipment(equipment_data),
+				serializedEquipment: equipment_data,
 				inventory: updateData.inventory_data,
 				updatedItem: newDbItem
 			}),

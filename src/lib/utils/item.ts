@@ -113,6 +113,8 @@ export async function getItem(id: string): Promise<Item> {
  * @throws Error if `dbItem.id` does not exist in the item registry
  */
 export function loadDbItem(dbItem: DBItem): Item {
+	dbItem = canonicalizeDbItem(dbItem); // 🔥 HEAL CORRUPTED ROWS HERE
+
 	const base = deepClone(itemRegistry[dbItem.id]);
 	if (!base) throw new Error(`Unknown item id: ${dbItem.id}`);
 
@@ -121,25 +123,51 @@ export function loadDbItem(dbItem: DBItem): Item {
 			? dbItem.modifiers.map(instantiateModifierFromHash)
 			: [];
 
-	// Keep base modifiers AND db modifiers.
 	let merged: (IItemModifier & HashableModifier)[] = [...base.modifiers];
 
 	for (const mod of dbMods) {
-		const existingIndex = merged.findIndex((m) => m.type === mod.type);
-		if (existingIndex >= 0) {
-			merged[existingIndex] = mod;
-		} else {
-			merged.push(mod);
-		}
+		const i = merged.findIndex((m) => m.type === mod.type);
+		if (i >= 0) merged[i] = mod;
+		else merged.push(mod);
 	}
-
-	merged = reviveModifiers(merged);
 
 	return {
 		...base,
 		uid: crypto.randomUUID(),
 		modifiers: merged
 	};
+}
+
+export function canonicalizeDbItem(db: DBItem): DBItem {
+	return {
+		id: db.id,
+		modifiers: (db.modifiers ?? []).map((m: any) =>
+			typeof m === 'string' ? m : m?.hash ? m.hash() : String(m)
+		)
+	};
+}
+
+export function canonicalizeModifiers(input: unknown[]): (IItemModifier & HashableModifier)[] {
+	return input.flatMap((mod) => {
+		if (!mod) return [];
+
+		// Already runtime instance
+		if (typeof mod === 'object' && 'type' in mod && (mod as any).modifyName) {
+			return [mod as IItemModifier & HashableModifier];
+		}
+
+		// Hash string from DB
+		if (typeof mod === 'string') {
+			return [instantiateModifierFromHash(mod)];
+		}
+
+		// Plain object leaked through JSON
+		if (typeof mod === 'object' && 'type' in mod) {
+			return [instantiateModifier(mod as any)];
+		}
+
+		return [];
+	});
 }
 
 /**
@@ -150,14 +178,14 @@ export function loadDbItem(dbItem: DBItem): Item {
  */
 export function encodeDbItem(item: Item): DBItem {
 	const base = itemRegistry[item.id];
-	const encodedMods: (IItemModifier & HashableModifier)[] = [];
+	const encodedMods: string[] = [];
 
 	for (const mod of item.modifiers ?? []) {
 		const baseMod = base.modifiers.find((b) => b.type === mod.type);
 
-		// brand new modifier
+		// Brand new modifier (always include)
 		if (!baseMod) {
-			encodedMods.push(mod);
+			encodedMods.push(mod.hash());
 			continue;
 		}
 
@@ -166,7 +194,6 @@ export function encodeDbItem(item: Item): DBItem {
 
 		for (const key in mod) {
 			if (key === 'type') continue;
-
 			const k = key as keyof IItemModifier;
 
 			if (!deepEqual(mod[k], baseMod[k])) {
@@ -175,12 +202,13 @@ export function encodeDbItem(item: Item): DBItem {
 			}
 		}
 
-		if (changed) encodedMods.push(fresh);
+		if (changed) encodedMods.push(fresh.hash());
 	}
 
-	console.log(encodedMods);
-
-	return { id: item.id, modifiers: encodedMods.map((m) => m.hash()) };
+	return {
+		id: item.id,
+		modifiers: encodedMods
+	};
 }
 
 /**
@@ -201,18 +229,13 @@ export function hydrateInventory(inventory: DBItem[]): Item[] {
 }
 
 export function reviveModifiers(
-	mods: (IItemModifier & HashableModifier)[]
+	mods: (IItemModifier & HashableModifier)[] | string[]
 ): (IItemModifier & HashableModifier)[] {
 	return mods.map((mod) => {
-		// If it's a hash string, instantiate from hash
-		if (typeof mod === 'string') {
-			return instantiateModifierFromHash(mod);
-		}
+		if (typeof mod === 'string') return instantiateModifierFromHash(mod);
 
-		// Plain object from deepClone or DB JSON
 		const revived = instantiateModifier(mod) as IItemModifier & HashableModifier;
 
-		// Recursively revive nested modifiers for EnhancerModifier
 		if (revived instanceof EnhancerModifier && Array.isArray(revived.enhancements)) {
 			revived.enhancements = reviveModifiers(revived.enhancements);
 		}

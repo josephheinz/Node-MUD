@@ -1,5 +1,5 @@
 import { supabase } from "$lib/auth/supabaseClient";
-import type { Equipment, EquipmentSlot } from "$lib/types/equipment";
+import type { DBEquipment, Equipment, EquipmentSlot } from "$lib/types/equipment";
 import { type DBItem, type Item } from "$lib/types/item.js";
 import { encodeDbItem } from "$lib/utils/item.js";
 
@@ -52,7 +52,7 @@ export async function POST({ request, params, cookies }) {
     }
 
     let inventory: DBItem[] = data.inventory_data ?? [];
-    let equipment: Equipment = data.equipment_data ?? {
+    let equipment: DBEquipment = data.equipment_data ?? {
         head: undefined,
         body: undefined,
         legs: undefined,
@@ -60,7 +60,7 @@ export async function POST({ request, params, cookies }) {
         mainhand: undefined,
     };
 
-    const item: Item | null = equipment[slot as EquipmentSlot];
+    const item: DBItem | null = equipment[slot as EquipmentSlot];
     if (!item) {
         return new Response(JSON.stringify({ error: "No item in slot" }), {
             status: 400,
@@ -70,7 +70,7 @@ export async function POST({ request, params, cookies }) {
 
     // Unequip item
     equipment[slot as EquipmentSlot] = null;
-    inventory.push(encodeDbItem(item));
+    inventory.push(item);
 
     // Update Supabase
     const { data: updateData, error: updateError } = await supabase
