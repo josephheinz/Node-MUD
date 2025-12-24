@@ -1,5 +1,5 @@
 import { type DBItem } from "./types/item";
-import type { Equipment } from "./types/equipment";
+import type { DBEquipment, Equipment } from "./types/equipment";
 
 export interface ChatMessage {
     timestamp: Date;
@@ -9,5 +9,5 @@ export interface ChatMessage {
 
 export type InventoryRow = {
     inventory_data: DBItem[];
-    equipment_data: Equipment;
+    equipment_data: DBEquipment;
 };

@@ -1,14 +1,21 @@
 import { EmptyEquipment, type Equipment, type EquipmentSlot } from '$lib/types/equipment';
-import { itemRegistry, type DBItem, type IItemModifier, type Item } from '$lib/types/item';
+import {
+	isHashableModifier,
+	itemRegistry,
+	type DBItem,
+	type HashableModifier,
+	type IItemModifier,
+	type Item
+} from '$lib/types/item';
 import { deepClone, deepEqual } from './general';
 import { get } from 'svelte/store';
 import * as store from '$lib/store';
 import {
 	cloneModifier,
 	instantiateModifier,
-	type ModifierDiff
+	instantiateModifierFromHash
 } from '$lib/modifiers/modifiersRegistry';
-import type { EnhancerModifier, StackableModifier } from '$lib/modifiers/basicModifiers';
+import { EnhancerModifier, type StackableModifier } from '$lib/modifiers/basicModifiers';
 import type { StarsModifier } from '$lib/modifiers/stars';
 import type { ReforgeableModifier, ReforgeGroup, ReforgeModifier } from '$lib/modifiers/reforges';
 import { EnchantmentModifier, type Enchantment } from '$lib/modifiers/enchantments';
@@ -106,30 +113,61 @@ export async function getItem(id: string): Promise<Item> {
  * @throws Error if `dbItem.id` does not exist in the item registry
  */
 export function loadDbItem(dbItem: DBItem): Item {
+	dbItem = canonicalizeDbItem(dbItem); // 🔥 HEAL CORRUPTED ROWS HERE
+
 	const base = deepClone(itemRegistry[dbItem.id]);
 	if (!base) throw new Error(`Unknown item id: ${dbItem.id}`);
 
-	const dbMods = dbItem.modifiers ?? [];
+	const dbMods: (IItemModifier & HashableModifier)[] =
+		dbItem.modifiers != undefined && dbItem.modifiers.length > 0
+			? dbItem.modifiers.map(instantiateModifierFromHash)
+			: [];
 
-	// Keep base modifiers AND db modifiers.
-	let merged = [...base.modifiers];
+	let merged: (IItemModifier & HashableModifier)[] = [...base.modifiers];
 
 	for (const mod of dbMods) {
-		const existingIndex = merged.findIndex((m) => m.type === mod.type);
-		if (existingIndex >= 0) {
-			merged[existingIndex] = mod;
-		} else {
-			merged.push(mod);
-		}
+		const i = merged.findIndex((m) => m.type === mod.type);
+		if (i >= 0) merged[i] = mod;
+		else merged.push(mod);
 	}
-
-	merged = reviveModifiers(merged);
 
 	return {
 		...base,
 		uid: crypto.randomUUID(),
-		modifiers: merged as IItemModifier[]
+		modifiers: merged
 	};
+}
+
+export function canonicalizeDbItem(db: DBItem): DBItem {
+	return {
+		id: db.id,
+		modifiers: (db.modifiers ?? []).map((m: any) =>
+			typeof m === 'string' ? m : m?.hash ? m.hash() : String(m)
+		)
+	};
+}
+
+export function canonicalizeModifiers(input: unknown[]): (IItemModifier & HashableModifier)[] {
+	return input.flatMap((mod) => {
+		if (!mod) return [];
+
+		// Already runtime instance
+		if (typeof mod === 'object' && 'type' in mod && (mod as any).modifyName) {
+			return [mod as IItemModifier & HashableModifier];
+		}
+
+		// Hash string from DB
+		if (typeof mod === 'string') {
+			return [instantiateModifierFromHash(mod)];
+		}
+
+		// Plain object leaked through JSON
+		if (typeof mod === 'object' && 'type' in mod) {
+			return [instantiateModifier(mod as any)];
+		}
+
+		return [];
+	});
 }
 
 /**
@@ -140,14 +178,14 @@ export function loadDbItem(dbItem: DBItem): Item {
  */
 export function encodeDbItem(item: Item): DBItem {
 	const base = itemRegistry[item.id];
-	const encodedMods: IItemModifier[] = [];
+	const encodedMods: string[] = [];
 
 	for (const mod of item.modifiers ?? []) {
 		const baseMod = base.modifiers.find((b) => b.type === mod.type);
 
-		// brand new modifier
+		// Brand new modifier (always include)
 		if (!baseMod) {
-			encodedMods.push(mod);
+			encodedMods.push(mod.hash());
 			continue;
 		}
 
@@ -156,7 +194,6 @@ export function encodeDbItem(item: Item): DBItem {
 
 		for (const key in mod) {
 			if (key === 'type') continue;
-
 			const k = key as keyof IItemModifier;
 
 			if (!deepEqual(mod[k], baseMod[k])) {
@@ -165,14 +202,13 @@ export function encodeDbItem(item: Item): DBItem {
 			}
 		}
 
-		if (changed) encodedMods.push(fresh);
+		if (changed) encodedMods.push(fresh.hash());
 	}
 
-	console.log(
-		JSON.stringify(itemRegistry['enchanted_book'].modifiers.find((m) => m.type === 'Enhancer'))
-	);
-
-	return { id: item.id, modifiers: encodedMods };
+	return {
+		id: item.id,
+		modifiers: encodedMods
+	};
 }
 
 /**
@@ -192,14 +228,20 @@ export function hydrateInventory(inventory: DBItem[]): Item[] {
 	return hydratedInventory;
 }
 
-/**
- * Reinstantiates raw modifier objects into their concrete modifier instances.
- *
- * @param mods - Array of modifier data (possibly plain objects) to revive into instantiated modifiers
- * @returns An array of instantiated `IItemModifier` objects with runtime behavior restored
- */
-export function reviveModifiers(mods: IItemModifier[]): IItemModifier[] {
-	return mods.map((mod) => instantiateModifier(mod));
+export function reviveModifiers(
+	mods: (IItemModifier & HashableModifier)[] | string[]
+): (IItemModifier & HashableModifier)[] {
+	return mods.map((mod) => {
+		if (typeof mod === 'string') return instantiateModifierFromHash(mod);
+
+		const revived = instantiateModifier(mod) as IItemModifier & HashableModifier;
+
+		if (revived instanceof EnhancerModifier && Array.isArray(revived.enhancements)) {
+			revived.enhancements = reviveModifiers(revived.enhancements);
+		}
+
+		return revived;
+	});
 }
 
 /**
@@ -334,7 +376,6 @@ export function addEnchantments(item: Item, enchants: Enchantment[]): Item {
 			});
 
 			item.modifiers.push(newEnchantMod);
-			console.log(item);
 
 			return item;
 		}
@@ -347,8 +388,6 @@ export function addEnchantments(item: Item, enchants: Enchantment[]): Item {
 	) as EnchantmentModifier;
 
 	if (itemEnchantMod) itemEnchantMod.enchantments = updatedEnchants;
-
-	console.log(item);
 
 	return item;
 }
@@ -389,4 +428,15 @@ export function combineEnchantments(
 	});
 
 	return updatedEnchants;
+}
+
+export function ensureItemModifiers(item: Item): Item {
+	if (!item.modifiers || item.modifiers.length === 0) return item;
+
+	// If ANY modifier is non-hashable, revive everything
+	if (item.modifiers.some((m) => !isHashableModifier(m))) {
+		item.modifiers = reviveModifiers(item.modifiers);
+	}
+
+	return item;
 }

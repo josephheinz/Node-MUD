@@ -1,6 +1,7 @@
 import { supabase } from "$lib/auth/supabaseClient";
-import type { Equipment, EquipmentSlot } from "$lib/types/equipment";
-import { type DBItem } from "$lib/types/item.js";
+import type { DBEquipment, Equipment, EquipmentSlot } from "$lib/types/equipment";
+import { type DBItem, type Item } from "$lib/types/item.js";
+import { encodeDbItem } from "$lib/utils/item.js";
 
 export async function POST({ request, params, cookies }) {
 
@@ -51,7 +52,7 @@ export async function POST({ request, params, cookies }) {
     }
 
     let inventory: DBItem[] = data.inventory_data ?? [];
-    let equipment: Equipment = data.equipment_data ?? {
+    let equipment: DBEquipment = data.equipment_data ?? {
         head: undefined,
         body: undefined,
         legs: undefined,

@@ -1,6 +1,6 @@
 import { parse } from 'yaml';
 import { type ITooltipData } from '../components/tooltip';
-import { instantiateModifier } from '../modifiers/modifiersRegistry';
+import { instantiateModifier, instantiateModifierFromHash } from '../modifiers/modifiersRegistry';
 import type { StatList } from './stats';
 import { type EquipmentSlot } from './equipment';
 import { determineSlot } from '$lib/utils/item';
@@ -32,9 +32,23 @@ export interface IItemModifier {
 	fromJSON?: (json: any) => IItemModifier;
 }
 
-export interface DBItem {
+export interface HashableModifier {
+	hash(): string;
+}
+
+export interface HashableModifierClass<T extends IItemModifier & HashableModifier> {
+	new (...args: any[]): T;
+	fromHash(hash: string): T;
+}
+
+export interface OldDBItem {
 	id: string;
 	modifiers?: IItemModifier[];
+}
+
+export interface DBItem {
+	id: string;
+	modifiers?: string[];
 }
 
 export type Item = {
@@ -47,13 +61,19 @@ export type Item = {
 		ascii: string;
 		image?: string;
 	};
-	modifiers: IItemModifier[];
+	modifiers: (IItemModifier & HashableModifier)[];
 	baseStats: StatList;
 };
 
+export function isHashableModifier(mod: IItemModifier): mod is IItemModifier & HashableModifier {
+	return typeof (mod as any).hash === 'function';
+}
+
 export function parseYAMLToItem(yamlString: string): Item {
 	let item = parse(yamlString)[0];
-	const modifiers: IItemModifier[] = (item.modifiers || []).map(instantiateModifier);
+	const modifiers: (IItemModifier & HashableModifier)[] = (item.modifiers || []).map(
+		(h: IItemModifier & HashableModifier) => instantiateModifier(h)
+	);
 
 	return {
 		uid: crypto.randomUUID(),

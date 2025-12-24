@@ -1,9 +1,10 @@
 import { supabase } from '$lib/auth/supabaseClient.js';
-import { type Item } from '$lib/types/item.js';
+import { type DBItem, type Item } from '$lib/types/item.js';
 import { Stats } from '$lib/types/stats.js';
-import { EmptyEquipment } from '$lib/types/equipment';
+import { EmptyEquipment, type DBEquipment } from '$lib/types/equipment';
 import type { DBQueueAction } from '$lib/types/action.js';
 import { PlayerSkills } from '$lib/types/skills.js';
+import { hydrateEquipment } from '../lib/types/equipment';
 
 /**
  * Load the current authenticated user (if any) and assemble their inventory, equipment, stats, action queue, and queue start time for page initialization.
@@ -88,7 +89,7 @@ export async function load({ cookies, fetch }) {
 			console.error(error);
 		});
 
-	let inventory: Item[] = [];
+	let inventory: DBItem[] = [];
 
 	const loadInventory = await fetch(`/api/inventory/${userId}`, {
 		method: 'GET',
