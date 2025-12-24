@@ -12,7 +12,7 @@ export class CaduceusModifier implements IItemModifier, HashableModifier {
 	};
 
 	modifyName(baseName: string): string {
-		return `☤ ${baseName}`;
+		return `<i class="fa-solid fa-staff-snake"></i> ${baseName}`;
 	}
 
 	hash(): string {
