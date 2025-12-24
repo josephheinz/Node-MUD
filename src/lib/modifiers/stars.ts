@@ -1,4 +1,5 @@
 import { type HashableModifier, type IItemModifier } from '$lib/types/item';
+import { intToBlackCircledNumber, intToCircledNumber } from '$lib/utils/general';
 
 const STAR_COLORS = [
 	'#ffffff', // tier 0 (1–5)
@@ -12,7 +13,9 @@ const STAR_COLORS = [
 export class StarsModifier implements IItemModifier, HashableModifier {
 	type = 'Stars';
 
-	constructor(public stars: number) {}
+	constructor(public stars: number) {
+		this.stars = Math.min(35, this.stars);
+	}
 
 	modifyName(baseName: string): string {
 		const tier = Math.floor((this.stars - 1) / 5); // 0-based tier
@@ -33,7 +36,8 @@ export class StarsModifier implements IItemModifier, HashableModifier {
 			result += `<span style="color:${previousColor}">✪</span>`;
 		}
 
-		if (tier > 4) result += `<span style="color:${currentColor}">+${this.stars - 25}</span>`;
+		if (tier > 4)
+			result += `<span style="color:${currentColor}">${intToBlackCircledNumber(this.stars - 25)}</span>`;
 
 		return `${baseName} ${result}`;
 	}

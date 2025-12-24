@@ -1,5 +1,10 @@
-import { EmptyEquipment, hydrateEquipment, type Equipment } from '$lib/types/equipment';
-import type { Item } from '$lib/types/item';
+import {
+	EmptyEquipment,
+	hydrateEquipment,
+	type DBEquipment,
+	type Equipment
+} from '$lib/types/equipment';
+import type { DBItem, Item } from '$lib/types/item';
 import numeral from 'numeral';
 import { hydrateInventory } from './item';
 
@@ -26,7 +31,7 @@ export function capitalizeFirstLetter(str: string): string {
 }
 
 export async function getInventory(id: string): Promise<Item[]> {
-	let inventory: Item[] = [];
+	let inventory: DBItem[] = [];
 
 	const loadInventory = await fetch(`/api/inventory/${id}`, {
 		method: 'GET',
@@ -52,7 +57,7 @@ export async function getInventory(id: string): Promise<Item[]> {
 
 export async function getEquipment(id: string): Promise<Equipment> {
 	// Load equipment
-	let equipment = EmptyEquipment;
+	let equipment: DBEquipment;
 
 	const loadEquipment = await fetch(`/api/equipment/${id}`, {
 		method: 'GET',
@@ -153,4 +158,18 @@ export function deepEqual(a: unknown, b: unknown): boolean {
 	}
 
 	return true;
+}
+
+export function intToCircledNumber(n: number): string {
+	if (n === 0) return String.fromCodePoint(0x24ea); // ⓪
+	if (n >= 1 && n <= 20) return String.fromCodePoint(0x2460 + n - 1); // ①–⑳
+	if (n >= 21 && n <= 35) return String.fromCodePoint(0x3251 + n - 21); // ㉑–㉟
+	if (n >= 36 && n <= 50) return String.fromCodePoint(0x32b1 + n - 36); // ㊱–㊿
+	throw new Error('Number out of supported range (0-50)');
+}
+
+export function intToBlackCircledNumber(n: number): string {
+    if (n < 1) throw new Error("Number must be >= 1");
+    if (n > 10) n = 10; // cap at 10
+    return String.fromCodePoint(0x2775 + n); // ❶–❿
 }
