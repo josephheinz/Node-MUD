@@ -3,6 +3,7 @@ import type { StatList } from '$lib/types/stats';
 
 export class CaduceusModifier implements IItemModifier, HashableModifier {
 	type = 'Caduceus';
+	priority = 999;
 
 	statChanges: StatList = {
 		'crit damage': 50,

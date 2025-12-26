@@ -37,6 +37,7 @@
 	"dependencies": {
 		"@fortawesome/fontawesome-free": "^7.1.0",
 		"@supabase/supabase-js": "^2.57.2",
+		"lodash": "^4.17.21",
 		"numeral": "^2.0.6",
 		"socket.io": "^4.8.1",
 		"socket.io-client": "^4.8.1",

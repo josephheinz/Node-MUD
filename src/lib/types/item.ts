@@ -30,6 +30,7 @@ export interface IItemModifier {
 	statChanges?: StatList;
 	toJSON?: () => object;
 	fromJSON?: (json: any) => IItemModifier;
+	priority?: number;
 }
 
 export interface HashableModifier {
@@ -170,6 +171,15 @@ export function getItemData(item: Item, equippable: boolean = true): ITooltipDat
 	};
 }
 
+export function sortModifiersByPriority(
+	mods: IItemModifier[],
+	mode: 'asc' | 'desc'
+): IItemModifier[] {
+	const dir = mode === 'asc' ? 1 : -1;
+
+	return mods.sort((a, b) => ((a.priority ?? 0) - (b.priority ?? 0)) * dir);
+}
+
 export function getRarity(color: string): string {
 	const rarity =
 		Object.keys(Rarity).find((k) => Rarity[k as keyof typeof Rarity] === color) ?? Rarity.Common;
@@ -178,7 +188,7 @@ export function getRarity(color: string): string {
 
 export function getDisplayName(item: Item): string {
 	let name = item.name;
-	for (const mod of item.modifiers ?? []) {
+	for (const mod of sortModifiersByPriority(item.modifiers, 'asc') ?? []) {
 		if (mod.modifyName) name = mod.modifyName(name);
 	}
 	return name;
@@ -193,7 +203,7 @@ export function getDisplayName(item: Item): string {
 export function getDisplayDescription(item: Item): string {
 	const base = item.desc ? `<i>${item.desc}</i>` : '';
 	return (
-		item.modifiers?.reduce(
+		sortModifiersByPriority(item.modifiers, 'desc')?.reduce(
 			(desc, mod) => (mod.modifyDescription ? mod.modifyDescription(desc) : desc),
 			base
 		) ?? base

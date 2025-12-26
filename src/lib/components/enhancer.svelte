@@ -3,7 +3,7 @@
 	import type { ReforgeableModifier } from '$lib/modifiers/reforges';
 	import { EmptyEquipment, Enhance, type Equipment } from '$lib/types/equipment';
 	import { type Item } from '$lib/types/item';
-	import { ConglomerateItems, previewEnhanceItem, reviveModifiers } from '$lib/utils/item';
+	import { ConglomerateItems, deepCloneItem, previewEnhanceItem, reviveModifiers } from '$lib/utils/item';
 	import { type MouseEventHandler } from 'svelte/elements';
 	import FlexColContainer from './generic/flexContainers/flexColContainer.svelte';
 	import Heading from './generic/heading.svelte';
@@ -116,8 +116,7 @@
 				selectedItem = undefined;
 				selectedEnhancer = undefined;
 
-				output = deepClone<Item>(newItem) ?? newItem;
-				output.modifiers = reviveModifiers(newItem.modifiers);
+				output = deepCloneItem(newItem) ?? newItem;
 			}
 		} catch (err) {
 			console.error(err);

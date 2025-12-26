@@ -177,38 +177,22 @@ export function canonicalizeModifiers(input: unknown[]): (IItemModifier & Hashab
  * @returns A DBItem containing the item's `id` and an array of modifiers that are either not present on the base item or have fields that differ from the base
  */
 export function encodeDbItem(item: Item): DBItem {
-	const base = itemRegistry[item.id];
-	const encodedMods: string[] = [];
+	if (!itemRegistry[item.id]) throw new Error(`Unknown item id: ${item.id}`);
 
-	for (const mod of item.modifiers ?? []) {
-		const baseMod = base.modifiers.find((b) => b.type === mod.type);
+	// Convert all modifiers to hashes
+	const encodedMods: string[] = (item.modifiers ?? []).map((mod) => mod.hash());
 
-		// Brand new modifier (always include)
-		if (!baseMod) {
-			encodedMods.push(mod.hash());
-			continue;
-		}
-
-		const fresh = cloneModifier(baseMod);
-		let changed = false;
-
-		for (const key in mod) {
-			if (key === 'type') continue;
-			const k = key as keyof IItemModifier;
-
-			if (!deepEqual(mod[k], baseMod[k])) {
-				(fresh as any)[k] = mod[k];
-				changed = true;
-			}
-		}
-
-		if (changed) encodedMods.push(fresh.hash());
-	}
+	// Sort to guarantee deterministic order for comparisons
+	encodedMods.sort();
 
 	return {
 		id: item.id,
 		modifiers: encodedMods
 	};
+}
+
+export function dbItemKey(dbItem: DBItem): string {
+	return `${dbItem.id}|${(dbItem.modifiers ?? []).join('|')}`;
 }
 
 /**
@@ -299,8 +283,7 @@ export function previewEnhanceItem(item: Item, enhancer: Item): Item {
 
 	const instantiated = enhancements.enhancements.map(instantiateModifier);
 
-	const newItem: Item = deepClone(item);
-	newItem.modifiers = reviveModifiers(deepClone(newItem.modifiers));
+	const newItem: Item = deepCloneItem(item);
 
 	for (const mod of instantiated) {
 		if (mod.type === 'Stars') {
@@ -308,8 +291,10 @@ export function previewEnhanceItem(item: Item, enhancer: Item): Item {
 				(m): m is StarsModifier => m.type === 'Stars'
 			) as StarsModifier;
 
+			const addStars: number = (mod as StarsModifier).stars;
+
 			if (existing) {
-				existing.stars += (mod as StarsModifier).stars;
+				existing.stars = Math.min(35, existing.stars + addStars);
 				continue;
 			}
 		} else if (mod.type === 'Reforge') {
@@ -327,6 +312,12 @@ export function previewEnhanceItem(item: Item, enhancer: Item): Item {
 	}
 
 	return newItem;
+}
+
+export function deepCloneItem<T extends Item>(item: T): T {
+	const cloned: T = { ...item } as T;
+	cloned.modifiers = item.modifiers.map((mod) => cloneModifier(mod));
+	return cloned;
 }
 
 // dont ask me, im confused writing this

@@ -11,6 +11,7 @@ export class ReforgeModifier implements IItemModifier, HashableModifier {
 	public reforge: IReforge;
 	statChanges?: StatList;
 	displayName?: string | undefined;
+	priority = 1;
 
 	constructor(reforge: IReforge | string) {
 		if (typeof reforge === 'string') this.reforge = Reforges[reforge];
@@ -47,8 +48,12 @@ export class ReforgeModifier implements IItemModifier, HashableModifier {
 
 export class ReforgeableModifier implements IItemModifier {
 	type = 'Reforgeable';
+	public group: ReforgeGroup;
+	readonly priority = 999;
 
-	constructor(public group: ReforgeGroup) {}
+	constructor(group: ReforgeGroup) {
+		this.group = group;
+	}
 
 	modifyDescription(baseDesc: string): string {
 		return `<span class="color:#333;">This item can be reforged</span></br>${baseDesc}`;

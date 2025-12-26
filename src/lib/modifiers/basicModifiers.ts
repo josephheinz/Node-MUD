@@ -84,7 +84,7 @@ export class EnhancerModifier implements IItemModifier, HashableModifier {
 			}
 		});
 
-		return `${base}${enhancementsString}${baseDesc}`;
+		return `${base}${enhancementsString}<br>${baseDesc}`;
 	}
 
 	hash(): string {

@@ -184,6 +184,7 @@ export async function Enhance(item: Item, enhancer: Item): Promise<Item | null> 
 	const userId = get(store.user)?.id;
 
 	if (!userId) throw new Error('No user logged in');
+	console.log(enhancer, encodeDbItem(enhancer));
 
 	const res = await fetch(`/api/item/${userId}/enhance`, {
 		method: 'POST',

@@ -12,10 +12,9 @@ const STAR_COLORS = [
 
 export class StarsModifier implements IItemModifier, HashableModifier {
 	type = 'Stars';
+	priority = 999;
 
-	constructor(public stars: number) {
-		this.stars = Math.min(35, this.stars);
-	}
+	constructor(public stars: number) {}
 
 	modifyName(baseName: string): string {
 		const tier = Math.floor((this.stars - 1) / 5); // 0-based tier

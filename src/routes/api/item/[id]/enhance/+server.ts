@@ -4,12 +4,21 @@ import { ReforgeableModifier } from '$lib/modifiers/reforges.js';
 import type { InventoryRow } from '$lib/types.svelte';
 import { serializeEquipment, type Equipment, type EquipmentSlot } from '$lib/types/equipment';
 import type { DBItem, Item } from '$lib/types/item.js';
-import { encodeDbItem, loadDbItem, previewEnhanceItem } from '$lib/utils/item';
+import {
+	canonicalizeDbItem,
+	encodeDbItem,
+	loadDbItem,
+	previewEnhanceItem,
+	dbItemKey
+} from '$lib/utils/item';
 import { hydrateEquipment } from '../../../../../lib/types/equipment';
 
 export async function POST({ request, params, cookies }) {
 	const { id } = params;
-	const { dbItem, dbEnhancer } = await request.json();
+	let { dbItem, dbEnhancer }: { dbItem: DBItem; dbEnhancer: DBItem } = await request.json();
+
+	dbItem = canonicalizeDbItem(dbItem);
+	dbEnhancer = canonicalizeDbItem(dbEnhancer);
 
 	// Load supabase session
 	const sessionCookie = cookies.get('supabase.session');
@@ -62,25 +71,38 @@ export async function POST({ request, params, cookies }) {
 
 	const inventory: DBItem[] = inventory_data ?? [];
 	const equipment: Equipment = hydrateEquipment(equipment_data) ?? {};
+	// Build a map for O(1) lookup by dbItemKey
+	const inventoryMap = new Map<string, number>();
+	inventory.forEach((dbItem, idx) => {
+		inventoryMap.set(dbItemKey(dbItem), idx);
+	});
 
-	// Find item in inventory
-	const itemIndex = inventory.findIndex((i) => JSON.stringify(i) === JSON.stringify(dbItem));
-	const enhancerIndex = inventory.findIndex(
-		(e) => JSON.stringify(e) === JSON.stringify(dbEnhancer)
+	// Load full items before comparing
+	const loadedInventory: Item[] = inventory.map(loadDbItem);
+	const loadedDbItem: Item = loadDbItem(dbItem);
+	const loadedDbEnhancer: Item = loadDbItem(dbEnhancer);
+
+	// Find indices by comparing loaded item UIDs or fully loaded properties
+	const itemIndex = loadedInventory.findIndex(
+		(i) => dbItemKey(encodeDbItem(i)) === dbItemKey(encodeDbItem(loadedDbItem))
 	);
+	const enhancerIndex = loadedInventory.findIndex(
+		(i) => dbItemKey(encodeDbItem(i)) === dbItemKey(encodeDbItem(loadedDbEnhancer))
+	);
+
+	if (enhancerIndex === undefined) {
+		throw new Error("Enhancer item not present in user's inventory");
+	}
+
+	// Keep equipped slot logic
 	let slot: EquipmentSlot | undefined;
-	if (itemIndex === -1) {
-		// If not found, check if it's already equipped
+	if (itemIndex === undefined) {
 		slot = Object.entries(equipment).find(([_, i]) => i?.id === dbItem.id)?.[0] as
 			| keyof Equipment
 			| undefined;
 	}
 
-	if (enhancerIndex === -1) {
-		throw new Error("Enhancer item not present in user's inventory");
-	}
-
-	if (!slot && itemIndex === -1)
+	if (!slot && itemIndex === undefined)
 		return new Response(JSON.stringify({ error: 'Item not in inventory or equipped' }), {
 			status: 400,
 			headers: { 'Content-Type': 'application/json' }
@@ -107,7 +129,7 @@ export async function POST({ request, params, cookies }) {
 	// Encode item back to db format
 	const newDbItem = encodeDbItem(newItem);
 
-	if (itemIndex === -1 && slot) {
+	if (itemIndex === undefined && slot) {
 		// Update equipped item
 		equipment[slot] = newItem;
 		inventory.splice(enhancerIndex, 1);
@@ -142,7 +164,7 @@ export async function POST({ request, params, cookies }) {
 		);
 	} else {
 		// Update inventory item
-		inventory[itemIndex] = newDbItem;
+		inventory[itemIndex!] = newDbItem;
 		inventory.splice(enhancerIndex, 1);
 		const { data: updateData, error: updateError } = await supabase
 			.from('inventories')
