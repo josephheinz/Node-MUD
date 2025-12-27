@@ -2,6 +2,7 @@
 	import type { EquipmentSlot, Item } from '$lib/types/item';
 	import * as ContextMenu from './context-menu/index';
 	import { tooltip } from '../tooltip';
+	import { getItemData } from '$lib/utils/item';
 
 	type Props = {
 		item: Item;
@@ -23,7 +24,7 @@
 		style="border:2px solid {item?.rarity ?? 'transparent'}"
 		title=""
 	>
-		<div class="relative size-full p-2" use:tooltip={{ title: 'Test', body: 'etst' }}>
+		<div class="relative size-full p-2" use:tooltip={getItemData(item)}>
 			<img src={item.icon} alt={item.name} class="image-rendering-pixelated size-full" />
 		</div>
 	</ContextMenu.Trigger>
