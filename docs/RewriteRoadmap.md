@@ -1,6 +1,6 @@
 # Rewrite Roadmap
 
-- [ ] Item type and Inventory and Equipment classes
+- [x] Item type and Inventory and Equipment classes
 - [ ] Item Renderer
 - [ ] Item and DB Encoding
 - [ ] Auth and login systems

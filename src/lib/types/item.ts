@@ -1,5 +1,4 @@
-//@ts-ignore
-import { chunk } from 'lodash';
+import * as _ from 'lodash-es';
 
 export enum Rarity {
 	Common = '#bdbdbd',
@@ -40,7 +39,7 @@ export type Item = {
 	rarity: Rarity;
 	desc?: string;
 	icon: string;
-	modifiers?: IItemModifier[];
+	modifiers: IItemModifier[];
 };
 
 export type DBItem = {
@@ -79,7 +78,7 @@ export class Inventory {
 	}
 
 	public paginate(pageSize: number): Array<Item[]> {
-		return chunk(this._contents, pageSize);
+		return _.chunk(this._contents, pageSize);
 	}
 
 	// Add later when adding encoding of items
