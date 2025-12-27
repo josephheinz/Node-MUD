@@ -1,8 +1,17 @@
 import type { ITooltipData } from '$lib/components/tooltip.old';
-import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
-import { Equipment, Rarity, type IItemModifier, type Item } from '$lib/types/item';
-import type { RarityKey } from '$lib/types/item.old';
+import { instantiateModifier, instantiateModifierFromHash } from '$lib/modifiers/modifiersRegistry';
+import {
+	Equipment,
+	Rarity,
+	type DBItem,
+	type IItemModifier,
+	type IRawModifierSpec,
+	type Item
+} from '$lib/types/item';
+import { itemRegistry, type RarityKey } from '$lib/types/item';
 import { parse } from 'yaml';
+//@ts-ignore
+import * as _ from 'lodash-es';
 
 export function parseYAMLToItem(yamlString: string): Item {
 	let item = parse(yamlString)[0];
@@ -15,7 +24,7 @@ export function parseYAMLToItem(yamlString: string): Item {
 		rarity: Rarity[item.rarity as RarityKey],
 		icon: item.icon.image,
 		modifiers,
-		//baseStats: item.stats,
+		baseStats: item.stats,
 		desc: item.description
 	};
 }
@@ -54,4 +63,53 @@ export function sortModifiersByPriority(
 	const dir = mode === 'asc' ? 1 : -1;
 
 	return mods.sort((a, b) => ((a.priority ?? 0) - (b.priority ?? 0)) * dir);
+}
+
+export function encodeDBItem(item: Item): DBItem {
+	if (!itemRegistry[item.id]) throw new Error(`Unknown item id: ${item.id}`);
+
+	const encodedMods: string[] = item.modifiers.map((mod) => mod.hash());
+
+	encodedMods.sort();
+
+	return {
+		id: item.id,
+		modifiers: encodedMods
+	};
+}
+
+export function loadDbItem(item: DBItem): Item {
+	// check to see if its outdated
+	canonicalizeDbItem(item);
+
+	const base = _.cloneDeep(itemRegistry[item.id]) as Item;
+	if (!base) throw new Error(`Unknown item id: ${item.id}`);
+
+	const dbMods: IItemModifier[] = item.modifiers?.map(instantiateModifierFromHash) ?? [];
+
+	let merged: IItemModifier[] = [...base.modifiers];
+
+	for (const mod of dbMods) {
+		const i = merged.findIndex((m) => m.type === mod.type);
+		if (i >= 0) merged[i] = mod;
+		else merged.push(mod);
+	}
+
+	return {
+		...base,
+		uid: crypto.randomUUID(),
+		modifiers: merged
+	};
+}
+
+export function canonicalizeDbItem(db: DBItem): DBItem {
+	return {
+		id: db.id,
+		modifiers: (db.modifiers ?? []).map((m: string | IRawModifierSpec) =>
+			// if mod is already a string, keep it
+			// otherwise, if it can be hashed, hash it
+			// otherwise otherwise, try to instantiate then hash it
+			typeof m === 'string' ? m : m?.hash ? m.hash() : instantiateModifier(m).hash()
+		)
+	};
 }

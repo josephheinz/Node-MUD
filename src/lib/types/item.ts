@@ -1,5 +1,9 @@
+//@ts-ignore
 import * as _ from 'lodash-es';
 import type { StatList } from './stats';
+import { encodeDBItem, loadDbItem, parseYAMLToItem } from '$lib/utils/item';
+
+export type RarityKey = keyof typeof Rarity;
 
 export enum Rarity {
 	Common = '#bdbdbd',
@@ -48,12 +52,13 @@ export type Item = {
 	rarity: Rarity;
 	desc?: string;
 	icon: string;
+	baseStats?: StatList;
 	modifiers: IItemModifier[];
 };
 
 export type DBItem = {
 	id: string;
-	modifiers?: IItemModifier[];
+	modifiers?: string[];
 };
 
 export type DBInventory = DBItem[];
@@ -90,14 +95,12 @@ export class Inventory {
 		return _.chunk(this._contents, pageSize);
 	}
 
-	// Add later when adding encoding of items
 	public serialize(): DBInventory {
-		return [];
+		return this._contents.map(encodeDBItem);
 	}
 
-	// Also add later
 	public static load(dbInv: DBInventory): Inventory {
-		return new Inventory([]);
+		return new Inventory(dbInv.map(loadDbItem));
 	}
 }
 
@@ -213,14 +216,34 @@ export class Equipment {
 		} else return null;
 	}
 
-	// implement when adding item encoding
-	/* public serialize(): DBEquipment{
-        return {};
-    } */
+	public serialize(): DBEquipment {
+		return {
+			head: this._head ? encodeDBItem(this._head) : null,
+			body: this._body ? encodeDBItem(this._body) : null,
+			legs: this._legs ? encodeDBItem(this._legs) : null,
+			offhand: this._offhand ? encodeDBItem(this._offhand) : null,
+			mainhand: this._mainhand ? encodeDBItem(this._mainhand) : null,
+			necklace: this._necklace ? encodeDBItem(this._necklace) : null,
+			ring: this._ring ? encodeDBItem(this._ring) : null,
+			hands: this._hands ? encodeDBItem(this._hands) : null
+		};
+	}
 
-	// also add when adding encoding
 	public load(dbEquip: DBEquipment): Equipment {
-		return new Equipment({});
+		let equipment: Record<string, Item | null> = {};
+
+		Object.entries(dbEquip).forEach(([slot, item]) => {
+			if (item === null) {
+				equipment[slot] = null;
+				return;
+			}
+
+			equipment[slot] = loadDbItem(item);
+		});
+
+		return new Equipment({
+			...equipment
+		});
 	}
 }
 
@@ -234,3 +257,16 @@ export type DBEquipment = {
 	ring: DBItem | null;
 	hands: DBItem | null;
 };
+
+export const itemRegistry: Record<string, Item> = {};
+
+const items = import.meta.glob('$lib/items/**/*', { eager: true, as: 'raw' });
+
+for (const item in items) {
+	const id = item
+		.split('/')
+		.pop()!
+		.replace(/\.[^/.]+$/, '');
+	let _item = (items[item] as any).default ?? items[item];
+	itemRegistry[id] = parseYAMLToItem(_item);
+}

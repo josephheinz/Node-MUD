@@ -1,7 +1,7 @@
 # Rewrite Roadmap
 
 - [x] Item type and Inventory and Equipment classes
-- [ ] Item Renderer
+- [x] Item Renderer
 - [ ] Item and DB Encoding
 - [ ] Auth and login systems
 - [ ] Loading player inventory and equipment from DB
