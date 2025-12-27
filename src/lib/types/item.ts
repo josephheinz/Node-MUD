@@ -1,4 +1,5 @@
 import * as _ from 'lodash-es';
+import type { StatList } from './stats';
 
 export enum Rarity {
 	Common = '#bdbdbd',
@@ -15,18 +16,26 @@ export interface IItemModifier {
 	type: string;
 	displayName?: string;
 	priority: number;
-	//statChanges: StatList; TODO
+	statChanges?: StatList;
 
 	modifyName?(baseName: string): string;
 	modifyDescription?(baseDesc: string): string;
+
+	toJSON(): IRawModifierSpec;
+	hash(): string;
 }
 
-export interface IItemModifierClass<T extends IItemModifier> {
+export interface IRawModifierSpec {
+	type: string;
+	[key: string]: any;
+}
+
+export interface IItemModifierClass<T extends IItemModifier = IItemModifier> {
 	// For building from objects
-	toJSON(): object;
-	fromJSON(obj: T): T;
+	//toJSON(): object;
+	fromJSON(raw: IRawModifierSpec): T;
 	// For building from hashes
-	hash(): string;
+	//hash(): string;
 	fromHash(hash: string): T;
 
 	new (...args: any[]): T;
