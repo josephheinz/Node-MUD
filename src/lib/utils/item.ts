@@ -3,31 +3,14 @@ import { instantiateModifier, instantiateModifierFromHash } from '$lib/modifiers
 import {
 	Equipment,
 	Rarity,
+	itemRegistry,
 	type DBItem,
 	type IItemModifier,
 	type IRawModifierSpec,
 	type Item
 } from '$lib/types/item';
-import { itemRegistry, type RarityKey } from '$lib/types/item';
-import { parse } from 'yaml';
 //@ts-ignore
 import * as _ from 'lodash-es';
-
-export function parseYAMLToItem(yamlString: string): Item {
-	let item = parse(yamlString)[0];
-	const modifiers: IItemModifier[] = (item.modifiers || []).map(instantiateModifier);
-
-	return {
-		uid: crypto.randomUUID(),
-		id: item.id,
-		name: item.name,
-		rarity: Rarity[item.rarity as RarityKey],
-		icon: item.icon.image,
-		modifiers,
-		baseStats: item.stats,
-		desc: item.description
-	};
-}
 
 export function Equip(equipment: Equipment, item: Item): Equipment {
 	return equipment;

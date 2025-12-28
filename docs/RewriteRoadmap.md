@@ -2,7 +2,7 @@
 
 - [x] Item type and Inventory and Equipment classes
 - [x] Item Renderer
-- [ ] Item and DB Encoding
+- [x] Item and DB Encoding
 - [ ] Auth and login systems
 - [ ] Loading player inventory and equipment from DB
 - [ ] Equipping and unequipping items

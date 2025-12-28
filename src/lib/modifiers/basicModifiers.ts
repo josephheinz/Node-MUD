@@ -157,15 +157,16 @@ export class EnhancerModifier implements IItemModifier {
 
 		if (buffer) {
 			const chunk = buffer.trim();
-			if (typeof chunk === 'string') inner.push(instantiateModifierFromHash(chunk));
-			else if (typeof chunk === 'object') inner.push(chunk as IItemModifier);
+			if (typeof chunk === 'string') {
+				inner.push(instantiateModifierFromHash(chunk));
+			} else if (typeof chunk === 'object') inner.push(chunk as IItemModifier);
 		}
 
 		return new EnhancerModifier(enhances, inner);
 	}
 
 	static fromJSON(raw: IRawModifierSpec): EnhancerModifier {
-		const enhancements: IItemModifier[] = raw.enhancements.map(instantiateModifierFromHash);
+		const enhancements: IItemModifier[] = raw.enhancements.map(instantiateModifier);
 		return new EnhancerModifier(raw.enhances as ReforgeGroup[], enhancements);
 	}
 }

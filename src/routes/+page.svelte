@@ -1,4 +1,5 @@
 <script>
+	import LoginDialog from '$lib/components/ui/auth/loginDialog.svelte';
 	import DarkModeButton from '$lib/components/ui/darkModeButton.svelte';
 	import ItemRenderer from '$lib/components/ui/itemRenderer.svelte';
 	import { Rarity } from '$lib/types/item';
@@ -19,3 +20,4 @@
 />
 
 <DarkModeButton />
+<LoginDialog />

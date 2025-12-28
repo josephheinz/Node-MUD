@@ -1,7 +1,9 @@
 //@ts-ignore
 import * as _ from 'lodash-es';
 import type { StatList } from './stats';
-import { encodeDBItem, loadDbItem, parseYAMLToItem } from '$lib/utils/item';
+import { encodeDBItem, loadDbItem } from '$lib/utils/item';
+import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
+import { parse } from 'yaml';
 
 export type RarityKey = keyof typeof Rarity;
 
@@ -258,15 +260,36 @@ export type DBEquipment = {
 	hands: DBItem | null;
 };
 
+// i know functions should be in here but it makes things cyclical if its in utils/item
+export function parseYAMLToItem(yamlString: string): Item {
+	let item = parse(yamlString)[0];
+	const modifiers: IItemModifier[] = (item.modifiers || []).map(instantiateModifier);
+
+	return {
+		uid: crypto.randomUUID(),
+		id: item.id,
+		name: item.name,
+		rarity: Rarity[item.rarity as RarityKey],
+		icon: item.icon.image,
+		modifiers,
+		baseStats: item.stats,
+		desc: item.description
+	};
+}
+
 export const itemRegistry: Record<string, Item> = {};
 
-const items = import.meta.glob('$lib/items/**/*', { eager: true, as: 'raw' });
+export function initializeItemRegistry() {
+	if (Object.keys(itemRegistry).length > 0) return; // Already initialized
 
-for (const item in items) {
-	const id = item
-		.split('/')
-		.pop()!
-		.replace(/\.[^/.]+$/, '');
-	let _item = (items[item] as any).default ?? items[item];
-	itemRegistry[id] = parseYAMLToItem(_item);
+	const items = import.meta.glob('$lib/items/**/*', { eager: true, as: 'raw' });
+
+	for (const item in items) {
+		const id = item
+			.split('/')
+			.pop()!
+			.replace(/\.[^/.]+$/, '');
+		let _item = (items[item] as any).default ?? items[item];
+		itemRegistry[id] = parseYAMLToItem(_item);
+	}
 }

@@ -59,16 +59,31 @@ export class EnchantmentModifier implements IItemModifier {
 	}
 
 	static fromJSON(raw: IRawModifierSpec): EnchantmentModifier {
-		const enchants: Enchantment[] = (raw.enchants as string[]).map((e) => {
-			const [name, level] = e.split(':');
-			const baseEnchant: Enchantment = Enchantments[name];
-			return {
-				...baseEnchant,
-				level: Number(level)
-			};
-		});
+		if (raw.enchants) {
+			const enchants: Enchantment[] = (raw.enchants as string[]).map((e) => {
+				const [name, level] = e.split(':');
+				const baseEnchant: Enchantment = Enchantments[name];
+				return {
+					...baseEnchant,
+					level: Number(level)
+				};
+			});
 
-		return new EnchantmentModifier(enchants);
+			return new EnchantmentModifier(enchants);
+		}
+		if (raw.enchantments) {
+			const enchants: Enchantment[] = (raw.enchantments as Enchantment[]).map((e) => {
+				const baseEnchant: Enchantment = Enchantments[e.name];
+				return {
+					...baseEnchant,
+					level: Number(e.level)
+				};
+			});
+
+			return new EnchantmentModifier(enchants);
+		}
+
+		throw new Error(`JSON is invalid: does not contain list of enchantments`);
 	}
 }
 
