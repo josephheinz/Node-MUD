@@ -1,4 +1,4 @@
-import * as _ from 'lodash-es';
+import * as _ from 'radashi';
 import type { StatList } from './stats';
 import { encodeDBItem, loadDbItem } from '$lib/utils/item';
 import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
@@ -92,8 +92,8 @@ export class Inventory {
 		return this._contents[index];
 	}
 
-	public paginate(pageSize: number): Array<Item[]> {
-		return _.chunk(this._contents, pageSize);
+	public paginate(): Array<Item[]> {
+		return _.cluster(this._contents, 25);
 	}
 
 	public serialize(): DBInventory {
@@ -245,6 +245,19 @@ export class Equipment {
 		return new Equipment({
 			...equipment
 		});
+	}
+
+	public export(): Array<[EquipmentSlot, Item | null]> {
+		return [
+			['Head', this._head],
+			['Body', this._body],
+			['Legs', this._legs],
+			['Offhand', this._offhand],
+			['Mainhand', this._mainhand],
+			['Necklace', this._necklace],
+			['Ring', this._ring],
+			['Hands', this._hands]
+		];
 	}
 }
 

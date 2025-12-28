@@ -9,7 +9,7 @@ import {
 	type IRawModifierSpec,
 	type Item
 } from '$lib/types/item';
-import * as _ from 'lodash-es';
+import * as _ from 'radashi';
 
 export function Equip(equipment: Equipment, item: Item): Equipment {
 	return equipment;

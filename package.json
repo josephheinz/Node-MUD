@@ -45,9 +45,9 @@
 	"dependencies": {
 		"@fortawesome/fontawesome-free": "^7.1.0",
 		"@supabase/supabase-js": "^2.57.2",
-		"lodash-es": "^4.17.22",
 		"mode-watcher": "^1.1.0",
 		"numeral": "^2.0.6",
+		"radashi": "^12.7.1",
 		"runed": "^0.37.1",
 		"socket.io": "^4.8.1",
 		"socket.io-client": "^4.8.1",

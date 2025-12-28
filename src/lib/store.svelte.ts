@@ -26,6 +26,6 @@ export const gameState = $state<{
 
 export const sidebar = $state({ open: true });
 
-export const tab = $state<{ tab: 'Home' | 'Inventory' }>({
+export const tab = $state<{ tab: 'Home' | 'Inventory' | 'Equipment' }>({
 	tab: 'Home'
 });
