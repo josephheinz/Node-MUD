@@ -9,7 +9,6 @@ import {
 	type IRawModifierSpec,
 	type Item
 } from '$lib/types/item';
-//@ts-ignore
 import * as _ from 'lodash-es';
 
 export function Equip(equipment: Equipment, item: Item): Equipment {

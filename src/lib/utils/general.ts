@@ -58,3 +58,25 @@ export function intToBlackCircledNumber(n: number): string {
 	if (n > 10) n = 10; // cap at 10
 	return String.fromCodePoint(0x2775 + n); // ❶–❿
 }
+
+export async function fetchUserData<T>(
+	endpoint: string,
+	userId: string,
+	fetch: typeof globalThis.fetch
+): Promise<T | null> {
+	try {
+		const response = await fetch(`/api/${endpoint}/${userId}`, {
+			method: 'GET',
+			headers: { 'Content-Type': 'application/json' }
+		});
+
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+
+		return await response.json();
+	} catch (error) {
+		console.error(`Error fetching ${endpoint}:`, error);
+		return null;
+	}
+}

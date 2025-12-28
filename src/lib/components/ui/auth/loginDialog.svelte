@@ -9,8 +9,78 @@
 
 	let tab = $state<'login' | 'signup'>('login');
 
+	let emailVal: string = $state('');
+	let passVal: string = $state('');
+	let passRepVal: string = $state('');
+	let errorText: string = $state('');
+	let successText: string = $state('');
+
+	async function login() {
+		let loginData = {
+			email: emailVal,
+			password: passVal
+		};
+
+		fetch('/api/auth/login', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(loginData)
+		})
+			.then(async (response) => {
+				let responseJSON = await response.json();
+				if (!response.ok) {
+					errorText = responseJSON.msg;
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				return responseJSON;
+			})
+			.then((data) => {
+				window.location.reload();
+			})
+			.catch((err) => {
+				console.error(err);
+			});
+	}
+
+	async function signup() {
+		if (passVal !== passRepVal) {
+			errorText = 'Passwords must match';
+			return;
+		}
+
+		let loginData = {
+			email: emailVal,
+			password: passVal
+		};
+
+		fetch('/api/auth/signup', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(loginData)
+		})
+			.then(async (response) => {
+				let responseJson = await response.json();
+				if (!response.ok) {
+					errorText = responseJson.msg;
+					throw new Error(JSON.stringify(response));
+				}
+				return responseJson;
+			})
+			.then((data) => {
+				successText = 'Successfully signed up! A confirmation email has been sent to your inbox';
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	}
+
 	function handleSubmit() {
-		return;
+		if (tab === 'login') login();
+		else signup();
 	}
 </script>
 
@@ -24,6 +94,12 @@
 			{@render loginContent()}
 		{:else}
 			{@render signupContent()}
+		{/if}
+		{#if errorText.trim() !== ''}
+			<span class="text-rose-500">{errorText}</span>
+		{/if}
+		{#if successText.trim() !== ''}
+			<span class="text-blue-500">{successText}</span>
 		{/if}
 	</Dialog.Content>
 </Dialog.Root>
@@ -46,7 +122,13 @@
 		{@render emailFirstPass()}
 		<div class="grid gap-3">
 			<Label for="passwordrep">Password (Repeat)</Label>
-			<Input id="passwordrep" name="passwordrep" type="password" placeholder="Securepass1!" />
+			<Input
+				id="passwordrep"
+				name="passwordrep"
+				type="password"
+				placeholder="Securepass1!"
+				bind:value={passRepVal}
+			/>
 		</div>
 	</div>
 	{@render footer(tab)}
@@ -55,7 +137,14 @@
 {#snippet emailFirstPass()}
 	<div class="grid gap-3">
 		<Label for="email">Email</Label>
-		<Input id="email" placeholder="example@example.com" name="email" type="email" required={true} />
+		<Input
+			id="email"
+			placeholder="example@example.com"
+			name="email"
+			type="email"
+			required={true}
+			bind:value={emailVal}
+		/>
 	</div>
 	<div class="grid gap-3">
 		<Label for="password">Password</Label>
@@ -65,6 +154,7 @@
 			name="password"
 			type="password"
 			required={true}
+			bind:value={passVal}
 		/>
 	</div>
 {/snippet}
@@ -80,6 +170,6 @@
 			>
 		</span>
 		<Dialog.Close class={buttonVariants({ variant: 'outline' })}>Cancel</Dialog.Close>
-		<Button type="submit">{_tab === 'login' ? 'Login' : 'Sign up'}</Button>
+		<Button onclick={handleSubmit}>{_tab === 'login' ? 'Login' : 'Sign up'}</Button>
 	</Dialog.Footer>
 {/snippet}

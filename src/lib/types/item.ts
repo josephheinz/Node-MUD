@@ -1,4 +1,3 @@
-//@ts-ignore
 import * as _ from 'lodash-es';
 import type { StatList } from './stats';
 import { encodeDBItem, loadDbItem } from '$lib/utils/item';
@@ -231,7 +230,7 @@ export class Equipment {
 		};
 	}
 
-	public load(dbEquip: DBEquipment): Equipment {
+	public static load(dbEquip: DBEquipment): Equipment {
 		let equipment: Record<string, Item | null> = {};
 
 		Object.entries(dbEquip).forEach(([slot, item]) => {
@@ -258,6 +257,17 @@ export type DBEquipment = {
 	necklace: DBItem | null;
 	ring: DBItem | null;
 	hands: DBItem | null;
+};
+
+export const EmptyEquipment: DBEquipment = {
+	head: null,
+	body: null,
+	legs: null,
+	offhand: null,
+	mainhand: null,
+	necklace: null,
+	ring: null,
+	hands: null
 };
 
 // i know functions should be in here but it makes things cyclical if its in utils/item
