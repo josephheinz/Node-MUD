@@ -20,7 +20,7 @@
 
 <ContextMenu.Root>
 	<ContextMenu.Trigger
-		class="relative flex h-16 w-16 items-center justify-center rounded-lg bg-card {userClass}"
+		class="relative flex h-16 w-16 items-center justify-center rounded-lg bg-card select-none {userClass}"
 		style="border:2px solid {item?.rarity ?? 'transparent'}"
 		title=""
 	>

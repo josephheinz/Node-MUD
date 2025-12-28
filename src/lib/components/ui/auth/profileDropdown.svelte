@@ -3,8 +3,9 @@
 	import * as DropdownMenu from '../dropdown-menu';
 	import type { Profile } from '$lib/store.svelte';
 	import Fa from 'svelte-fa';
-	import { faArrowRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
+	import { faArrowRightFromBracket, faSort, faUser } from '@fortawesome/free-solid-svg-icons';
 	import { Button } from '../button/index';
+	import ChevronUpDown from '../chevronUpDown.svelte';
 
 	let { profile }: { profile: Profile } = $props();
 
@@ -20,15 +21,20 @@
 </script>
 
 <DropdownMenu.Root>
-	<DropdownMenu.Trigger>
-		<Button variant="outline" size="lg" class="flex items-center justify-start gap-2 px-2 min-w-24 max-w-30">
+	<DropdownMenu.Trigger class="select-none">
+		<Button
+			variant="outline"
+			size="lg"
+			class="flex w-full cursor-pointer items-center justify-start gap-2 px-2"
+		>
 			<Avatar.Root>
 				<Avatar.Image src={profile.profile_picture} alt={`@${profile.username}`} />
 				<Avatar.Fallback>{profile.display_name.substring(0, 2)}</Avatar.Fallback>
 			</Avatar.Root>
-			<span>
+			<span class="grow text-left">
 				{profile.display_name ?? `@${profile.username}`}
 			</span>
+			<ChevronUpDown />
 		</Button>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content align="end">

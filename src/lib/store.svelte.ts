@@ -23,3 +23,9 @@ export const gameState = $state<{
 	inventory: new Inventory([]),
 	equipment: new Equipment({})
 });
+
+export const sidebar = $state({ open: true });
+
+export const tab = $state<{ tab: 'Home' | 'Inventory' }>({
+	tab: 'Home'
+});

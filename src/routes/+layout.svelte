@@ -6,7 +6,9 @@
 	import { Equipment, initializeItemRegistry, Inventory } from '$lib/types/item';
 	import type { PageData } from './$types';
 	import type { User } from '@supabase/supabase-js';
-	import { gameState, type Profile } from '$lib/store.svelte';
+	import { gameState, type Profile, sidebar } from '$lib/store.svelte';
+	import * as Sidebar from '$lib/components/ui/sidebar';
+	import AppSidebar from '$lib/components/ui/sidebar.svelte';
 
 	let { data, children }: { data: PageData; children: any } = $props();
 
@@ -29,6 +31,10 @@
 
 <ModeWatcher />
 
-<div class="size-full bg-background text-foreground">
-	{@render children?.()}
-</div>
+<Sidebar.Provider class="size-full bg-background text-foreground" bind:open={sidebar.open}>
+	<AppSidebar />
+	<main>
+		<Sidebar.Trigger />
+		{@render children?.()}
+	</main>
+</Sidebar.Provider>
