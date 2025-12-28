@@ -2,7 +2,7 @@
   name: Snake Egg
   icon:
     ascii: "o"
-    image: "/images/items/snakeEgg.svg"
+    image: "/images/items/snakeEgg.png"
   rarity: Uncommon
   modifiers:
     - type: Enhancer

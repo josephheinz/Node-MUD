@@ -87,7 +87,9 @@ export class EnchantmentModifier implements IItemModifier {
 	}
 }
 
-export const Enchantments: Record<string, Enchantment> = {};
+export const Enchantments: Record<string, Enchantment> = {
+	Sharp: { name: 'Sharp', level: 1, maxLevel: 7, applies: ['Sword'], statChanges: { damage: 10 } }
+};
 
 export type Enchantment = {
 	name: string;

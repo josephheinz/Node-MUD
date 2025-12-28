@@ -2,7 +2,7 @@
   name: Gold Ore
   icon:
     ascii: '🪨'
-    image: '/images/items/materials/crafting/ores/goldOre.svg'
+    image: '/images/items/materials/crafting/ores/goldOre.png'
   rarity: Common
   modifiers:
     - type: Stackable

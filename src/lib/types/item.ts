@@ -1,6 +1,6 @@
 import * as _ from 'radashi';
 import type { StatList } from './stats';
-import { encodeDBItem, loadDbItem } from '$lib/utils/item';
+import { encodeDBItem, loadDbItem, sortModifiersByPriority } from '$lib/utils/item';
 import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
 import { parse } from 'yaml';
 

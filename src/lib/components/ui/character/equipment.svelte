@@ -46,11 +46,11 @@
 		/>
 	{:else}
 		<div
-			class="flex h-16 w-16 items-center justify-center rounded-lg border-2 border-zinc-500 bg-zinc-600 select-none {slotGridSpots[
+			class="bg-card-background flex h-16 w-16 items-center justify-center rounded-lg border-2 border-ring text-card-foreground select-none {slotGridSpots[
 				slot
 			]}"
 		>
-			<h1 class="text-sm font-semibold">{slot as EquipmentSlot}</h1>
+			<h1 class="text-xs font-semibold">{slot as EquipmentSlot}</h1>
 		</div>
 	{/if}
 {/snippet}

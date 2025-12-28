@@ -1,3 +1,5 @@
+import numeral from 'numeral';
+
 export function toRoman(num: number): string {
 	if (!Number.isInteger(num) || num <= 0 || num >= 4000) {
 		throw new RangeError('Roman numerals support 1-3999');
@@ -29,22 +31,6 @@ export function toRoman(num: number): string {
 	return result;
 }
 
-export function deepEqual(a: unknown, b: unknown): boolean {
-	if (a === b) return true;
-
-	if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) return false;
-
-	const aKeys = Object.keys(a as object);
-	const bKeys = Object.keys(b as object);
-	if (aKeys.length !== bKeys.length) return false;
-
-	for (const key of aKeys) {
-		if (!deepEqual((a as any)[key], (b as any)[key])) return false;
-	}
-
-	return true;
-}
-
 export function intToCircledNumber(n: number): string {
 	if (n === 0) return String.fromCodePoint(0x24ea); // ⓪
 	if (n >= 1 && n <= 20) return String.fromCodePoint(0x2460 + n - 1); // ①–⑳
@@ -57,6 +43,10 @@ export function intToBlackCircledNumber(n: number): string {
 	if (n < 1) throw new Error('Number must be >= 1');
 	if (n > 10) n = 10; // cap at 10
 	return String.fromCodePoint(0x2775 + n); // ❶–❿
+}
+
+export function formatNumber(num: number): string {
+	return numeral(num).format('0,0[.][00]A');
 }
 
 export async function fetchUserData<T>(

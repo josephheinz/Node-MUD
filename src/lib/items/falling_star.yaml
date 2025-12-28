@@ -2,7 +2,7 @@
   name: Falling Star
   icon:
     ascii: 'x'
-    image: '/images/items/fallingStar.svg'
+    image: '/images/items/fallingStar.png'
   rarity: Rare
   modifiers:
     - type: Enhancer
