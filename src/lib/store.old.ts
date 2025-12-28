@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+/* import { writable } from 'svelte/store';
 import type { Item } from './types/item';
 import { Stats, type StatList } from './types/stats';
 import type { User } from '@supabase/supabase-js';
@@ -43,3 +43,4 @@ export const actionModalData = writable<{ action: string; visible: boolean; amou
 	visible: false,
 	amount: 1
 });
+ */

@@ -3,10 +3,11 @@
 	import DarkModeButton from '$lib/components/ui/darkModeButton.svelte';
 	import ItemRenderer from '$lib/components/ui/itemRenderer.svelte';
 	import { Rarity } from '$lib/types/item';
-	import * as context from '$lib/context';
+	import { gameState } from '$lib/store.svelte';
 	import type { User } from '@supabase/supabase-js';
+	import NavProfile from '$lib/components/ui/auth/navProfile.svelte';
 
-	let user: User | undefined = $derived(context.userContext.getOr(undefined));
+	let user: User | null = $derived(gameState.user);
 </script>
 
 <ItemRenderer
@@ -24,9 +25,4 @@
 />
 
 <DarkModeButton />
-{user}
-{#if user}
-	{user.email}
-{:else}
-	<LoginDialog />
-{/if}
+<NavProfile />
