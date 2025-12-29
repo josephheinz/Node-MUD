@@ -1,5 +1,4 @@
-// +layout.server.ts
-import { supabase } from '$lib/auth/supabaseClient.js';
+import type { Profile } from '$lib/store.svelte';
 import {
 	EmptyEquipment,
 	Equipment,
@@ -8,10 +7,9 @@ import {
 	type DBItem
 } from '$lib/types/item';
 import { fetchUserData } from '$lib/utils/general.js';
-import type { Profile } from '$lib/context';
 import type { User } from '@supabase/supabase-js';
 
-export async function load({ cookies, fetch }): Promise<{
+export async function load({ cookies, fetch, locals }): Promise<{
 	profile: Profile | null;
 	user: User | null;
 	inventory: DBItem[];
@@ -21,6 +19,7 @@ export async function load({ cookies, fetch }): Promise<{
 	started: Date;
 	skills: typeof PlayerSkills; */
 }> {
+	const supabase = locals.supabase;
 	initializeItemRegistry();
 
 	const sessionCookie = cookies.get('supabase.session');

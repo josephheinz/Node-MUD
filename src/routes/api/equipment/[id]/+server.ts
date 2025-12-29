@@ -1,9 +1,7 @@
-import { supabase } from '$lib/auth/supabaseClient';
-
-export async function GET({ params }) {
+export async function GET({ params, locals }) {
 	const { id } = params;
 
-	const { data, error } = await supabase
+	const { data, error } = await locals.supabase
 		.from('inventories')
 		.select('equipment_data')
 		.eq('player_id', id)

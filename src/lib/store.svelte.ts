@@ -1,6 +1,5 @@
 import type { User } from '@supabase/supabase-js';
-import { Inventory } from './types/item';
-import { Equipment } from './types/item';
+import { Inventory, Equipment } from './types/item';
 
 export type Profile = {
 	id: string;

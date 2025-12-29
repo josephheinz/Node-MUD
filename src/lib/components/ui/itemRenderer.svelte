@@ -1,8 +1,10 @@
 <script lang="ts">
-	import type { EquipmentSlot, Item } from '$lib/types/item';
+	import { Equipment, Inventory, type EquipmentSlot, type Item } from '$lib/types/item';
 	import * as ContextMenu from './context-menu/index';
 	import { tooltip } from '../tooltip';
-	import { determineSlot, getItemData } from '$lib/utils/item';
+	import { determineSlot, Equip, getDisplayName, getItemData } from '$lib/utils/item';
+	import { gameState } from '$lib/store.svelte';
+	import { toast } from 'svelte-sonner';
 
 	type Props = {
 		item: Item;
@@ -14,6 +16,69 @@
 		equippedSlot?: EquipmentSlot;
 		equippable: boolean;
 	};
+
+	async function tryEquip() {
+		if (equipFlags.equippable && equipFlags.equippedSlot) {
+			console.log('Unequip in the future');
+		} else {
+			const slot = determineSlot(item);
+			if (slot) {
+				// Store originals for rollback
+				const originalEquipment = gameState.equipment;
+				const originalInventory = gameState.inventory;
+
+				// Optimistic update - update UI immediately
+				// Messy
+				const optimisticInventory = new Inventory([
+					...gameState.inventory.contents.filter((i) => i !== item),
+					...(gameState.equipment[slot] ? [gameState.equipment[slot]] : [])
+				]);
+				const optimisticEquipment = new Equipment({
+					...gameState.equipment,
+					[slot]: item
+				});
+
+				const optimisticReplaceItem: Item | null = originalEquipment[slot];
+
+				gameState.equipment = optimisticEquipment;
+				gameState.inventory = optimisticInventory;
+
+				try {
+					// Call server
+					const { equipment: newEq, inventory: newInv } = await Equip(
+						originalEquipment, // Send original, not optimistic
+						originalInventory,
+						item,
+						gameState.user?.id
+					);
+
+					// Server confirmed - update with server state
+					if (newEq) gameState.equipment = newEq;
+					if (newInv) gameState.inventory = newInv;
+
+					let description = optimisticReplaceItem
+						? `Replaced ${optimisticReplaceItem.name} in ${slot}`
+						: '';
+
+					toast.success(`Successfully equipped ${item.name}`, {
+						description,
+						duration: 2500
+					});
+				} catch (error) {
+					gameState.equipment = originalEquipment;
+					gameState.inventory = originalInventory;
+
+					toast.error(`Failed to equip item: ${item.name}`, {
+						duration: 2500
+					});
+
+					console.error('Failed to equip item:', error);
+				}
+			} else {
+				console.warn(`Item ${item.id} is not equippable`);
+			}
+		}
+	}
 
 	const { item, class: userClass = '', equipFlags }: Props = $props();
 </script>
@@ -38,7 +103,10 @@
 			</ContextMenu.Item>
 
 			{#if equipFlags.equippable && determineSlot(item) != undefined}
-				<ContextMenu.Item class="cursor-pointer rounded bg-background px-2 py-1 hover:bg-secondary">
+				<ContextMenu.Item
+					onclick={tryEquip}
+					class="cursor-pointer rounded bg-background px-2 py-1 hover:bg-secondary"
+				>
 					{equipFlags.equippedSlot !== undefined ? 'Unequip' : 'Equip'}
 				</ContextMenu.Item>
 			{/if}

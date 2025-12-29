@@ -23,7 +23,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	});
 
-	// READ YOUR COOKIE
 	const raw = event.cookies.get('supabase.session');
 
 	if (raw) {

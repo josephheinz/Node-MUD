@@ -2,13 +2,13 @@
 	import '../app.css';
 	import '../ui.css';
 	import { ModeWatcher } from 'mode-watcher';
-	import { onMount } from 'svelte';
 	import { Equipment, initializeItemRegistry, Inventory } from '$lib/types/item';
 	import type { PageData } from './$types';
 	import type { User } from '@supabase/supabase-js';
 	import { gameState, type Profile, sidebar } from '$lib/store.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar';
 	import AppSidebar from '$lib/components/ui/sidebar.svelte';
+	import { Toaster } from '$lib/components/ui/sonner/index.js';
 
 	let { data, children }: { data: PageData; children: any } = $props();
 
@@ -30,6 +30,7 @@
 </svelte:head>
 
 <ModeWatcher />
+<Toaster position="bottom-right" richColors />
 
 <Sidebar.Provider class="size-full bg-background text-foreground" bind:open={sidebar.open}>
 	<AppSidebar />

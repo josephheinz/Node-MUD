@@ -3,6 +3,7 @@ import type { EquippableModifier, StackableModifier } from '$lib/modifiers/basic
 import { instantiateModifier, instantiateModifierFromHash } from '$lib/modifiers/modifiersRegistry';
 import {
 	Equipment,
+	Inventory,
 	Rarity,
 	itemRegistry,
 	type DBItem,
@@ -14,8 +15,61 @@ import {
 import * as _ from 'radashi';
 import { formatNumber } from './general';
 
-export function Equip(equipment: Equipment, item: Item): Equipment {
-	return equipment;
+export async function Equip(
+	equipment: Equipment,
+	inventory: Inventory,
+	item: Item,
+	userId?: string
+): Promise<{ inventory?: Inventory; equipment?: Equipment }> {
+	if (!userId) console.error('No user logged in');
+
+	const startInventory: Inventory = _.cloneDeep(inventory);
+	const startEquipment: Equipment = _.cloneDeep(equipment);
+
+	let changeInventory = _.cloneDeep(startInventory);
+	let changeEquipment = _.cloneDeep(startEquipment);
+
+	// Try to client-side predict the equip
+	try {
+		let slot: EquipmentSlot | undefined = determineSlot(item);
+		const itemIndex = startInventory.contents.findIndex(
+			(i) => JSON.stringify(i) === JSON.stringify(item)
+		);
+
+		if (itemIndex === -1) {
+			throw new Error('Item not in inventory');
+		}
+
+		if (slot) {
+			if (startEquipment[slot]) changeInventory.add(startEquipment[slot]);
+			changeEquipment[slot] = item;
+			// Not best practice, should make a function for this
+			changeInventory.contents.splice(itemIndex, 1);
+		}
+	} catch (e) {
+		console.error(e);
+	}
+
+	const res = await fetch(`/api/equipment/${userId}/equip`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ dbItem: encodeDBItem(item) })
+	});
+
+	const data = await res.json();
+
+	if (!res.ok) {
+		console.error('Failed to equip:', data.error);
+		throw new Error(data.error);
+	}
+
+	let newEq = Equipment.load(data.equipment_data);
+	let newInv = Inventory.load(data.inventory_data);
+
+	return {
+		inventory: newInv,
+		equipment: newEq
+	};
 }
 
 export function Unequip(equipment: Equipment, item: Item): Equipment {
@@ -64,15 +118,18 @@ export function sortModifiersByPriority(
 }
 
 export function encodeDBItem(item: Item): DBItem {
-	if (!itemRegistry[item.id]) throw new Error(`Unknown item id: ${item.id}`);
+	const baseItem = itemRegistry[item.id];
+	if (!baseItem) throw new Error(`Unknown item id: ${item.id}`);
 
+	const baseModHashes: string[] = baseItem.modifiers.map((mod) => mod.hash());
 	const encodedMods: string[] = item.modifiers.map((mod) => mod.hash());
 
-	encodedMods.sort();
+	const diffModifiers: string[] = _.diff(encodedMods, baseModHashes);
+	console.log(baseModHashes, encodedMods, diffModifiers);
 
 	return {
 		id: item.id,
-		modifiers: encodedMods
+		modifiers: diffModifiers
 	};
 }
 

@@ -27,8 +27,6 @@
 	];
 
 	let open: boolean = $derived(sidebar.open);
-
-	$inspect(tab.tab);
 </script>
 
 <Sidebar.Root collapsible="icon">

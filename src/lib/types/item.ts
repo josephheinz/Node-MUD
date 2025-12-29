@@ -1,6 +1,6 @@
 import * as _ from 'radashi';
 import type { StatList } from './stats';
-import { encodeDBItem, loadDbItem, sortModifiersByPriority } from '$lib/utils/item';
+import { encodeDBItem, loadDbItem } from '$lib/utils/item';
 import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
 import { parse } from 'yaml';
 
@@ -219,14 +219,14 @@ export class Equipment {
 
 	public serialize(): DBEquipment {
 		return {
-			head: this._head ? encodeDBItem(this._head) : null,
-			body: this._body ? encodeDBItem(this._body) : null,
-			legs: this._legs ? encodeDBItem(this._legs) : null,
-			offhand: this._offhand ? encodeDBItem(this._offhand) : null,
-			mainhand: this._mainhand ? encodeDBItem(this._mainhand) : null,
-			necklace: this._necklace ? encodeDBItem(this._necklace) : null,
-			ring: this._ring ? encodeDBItem(this._ring) : null,
-			hands: this._hands ? encodeDBItem(this._hands) : null
+			Head: this._head ? encodeDBItem(this._head) : null,
+			Body: this._body ? encodeDBItem(this._body) : null,
+			Legs: this._legs ? encodeDBItem(this._legs) : null,
+			Offhand: this._offhand ? encodeDBItem(this._offhand) : null,
+			Mainhand: this._mainhand ? encodeDBItem(this._mainhand) : null,
+			Necklace: this._necklace ? encodeDBItem(this._necklace) : null,
+			Ring: this._ring ? encodeDBItem(this._ring) : null,
+			Hands: this._hands ? encodeDBItem(this._hands) : null
 		};
 	}
 
@@ -262,25 +262,25 @@ export class Equipment {
 }
 
 export type DBEquipment = {
-	head: DBItem | null;
-	body: DBItem | null;
-	legs: DBItem | null;
-	offhand: DBItem | null;
-	mainhand: DBItem | null;
-	necklace: DBItem | null;
-	ring: DBItem | null;
-	hands: DBItem | null;
+	Head: DBItem | null;
+	Body: DBItem | null;
+	Legs: DBItem | null;
+	Offhand: DBItem | null;
+	Mainhand: DBItem | null;
+	Necklace: DBItem | null;
+	Ring: DBItem | null;
+	Hands: DBItem | null;
 };
 
 export const EmptyEquipment: DBEquipment = {
-	head: null,
-	body: null,
-	legs: null,
-	offhand: null,
-	mainhand: null,
-	necklace: null,
-	ring: null,
-	hands: null
+	Head: null,
+	Body: null,
+	Legs: null,
+	Offhand: null,
+	Mainhand: null,
+	Necklace: null,
+	Ring: null,
+	Hands: null
 };
 
 // i know functions should be in here but it makes things cyclical if its in utils/item
