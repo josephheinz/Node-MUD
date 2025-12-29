@@ -2,7 +2,7 @@
 	import { Equipment, Inventory, type EquipmentSlot, type Item } from '$lib/types/item';
 	import * as ContextMenu from './context-menu/index';
 	import { tooltip } from '../tooltip';
-	import { determineSlot, Equip, getDisplayName, getItemData } from '$lib/utils/item';
+	import { determineSlot, Equip, getDisplayName, getItemData, Unequip } from '$lib/utils/item';
 	import { gameState } from '$lib/store.svelte';
 	import { toast } from 'svelte-sonner';
 
@@ -19,7 +19,54 @@
 
 	async function tryEquip() {
 		if (equipFlags.equippable && equipFlags.equippedSlot) {
-			console.log('Unequip in the future');
+			const slot = determineSlot(item);
+			if (slot) {
+				// Store originals for rollback
+				const originalEquipment = gameState.equipment;
+				const originalInventory = gameState.inventory;
+
+				// Optimistic update - update UI immediately
+				// Messy
+				const optimisticInventory = new Inventory([
+					...gameState.inventory.contents,
+					...(gameState.equipment[slot] ? [gameState.equipment[slot]] : [])
+				]);
+				const optimisticEquipment = new Equipment({
+					...gameState.equipment,
+					[slot]: null
+				});
+
+				gameState.equipment = optimisticEquipment;
+				gameState.inventory = optimisticInventory;
+
+				try {
+					// Call server
+					const { equipment: newEq, inventory: newInv } = await Unequip(
+						originalEquipment,
+						item,
+						gameState.user?.id
+					);
+
+					// Server confirmed - update with server state
+					if (newEq) gameState.equipment = newEq;
+					if (newInv) gameState.inventory = newInv;
+
+					toast.success(`Successfully unequipped ${item.name}`, {
+						duration: 2500
+					});
+				} catch (error) {
+					gameState.equipment = originalEquipment;
+					gameState.inventory = originalInventory;
+
+					toast.error(`Failed to unequip item: ${item.name}`, {
+						duration: 2500
+					});
+
+					console.error('Failed to unequip item:', error);
+				}
+			} else {
+				console.warn(`Item ${item.id} is not equippable`);
+			}
 		} else {
 			const slot = determineSlot(item);
 			if (slot) {
@@ -45,12 +92,7 @@
 
 				try {
 					// Call server
-					const { equipment: newEq, inventory: newInv } = await Equip(
-						originalEquipment, // Send original, not optimistic
-						originalInventory,
-						item,
-						gameState.user?.id
-					);
+					const { equipment: newEq, inventory: newInv } = await Equip(item, gameState.user?.id);
 
 					// Server confirmed - update with server state
 					if (newEq) gameState.equipment = newEq;

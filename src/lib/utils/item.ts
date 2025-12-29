@@ -14,41 +14,13 @@ import {
 } from '$lib/types/item';
 import * as _ from 'radashi';
 import { formatNumber } from './general';
+import { isEqual } from 'radashi';
 
 export async function Equip(
-	equipment: Equipment,
-	inventory: Inventory,
 	item: Item,
 	userId?: string
 ): Promise<{ inventory?: Inventory; equipment?: Equipment }> {
 	if (!userId) console.error('No user logged in');
-
-	const startInventory: Inventory = _.cloneDeep(inventory);
-	const startEquipment: Equipment = _.cloneDeep(equipment);
-
-	let changeInventory = _.cloneDeep(startInventory);
-	let changeEquipment = _.cloneDeep(startEquipment);
-
-	// Try to client-side predict the equip
-	try {
-		let slot: EquipmentSlot | undefined = determineSlot(item);
-		const itemIndex = startInventory.contents.findIndex(
-			(i) => JSON.stringify(i) === JSON.stringify(item)
-		);
-
-		if (itemIndex === -1) {
-			throw new Error('Item not in inventory');
-		}
-
-		if (slot) {
-			if (startEquipment[slot]) changeInventory.add(startEquipment[slot]);
-			changeEquipment[slot] = item;
-			// Not best practice, should make a function for this
-			changeInventory.contents.splice(itemIndex, 1);
-		}
-	} catch (e) {
-		console.error(e);
-	}
 
 	const res = await fetch(`/api/equipment/${userId}/equip`, {
 		method: 'POST',
@@ -72,8 +44,38 @@ export async function Equip(
 	};
 }
 
-export function Unequip(equipment: Equipment, item: Item): Equipment {
-	return equipment;
+export async function Unequip(
+	equipment: Equipment,
+	item: Item,
+	userId?: string
+): Promise<{ inventory?: Inventory; equipment?: Equipment }> {
+	if (!userId) console.error('No user logged in');
+
+	const slot: EquipmentSlot | undefined = determineSlot(item);
+	if (!slot) throw new Error('Item is not equippable');
+
+	if (equipment[slot] === null) throw new Error('Item is not currently equipped');
+
+	const res = await fetch(`/api/equipment/${userId}/unequip`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ slot })
+	});
+
+	const data = await res.json();
+
+	if (!res.ok) {
+		console.error('Failed to equip:', data.error);
+		throw new Error(data.error);
+	}
+
+	let newEq = Equipment.load(data.equipment_data);
+	let newInv = Inventory.load(data.inventory_data);
+
+	return {
+		inventory: newInv,
+		equipment: newEq
+	};
 }
 
 export function getItemData(item: Item, equippable: boolean = false): ITooltipData {
@@ -204,4 +206,32 @@ export function determineSlot(
 	});
 
 	return slot;
+}
+
+export function compareItems(a: Item, b: Item): boolean {
+	const sa: Item = {
+		...a,
+		modifiers: [...(a.modifiers ?? [])].sort()
+	};
+
+	const sb: Item = {
+		...b,
+		modifiers: [...(b.modifiers ?? [])].sort()
+	};
+
+	return isEqual(sa, sb);
+}
+
+export function compareDbItems(a: DBItem, b: DBItem): boolean {
+	const sa: DBItem = {
+		...a,
+		modifiers: [...(a.modifiers ?? [])].sort()
+	};
+
+	const sb: DBItem = {
+		...b,
+		modifiers: [...(b.modifiers ?? [])].sort()
+	};
+
+	return isEqual(sa, sb);
 }
