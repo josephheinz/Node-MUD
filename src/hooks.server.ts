@@ -1,15 +1,9 @@
-// src/hooks.server.ts
 import type { Handle } from '@sveltejs/kit';
-/* import { initSocketServer } from '$lib/server/socket';
- */ import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 
 // @ts-expect-error - server is available in dev mode
 const server = globalThis.__sveltekit_server__;
-/* 
-if (server) {
-	initSocketServer(server);
-} */
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {

@@ -10,6 +10,7 @@
 	import NavProfile from './auth/navProfile.svelte';
 	import { sidebar, tab } from '$lib/store.svelte';
 	import ProfileAvatar from './auth/profileAvatar.svelte';
+	import OnlineCounter from './onlineCounter.svelte';
 
 	const items: Array<{ tab: typeof tab.tab; icon: IconDefinition }> = [
 		{
@@ -33,6 +34,7 @@
 	{#if open}
 		<Sidebar.Header>
 			<h1 class="text-2xl font-bold">Web based Runescape-like</h1>
+			<OnlineCounter />
 		</Sidebar.Header>
 	{/if}
 	<Sidebar.Content>

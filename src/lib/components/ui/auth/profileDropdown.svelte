@@ -6,6 +6,7 @@
 	import { faArrowRightFromBracket, faSort, faUser } from '@fortawesome/free-solid-svg-icons';
 	import { Button } from '../button/index';
 	import ChevronUpDown from '../chevronUpDown.svelte';
+	import UserAvatar from '../userAvatar.svelte';
 
 	let { profile }: { profile: Profile } = $props();
 
@@ -27,10 +28,7 @@
 			size="lg"
 			class="flex w-full cursor-pointer items-center justify-start gap-2 px-2"
 		>
-			<Avatar.Root>
-				<Avatar.Image src={profile.profile_picture} alt={`@${profile.username}`} />
-				<Avatar.Fallback>{profile.display_name.substring(0, 2)}</Avatar.Fallback>
-			</Avatar.Root>
+			<UserAvatar {profile} />
 			<span class="grow text-left">
 				{profile.display_name ?? `@${profile.username}`}
 			</span>
