@@ -1,5 +1,7 @@
 import numeral from 'numeral';
 
+export type Require<T, K extends keyof T> = T & Required<Pick<T, K>>;
+
 export function toRoman(num: number): string {
 	if (!Number.isInteger(num) || num <= 0 || num >= 4000) {
 		throw new RangeError('Roman numerals support 1-3999');

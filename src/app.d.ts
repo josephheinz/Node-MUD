@@ -1,4 +1,4 @@
-import { WebSocketHelper } from './lib/websocket';
+import { WebSocketHelper } from './lib/websocketManager';
 
 declare global {
 	namespace App {

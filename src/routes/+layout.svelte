@@ -10,6 +10,7 @@
 	import AppSidebar from '$lib/components/ui/sidebar.svelte';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	import DarkModeButton from '$lib/components/ui/darkModeButton.svelte';
+	import WebsocketManager from '$lib/components/auth/websocketManager.svelte';
 	let { data, children }: { data: PageData; children: any } = $props();
 
 	initializeItemRegistry();
@@ -32,6 +33,7 @@
 <ModeWatcher />
 <Toaster position="bottom-right" richColors />
 <DarkModeButton />
+<WebsocketManager user={user as User} />
 
 <Sidebar.Provider class="size-full bg-background text-foreground" bind:open={sidebar.open}>
 	<AppSidebar />

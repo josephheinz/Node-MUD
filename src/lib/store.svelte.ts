@@ -16,12 +16,15 @@ export const gameState = $state<{
 	profile: Profile | null;
 	inventory: Inventory;
 	equipment: Equipment;
+	playerCount: number;
 }>({
 	user: null,
 	profile: null,
 	inventory: new Inventory([]),
-	equipment: new Equipment({})
+	equipment: new Equipment({}),
+	playerCount: 0
 });
+
 
 export const sidebar = $state({ open: true });
 

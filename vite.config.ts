@@ -2,9 +2,10 @@ import tailwindcss from '@tailwindcss/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig, loadEnv } from 'vite';
 import { webSocketServer } from 'sveltekit-ws/vite';
-import { getWebSocketManager } from 'sveltekit-ws';
+import { getWebSocketManager, type WSConnection } from 'sveltekit-ws';
 import { createClient } from '@supabase/supabase-js';
 import type { Session } from '@supabase/supabase-js';
+import { wsManager } from './src/lib/websocketManager';
 
 function parseCookies(cookieHeader: string | undefined): Record<string, string> {
 	if (!cookieHeader) return {};
@@ -17,6 +18,47 @@ function parseCookies(cookieHeader: string | undefined): Record<string, string> 
 		},
 		{} as Record<string, string>
 	);
+}
+
+async function authMessage(
+	connection: WSConnection,
+	message: Partial<WSMessage<{ session: string }>> & { data: { session: string } },
+	mode: string
+) {
+	const env = loadEnv(mode, process.cwd(), '');
+
+	try {
+		// Parse and verify the session (same as verifyClient)
+		const session = JSON.parse(message.data.session);
+
+		const supabase = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY, {
+			auth: {
+				persistSession: false,
+				autoRefreshToken: false,
+				detectSessionInUrl: false
+			}
+		});
+
+		await supabase.auth.setSession(session);
+		const {
+			data: { user }
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			connection.ws.close();
+			return;
+		}
+
+		// Send success back
+		const manager = getWebSocketManager();
+		manager.send(connection.id, { type: 'auth-success', data: {} });
+
+		// Now you have verified userId
+		wsManager.addConnection(connection.id, { userId: user.id }, supabase);
+	} catch (e) {
+		console.error('Auth failed:', e);
+		connection.ws.close();
+	}
 }
 
 export default defineConfig(({ mode }) => {
@@ -65,16 +107,29 @@ export default defineConfig(({ mode }) => {
 					onConnect: (connection) => {
 						console.log('Client connected:', connection.id);
 					},
-					onMessage: (connection, message) => {
+					onMessage: async (connection, message) => {
+						const user = wsManager.getUserByConnection(connection.id);
+
+						if (!user && message.type !== 'auth') {
+							connection.ws.close();
+							return;
+						}
+
+						if (message.type === 'auth') {
+							console.log('authenticating');
+							await authMessage(connection, message as any, mode);
+						}
+						/* 
 						const manager = getWebSocketManager();
 						manager.broadcast({
 							type: message.type,
 							data: message.data
-						});
+						}); */
 
 						console.log('Received', message, 'from', connection.id);
 					},
 					onDisconnect: (connection) => {
+						wsManager.removeConnection(connection.id);
 						console.log('Client disconnected:', connection.id);
 					}
 				}
