@@ -5,6 +5,8 @@
 	import { determineSlot, Equip, getDisplayName, getItemData, Unequip } from '$lib/utils/item';
 	import { gameState } from '$lib/store.svelte';
 	import { toast } from 'svelte-sonner';
+	import type { StackableModifier } from '$lib/modifiers/basicModifiers';
+	import { formatNumber } from '$lib/utils/general';
 
 	type Props = {
 		item: Item;
@@ -123,6 +125,10 @@
 	}
 
 	const { item, class: userClass = '', equipFlags }: Props = $props();
+
+	const stackMod: StackableModifier | undefined = item.modifiers.find(
+		(m) => m.type === 'Stackable'
+	) as StackableModifier;
 </script>
 
 <ContextMenu.Root>
@@ -134,6 +140,12 @@
 		<div class="relative size-full p-2" use:tooltip={getItemData(item, equipFlags.equippable)}>
 			<img src={item.icon} alt={item.name} class="image-rendering-pixelated size-full" />
 		</div>
+		{#if stackMod}
+			<span
+				class="pointer-events-none absolute right-0.5 bottom-0 text-stroke-2 text-stroke-zinc-800 text-lg font-semibold text-white shadow-xs"
+				>{formatNumber(stackMod.amount)}</span
+			>
+		{/if}
 	</ContextMenu.Trigger>
 
 	<ContextMenu.Portal>

@@ -16,6 +16,7 @@
 	};
 
 	let messages: ChatMessage[] = $state([]);
+
 </script>
 
 <div class="flex size-full flex-col items-stretch justify-end-safe bg-background py-2">
