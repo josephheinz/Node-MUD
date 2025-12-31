@@ -146,6 +146,10 @@ class WebsocketManager {
 		return;
 	}
 
+	getBadges(userId: string): string[] {
+		return this.userMap.get(userId)?.badges ?? [];
+	}
+
 	getPlayerCount(): number {
 		return this.userMap.size;
 	}

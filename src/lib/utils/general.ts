@@ -72,3 +72,7 @@ export async function fetchUserData<T>(
 		return null;
 	}
 }
+
+export function escapeRegExp(str: string) {
+	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

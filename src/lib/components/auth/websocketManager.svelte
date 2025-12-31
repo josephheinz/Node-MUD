@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { gameState } from '$lib/store.svelte';
+	import { chatMessages, gameState } from '$lib/store.svelte';
 	import type { Session, User } from '@supabase/supabase-js';
 	import { onDestroy, onMount } from 'svelte';
+	import { websocketStore } from '$lib/stores/websocket.svelte';
+	import type { ChatMessage } from '$lib/utils/chat';
 
 	const { user }: { user: User } = $props();
 
@@ -35,8 +37,11 @@
 
 		ws = new WebSocket(`ws://${window.location.host}/ws`);
 
+		websocketStore.setConnection(ws);
+
 		ws.onopen = () => {
 			connected = true;
+			websocketStore.setConnected(true);
 			console.log('Connected!');
 
 			if (ws) void authWebsocket(ws);
@@ -44,22 +49,29 @@
 
 		ws.onclose = () => {
 			connected = false;
+			websocketStore.setConnected(false);
 			console.log('Disconnected');
 		};
 
 		ws.onmessage = (event) => {
-			const message: WSMessage<{ amount: number }> = JSON.parse(event.data);
-			if (message.type === 'auth-success') {
-				console.log('Successfully authenticated to the websocket');
-			}
+			const message: WSMessage<any> = JSON.parse(event.data);
+			switch (message.type) {
+				case 'auth-success':
+					console.log('Successfully authenticated to the websocket');
+					break;
 
-			if (message.type === 'player-count-update') {
-				gameState.playerCount = message.data.amount;
-				console.log('Player count update:', message.data.amount);
+				case 'player-count-update':
+					gameState.playerCount = message.data.amount;
+					console.log('Player count update:', message.data.amount);
+					break;
+
+				case 'chat-message':
+					chatMessages.messages.push(message.data as ChatMessage);
+					break;
 			}
 			console.log('Message received:', event.data);
 		};
-        
+
 		if (browser) {
 			window.addEventListener('beforeunload', closeConnection);
 		}

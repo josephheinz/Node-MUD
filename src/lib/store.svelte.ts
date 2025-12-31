@@ -1,5 +1,6 @@
 import type { User } from '@supabase/supabase-js';
-import { Inventory, Equipment } from './types/item';
+import { Inventory, Equipment, type Item } from './types/item';
+import type { ChatMessage } from './utils/chat';
 
 export type Profile = {
 	id: string;
@@ -25,6 +26,9 @@ export const gameState = $state<{
 	playerCount: 0
 });
 
+export const chatMessages: { messages: ChatMessage[] } = $state({ messages: [] });
+
+export const chatItemLinkTable: Map<number, Item> = $state(new Map());
 
 export const sidebar = $state({ open: true });
 

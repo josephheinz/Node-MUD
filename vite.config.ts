@@ -61,6 +61,24 @@ async function authMessage(
 	}
 }
 
+function handleChatMessage(msg: string) {
+	const manager = getWebSocketManager();
+	const message = JSON.parse(msg) as { author: string; content: string; timestamp: number };
+
+	manager.broadcast({
+		type: 'chat-message',
+		data: {
+			author: {
+				username: wsManager.getUser(message.author)?.username,
+				badges: wsManager.getBadges(message.author) ?? []
+			},
+			content: message.content,
+			timestamp: message.timestamp
+		},
+		timestamp: Date.now()
+	});
+}
+
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
 
@@ -115,16 +133,15 @@ export default defineConfig(({ mode }) => {
 							return;
 						}
 
-						if (message.type === 'auth') {
-							console.log('authenticating');
-							await authMessage(connection, message as any, mode);
+						switch (message.type) {
+							case 'auth':
+								console.log('authenticating');
+								await authMessage(connection, message as any, mode);
+								break;
+							case 'chat-message':
+								handleChatMessage(JSON.stringify(message.data));
+								break;
 						}
-						/* 
-						const manager = getWebSocketManager();
-						manager.broadcast({
-							type: message.type,
-							data: message.data
-						}); */
 
 						console.log('Received', message, 'from', connection.id);
 					},

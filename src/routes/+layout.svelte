@@ -34,8 +34,8 @@
 
 <ModeWatcher />
 <Toaster position="bottom-right" richColors />
-<DarkModeButton />
-<WebsocketManager user={user as User} />
+<!-- <DarkModeButton />
+ --><WebsocketManager user={user as User} />
 
 <Sidebar.Provider class="size-full bg-background text-foreground" bind:open={sidebar.open}>
 	<AppSidebar />
