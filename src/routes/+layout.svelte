@@ -7,14 +7,16 @@
 	import type { User } from '@supabase/supabase-js';
 	import { gameState, type Profile, sidebar } from '$lib/store.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar';
+	import * as Resizable from '$lib/components/ui/resizable';
 	import AppSidebar from '$lib/components/ui/sidebar.svelte';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	import DarkModeButton from '$lib/components/ui/darkModeButton.svelte';
 	import WebsocketManager from '$lib/components/auth/websocketManager.svelte';
+	import Chat from '$lib/components/ui/chat/chat.svelte';
+
 	let { data, children }: { data: PageData; children: any } = $props();
 
 	initializeItemRegistry();
-
 	let inv: Inventory = Inventory.load(data.inventory);
 	let eq: Equipment = Equipment.load(data.equipment);
 	let user: User | null = data.user;
@@ -37,8 +39,17 @@
 
 <Sidebar.Provider class="size-full bg-background text-foreground" bind:open={sidebar.open}>
 	<AppSidebar />
-	<main>
-		<Sidebar.Trigger />
-		{@render children?.()}
-	</main>
+	<Sidebar.Trigger />
+
+	<Resizable.PaneGroup direction="horizontal" class="size-full" autoSaveId="mainContentPaneGroup">
+		<Resizable.Pane defaultSize={75} minSize={60}>
+			{@render children?.()}
+		</Resizable.Pane>
+
+		<Resizable.Handle />
+
+		<Resizable.Pane defaultSize={25} minSize={20} maxSize={40}>
+			<Chat />
+		</Resizable.Pane>
+	</Resizable.PaneGroup>
 </Sidebar.Provider>
