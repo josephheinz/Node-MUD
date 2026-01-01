@@ -7,6 +7,7 @@
 	import { toast } from 'svelte-sonner';
 	import type { StackableModifier } from '$lib/modifiers/basicModifiers';
 	import { formatNumber } from '$lib/utils/general';
+	import { linkItemToChat } from '$lib/utils/chat';
 
 	type Props = {
 		item: Item;
@@ -152,7 +153,12 @@
 		<ContextMenu.Content
 			class="min-w-[150px] rounded-md bg-background p-2 text-foreground shadow-lg"
 		>
-			<ContextMenu.Item class="cursor-pointer rounded bg-background px-2 py-1 hover:bg-secondary">
+			<ContextMenu.Item
+				class="cursor-pointer rounded bg-background px-2 py-1 hover:bg-secondary"
+				onclick={() => {
+					linkItemToChat(item);
+				}}
+			>
 				Link to chat
 			</ContextMenu.Item>
 

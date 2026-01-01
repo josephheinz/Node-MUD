@@ -1,24 +1,16 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	import ChatMessage from './chatMessage.svelte';
 	import Button from '../button/button.svelte';
 	import Fa from 'svelte-fa';
-	import { faArrowCircleDown, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+	import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
+	import type { ChatMessage as TChatMessage } from '$lib/utils/chat';
+	import ChatMessage from './chatMessage.svelte';
 
-	type Message = {
-		author: {
-			username: string;
-			badges: string[];
-		};
-		content: string;
-		timestamp: number;
-	};
-
-	let { messages = $bindable() }: { messages: Message[] } = $props();
+	let { messages = $bindable() }: { messages: TChatMessage[] } = $props();
 
 	let chatContainer: HTMLDivElement;
 	let shouldAutoScroll = $state(true);
-	
+
 	// Scroll to bottom function
 	function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
 		if (chatContainer) {

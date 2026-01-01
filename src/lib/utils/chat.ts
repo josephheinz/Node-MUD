@@ -1,9 +1,9 @@
 import { faSquareWebAwesome } from '@fortawesome/free-brands-svg-icons';
 import { faCode, faMedal, type IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { escapeRegExp } from './general';
-import { encodeDBItem } from './item';
-import { chatItemLinkTable } from '$lib/store.svelte';
-import type { Item } from '$lib/types/item';
+import { encodeDBItem, loadDbItem } from './item';
+import { chatItemLinkTable, currentChatMessage } from '$lib/store.svelte';
+import type { DBItem, Item } from '$lib/types/item';
 import { wsManager } from '$lib/websocketManager';
 
 export const BadgeReferences: Record<string, { icon: IconDefinition; color: string }> = {
@@ -38,6 +38,13 @@ export function sendMessage(message: string, username: string, ws: WebSocket) {
 	);
 
 	chatItemLinkTable.clear();
+	currentChatMessage.value = '';
+}
+
+export function linkItemToChat(item: Item) {
+	const index: number = chatItemLinkTable.size + 1;
+	chatItemLinkTable.set(index, item);
+	currentChatMessage.value += `[ItemLink#${index}]`;
 }
 
 export function prepareMessage(msg: string, itemLinkTable: Map<number, Item>): string {
@@ -59,11 +66,60 @@ export function prepareMessage(msg: string, itemLinkTable: Map<number, Item>): s
 	return payload;
 }
 
-export type ChatMessage = {
+export type messagePart = {
+	type: 'text' | 'item';
+	content: string | Item;
+};
+
+export function extractItemsFromMessage(message: string): Set<messagePart> | string {
+	const result: Set<messagePart> = new Set();
+	// dont question the regex
+	const regex = /\[item:\{"id":"([^"]+)","modifiers":\[((?:"[^"]*"(?:,)?)*)\]\}\]/g;
+
+	let lastIndex = 0;
+
+	for (const match of message.matchAll(regex)) {
+		if (match.index > lastIndex) {
+			result.add({
+				type: 'text',
+				content: message.slice(lastIndex, match.index)
+			});
+		}
+
+		const modifiers = match[2].match(/"([^"]+)"/g)?.map((m) => m.slice(1, -1)) || [];
+		const item: Item = loadDbItem({
+			id: match[1],
+			modifiers
+		});
+		console.log(item);
+		result.add({
+			type: 'item',
+			content: item
+		});
+
+		lastIndex = match.index + match[0].length;
+	}
+
+	if (message.matchAll(regex).toArray().length === 0) {
+		console.log(message.matchAll(regex).toArray());
+		return message;
+	}
+
+	if (lastIndex < message.length) {
+		result.add({
+			type: 'text',
+			content: message.slice(lastIndex)
+		});
+	}
+
+	return result;
+}
+
+export type ChatMessage<T = string | Set<messagePart>> = {
 	author: {
 		username: string;
 		badges: string[];
 	};
-	content: string;
+	content: T;
 	timestamp: number;
 };

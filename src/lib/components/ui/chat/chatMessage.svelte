@@ -1,9 +1,15 @@
 <script lang="ts">
 	import Fa from 'svelte-fa';
-	import type { ChatMessage } from './chat.svelte';
-	import { BadgeReferences } from '$lib/utils/chat';
+	import { BadgeReferences, type ChatMessage } from '$lib/utils/chat';
+	import ItemHover from './itemHover.svelte';
+	import { type Item } from '$lib/types/item';
+	import { onMount } from 'svelte';
 
 	const { message }: { message: ChatMessage } = $props();
+
+	onMount(() => {
+		console.log(message);
+	});
 </script>
 
 <div class="mb-3">
@@ -22,5 +28,17 @@
 			})}
 		</span>
 	</div>
-	<p class="text-sm">{message.content}</p>
+	{#if typeof message.content === 'string'}
+		<span class="text-sm">{message.content}</span>
+	{:else}
+		<span class="text-sm">
+			{#each message.content as entry}
+				{#if entry.type === 'text'}
+					{entry}
+				{:else}
+					<ItemHover item={entry.content as Item} />
+				{/if}
+			{/each}
+		</span>
+	{/if}
 </div>

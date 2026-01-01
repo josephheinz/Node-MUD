@@ -4,7 +4,7 @@
 	import type { Session, User } from '@supabase/supabase-js';
 	import { onDestroy, onMount } from 'svelte';
 	import { websocketStore } from '$lib/stores/websocket.svelte';
-	import type { ChatMessage } from '$lib/utils/chat';
+	import { extractItemsFromMessage, type ChatMessage, type messagePart } from '$lib/utils/chat';
 
 	const { user }: { user: User } = $props();
 
@@ -66,7 +66,12 @@
 					break;
 
 				case 'chat-message':
-					chatMessages.messages.push(message.data as ChatMessage);
+					chatMessages.messages.push(message.data as ChatMessage<string>);
+					chatMessages.parsed.push({
+						author: message.data.author,
+						content: extractItemsFromMessage(message.data.content) as Set<messagePart>,
+						timestamp: message.data.timestamp
+					});
 					break;
 			}
 			console.log('Message received:', event.data);
