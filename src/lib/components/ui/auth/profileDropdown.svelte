@@ -3,10 +3,12 @@
 	import * as DropdownMenu from '../dropdown-menu';
 	import type { Profile } from '$lib/store.svelte';
 	import Fa from 'svelte-fa';
-	import { faArrowRightFromBracket, faSort, faUser } from '@fortawesome/free-solid-svg-icons';
+	import { faArrowRightFromBracket, faMoon, faSort, faSun, faUser } from '@fortawesome/free-solid-svg-icons';
 	import { Button } from '../button/index';
 	import ChevronUpDown from '../chevronUpDown.svelte';
 	import UserAvatar from '../userAvatar.svelte';
+	import { toggleMode, mode } from 'mode-watcher';
+	import { capitalizeFirstLetter } from '$lib/utils/general';
 
 	let { profile }: { profile: Profile } = $props();
 
@@ -42,6 +44,9 @@
 				<a href="#" class="flex items-center gap-2">
 					<Fa icon={faUser} />Profile
 				</a>
+			</DropdownMenu.Item>
+			<DropdownMenu.Item onclick={toggleMode}>
+				<Fa icon={mode.current === "dark" ? faMoon : faSun} /> {capitalizeFirstLetter(mode.current ?? "system")}
 			</DropdownMenu.Item>
 			<DropdownMenu.Item onclick={signout} class="flex items-center gap-2" variant="destructive">
 				<Fa icon={faArrowRightFromBracket} /> Sign Out

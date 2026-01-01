@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { gameState, type Profile } from '$lib/store.svelte';
 	import * as Card from './card';
-	import * as Avatar from './avatar';
 	import UserAvatar from './userAvatar.svelte';
 
 	let profile: Profile | null = $state(gameState.profile);

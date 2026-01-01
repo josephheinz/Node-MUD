@@ -76,3 +76,11 @@ export async function fetchUserData<T>(
 export function escapeRegExp(str: string) {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
+
+export function capitalizeAfterSpaces(str: String): String {
+	return str.replace(/(^|\s)[a-z]/gi, (l) => l.toUpperCase());
+}
+
+export function capitalizeFirstLetter(str: string): string {
+	return String(str).charAt(0).toUpperCase() + String(str).slice(1);
+}
