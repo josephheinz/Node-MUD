@@ -34,7 +34,7 @@
 		<span class="text-sm">
 			{#each message.content as entry}
 				{#if entry.type === 'text'}
-					{entry}
+					{entry.content}
 				{:else}
 					<ItemHover item={entry.content as Item} />
 				{/if}

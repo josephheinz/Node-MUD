@@ -100,10 +100,7 @@ export function extractItemsFromMessage(message: string): Set<messagePart> | str
 		lastIndex = match.index + match[0].length;
 	}
 
-	if (message.matchAll(regex).toArray().length === 0) {
-		console.log(message.matchAll(regex).toArray());
-		return message;
-	}
+	if (message.matchAll(regex).toArray().length === 0) return message;
 
 	if (lastIndex < message.length) {
 		result.add({

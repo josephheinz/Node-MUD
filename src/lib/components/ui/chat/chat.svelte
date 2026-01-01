@@ -33,7 +33,7 @@
 	});
 </script>
 
-<div class="flex size-full flex-col items-stretch justify-end-safe bg-background py-2">
+<div class="flex size-full flex-col items-stretch justify-between bg-background py-2">
 	<h3 class="mb-2 px-2 text-lg font-semibold text-foreground">Global Chat</h3>
 	<ChatMessages bind:messages={parsedMessages} />
 	<ButtonGroup.Root style="width:calc(100% - calc(var(--spacing) * 4));" class=" m-2 mb-0">

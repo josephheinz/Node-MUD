@@ -5,9 +5,9 @@
 - [x] Item and DB Encoding
 - [x] Auth and login systems
 - [x] Loading player inventory and equipment from DB
-- [ ] Equipping and unequipping items
-- [ ] Websockets setup
-- [ ] Chat, including ItemHover
+- [x] Equipping and unequipping items
+- [x] Websockets setup
+- [x] Chat, including ItemHover
 - [ ] Action loading and display
 - [ ] Action queueing
 - [ ] Action inventory updating

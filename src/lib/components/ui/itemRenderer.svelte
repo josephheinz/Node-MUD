@@ -143,7 +143,7 @@
 		</div>
 		{#if stackMod}
 			<span
-				class="pointer-events-none absolute right-0.5 bottom-0 text-stroke-2 text-stroke-zinc-800 text-lg font-semibold text-white shadow-xs"
+				class="pointer-events-none absolute right-0.5 bottom-0 text-stroke-2 text-stroke-zinc-800 text-lg font-extrabold text-white shadow-xs"
 				>{formatNumber(stackMod.amount)}</span
 			>
 		{/if}

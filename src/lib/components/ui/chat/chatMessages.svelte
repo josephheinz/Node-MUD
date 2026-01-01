@@ -2,9 +2,10 @@
 	import { onMount, tick } from 'svelte';
 	import Button from '../button/button.svelte';
 	import Fa from 'svelte-fa';
-	import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
+	import { faArrowDown, faGhost } from '@fortawesome/free-solid-svg-icons';
 	import type { ChatMessage as TChatMessage } from '$lib/utils/chat';
 	import ChatMessage from './chatMessage.svelte';
+	import * as Empty from '../empty';
 
 	let { messages = $bindable() }: { messages: TChatMessage[] } = $props();
 
@@ -50,13 +51,23 @@
 	});
 </script>
 
-<div class="relative flex h-[85%] max-h-[85%] flex-col">
+<div class="relative flex h-9/10 max-h-9/10 flex-col">
 	<div
 		bind:this={chatContainer}
 		onscroll={handleScroll}
 		class="max-h-full flex-1 grow overflow-y-auto rounded border px-4"
 	>
-		{#if messages.length === 0}{:else}
+		{#if messages.length === 0}
+			<Empty.Root>
+				<Empty.Header>
+					<Empty.Media>
+						<Fa icon={faGhost} class="text-4xl" />
+					</Empty.Media>
+					<Empty.Title>No Chat Messages Yet</Empty.Title>
+					<Empty.Description>It's quiet in here...</Empty.Description>
+				</Empty.Header>
+			</Empty.Root>
+		{:else}
 			{#each messages as message (message.timestamp)}
 				<ChatMessage {message} />
 			{/each}
