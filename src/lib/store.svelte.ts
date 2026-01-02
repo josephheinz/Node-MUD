@@ -8,8 +8,9 @@ export type Profile = {
 	joined_at: Date;
 	last_logged_in: Date;
 	profile_picture: string;
+	banner_picture: string;
 	display_name: string;
-	accolades: string[];
+	badges: string[];
 };
 
 export const gameState = $state<{
@@ -38,6 +39,6 @@ export const currentChatMessage: { value: string } = $state({ value: '' });
 
 export const sidebar = $state({ open: true });
 
-export const tab = $state<{ tab: 'Home' | 'Inventory' | 'Equipment' | "Actions" }>({
+export const tab = $state<{ tab: 'Home' | 'Inventory' | 'Equipment' | 'Actions' }>({
 	tab: 'Home'
 });

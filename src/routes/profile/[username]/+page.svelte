@@ -26,7 +26,7 @@
 <title>{profile?.display_name ?? `@${profile?.username}`}'s Profile</title>
 
 {#if profile && apiSettings}
-	<ProfileHeader {profile} />
+	<ProfileHeader bind:profile />
 	<ProfileBody {data} />
 {:else}
 	<Empty.Root>
