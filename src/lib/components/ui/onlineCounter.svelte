@@ -7,10 +7,7 @@
 
 	let connections: number = $state(gameState.playerCount);
 
-	$inspect(gameState);
-
 	$effect(() => {
-		console.log(gameState.playerCount);
 		connections = gameState.playerCount;
 	});
 </script>

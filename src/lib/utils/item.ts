@@ -127,7 +127,6 @@ export function encodeDBItem(item: Item): DBItem {
 	const encodedMods: string[] = item.modifiers.map((mod) => mod.hash());
 
 	const diffModifiers: string[] = _.diff(encodedMods, baseModHashes);
-	console.log(baseModHashes, encodedMods, diffModifiers);
 
 	return {
 		id: item.id,

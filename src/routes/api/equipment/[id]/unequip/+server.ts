@@ -26,8 +26,6 @@ export async function POST({ request, params, cookies, locals }) {
 	equipment_data[slot] = null;
 	inventory_data.push(item);
 
-	console.log(equipment_data, inventory_data);
-
 	const { error: updateError } = await supabase
 		.from('inventories')
 		.update({

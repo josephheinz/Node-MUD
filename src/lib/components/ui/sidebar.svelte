@@ -14,10 +14,11 @@
 	import OnlineCounter from './onlineCounter.svelte';
 	import QueueDisplay from './action/queueDisplay.svelte';
 
-	const items: Array<{ tab: typeof tab.tab; icon: IconDefinition }> = [
+	const items: Array<{ tab: typeof tab.tab; icon: IconDefinition; href?: string }> = [
 		{
 			tab: 'Home',
-			icon: faHome
+			icon: faHome,
+			href: '/'
 		},
 		{
 			tab: 'Inventory',
@@ -52,7 +53,18 @@
 						<Sidebar.MenuItem>
 							<Sidebar.MenuButton>
 								{#snippet child({ props })}
-									<button onclick={() => (tab.tab = item.tab)} {...props}>
+									<button
+										onclick={() => {
+											if (item.href) {
+												if (window.location.href.split(window.location.host)[1] !== item.href)
+													window.location.href = item.href;
+												else tab.tab = item.tab;
+											} else {
+												tab.tab = item.tab;
+											}
+										}}
+										{...props}
+									>
 										<Fa icon={item.icon} />
 										<span>{item.tab}</span>
 									</button>

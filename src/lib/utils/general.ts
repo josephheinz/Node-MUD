@@ -1,3 +1,10 @@
+import {
+	EmptyEquipment,
+	Equipment,
+	Inventory,
+	type DBEquipment,
+	type DBItem
+} from '$lib/types/item';
 import numeral from 'numeral';
 
 export type Require<T, K extends keyof T> = T & Required<Pick<T, K>>;
@@ -83,4 +90,56 @@ export function capitalizeAfterSpaces(str: String): String {
 
 export function capitalizeFirstLetter(str: string): string {
 	return String(str).charAt(0).toUpperCase() + String(str).slice(1);
+}
+
+export async function getInventory(id: string): Promise<Inventory> {
+	let inventory: DBItem[] = [];
+
+	const loadInventory = await fetch(`/api/inventory/${id}`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	})
+		.then(async (response) => {
+			let responseJson = await response.json();
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+			return responseJson;
+		})
+		.then(async (data) => {
+			inventory = data.inventory;
+		})
+		.catch((error) => {
+			console.error(error);
+		});
+	return Inventory.load(inventory);
+}
+
+export async function getEquipment(id: string): Promise<Equipment> {
+	// Load equipment
+	let equipment: DBEquipment = EmptyEquipment;
+
+	const loadEquipment = await fetch(`/api/equipment/${id}`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	})
+		.then(async (response) => {
+			let responseJson = await response.json();
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+			return responseJson;
+		})
+		.then(async (data) => {
+			equipment = data.equipment;
+		})
+		.catch((error) => {
+			console.error(error);
+		});
+
+	return Equipment.load(equipment);
 }

@@ -91,7 +91,7 @@ export function extractItemsFromMessage(message: string): Set<messagePart> | str
 			id: match[1],
 			modifiers
 		});
-		console.log(item);
+
 		result.add({
 			type: 'item',
 			content: item

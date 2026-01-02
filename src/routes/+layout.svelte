@@ -37,19 +37,11 @@
 <!-- <DarkModeButton />
  --><WebsocketManager user={user as User} />
 
-<Sidebar.Provider class="size-full bg-background text-foreground" bind:open={sidebar.open}>
+<Sidebar.Provider class="relative size-full bg-background text-foreground" bind:open={sidebar.open}>
 	<AppSidebar />
-	<Sidebar.Trigger />
 
-	<Resizable.PaneGroup direction="horizontal" class="size-full" autoSaveId="mainContentPaneGroup">
-		<Resizable.Pane defaultSize={75} minSize={60}>
-			{@render children?.()}
-		</Resizable.Pane>
-
-		<Resizable.Handle />
-
-		<Resizable.Pane defaultSize={25} minSize={20} maxSize={40}>
-			<Chat />
-		</Resizable.Pane>
-	</Resizable.PaneGroup>
+	<div class="relative w-full">
+		<Sidebar.Trigger class="absolute z-10 backdrop-invert bg-transparent" />
+		{@render children?.()}
+	</div>
 </Sidebar.Provider>

@@ -88,12 +88,8 @@ export default defineConfig(({ mode }) => {
 			webSocketServer({
 				path: '/ws',
 				verifyClient: async ({ req }) => {
-					console.log('Verify attempt, cookies:', req.headers.cookie);
-
 					const cookies = parseCookies(req.headers.cookie);
 					const sessionString = cookies['supabase.session'];
-
-					console.log('Session string:', sessionString ? 'found' : 'not found');
 
 					if (!sessionString) return false;
 
@@ -143,7 +139,7 @@ export default defineConfig(({ mode }) => {
 								break;
 						}
 
-						console.log('Received', message, 'from', connection.id);
+						//console.log('Received', message, 'from', connection.id);
 					},
 					onDisconnect: (connection) => {
 						wsManager.removeConnection(connection.id);

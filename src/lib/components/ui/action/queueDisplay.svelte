@@ -16,7 +16,7 @@
 		<span>Upcoming actions: </span>
 		<span
 			>[action name] x1000
-			<Button variant="outline" size="icon-xs">&bullet;&bullet;&bullet;</Button></span
+			<Button variant="outline" size="icon-xs" class="px-2.5">&bullet;&bullet;&bullet;</Button></span
 		>
 	</Card.Footer>
 </Card.Root>

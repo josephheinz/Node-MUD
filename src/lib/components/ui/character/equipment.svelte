@@ -4,9 +4,12 @@
 	import * as Card from '../card';
 	import ItemRenderer from '../itemRenderer.svelte';
 
-	const { display = false }: { display?: boolean } = $props();
+	const {
+		equipment: initEquipment,
+		display = false
+	}: { display?: boolean; equipment?: Equipment } = $props();
 
-	let equipment: Equipment = $state(gameState.equipment);
+	let equipment: Equipment = $state(initEquipment ?? gameState.equipment);
 
 	const slotGridSpots: Record<EquipmentSlot, string> = {
 		Head: 'col-start-3 row-start-1',
@@ -18,15 +21,11 @@
 		Ring: 'col-start-2 row-start-1',
 		Hands: 'col-start-2 row-start-3'
 	};
-
-	$effect(() => {
-		equipment = gameState.equipment;
-	});
 </script>
 
 <Card.Root class="select-none">
 	<Card.Header>
-		<Card.Title>Your Equipment</Card.Title>
+		<Card.Title>{!display ? 'Your ' : ''}Equipment</Card.Title>
 	</Card.Header>
 	<Card.Content>
 		<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">

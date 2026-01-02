@@ -6,25 +6,24 @@
 	import type { Item } from '$lib/types/item';
 	import ItemRenderer from '../itemRenderer.svelte';
 
-	let inventory: Inventory = $state(gameState.inventory);
-	let pageNumber: number = $state(1);
-	let totalPages: number = $derived(inventory.paginate().length);
-	let page: Item[] = $derived.by(() => inventory.paginate()[pageNumber - 1]);
+	const {
+		inventory: initInventory,
+		display = false
+	}: { display?: boolean; inventory?: Inventory } = $props();
 
-	$effect(() => {
-		inventory = gameState.inventory;
-		console.log(inventory, pageNumber, totalPages, page);
-	});
+	let inventory: Inventory = $state(initInventory ?? gameState.inventory);
+	let pageNumber: number = $state(1);
+	let page: Item[] = $derived.by(() => inventory.paginate()[pageNumber - 1]);
 </script>
 
 <Card.Root class="aspect-square p-2 select-none">
 	<Card.Header>
-		<Card.Title>Your Inventory</Card.Title>
+		<Card.Title>{!display ? 'Your ' : ''}Inventory</Card.Title>
 	</Card.Header>
 	<Card.Content>
 		<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
 			{#each page as item (item.uid)}
-				<ItemRenderer {item} equipFlags={{ equippable: true }} />
+				<ItemRenderer {item} equipFlags={{ equippable: !display }} />
 			{/each}
 		</div>
 	</Card.Content>

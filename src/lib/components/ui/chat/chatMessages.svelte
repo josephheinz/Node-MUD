@@ -55,7 +55,7 @@
 	<div
 		bind:this={chatContainer}
 		onscroll={handleScroll}
-		class="max-h-full flex-1 grow overflow-y-auto rounded border px-4"
+		class="max-h-full flex-1 grow overflow-y-auto rounded border px-4 pt-4"
 	>
 		{#if messages.length === 0}
 			<Empty.Root>
