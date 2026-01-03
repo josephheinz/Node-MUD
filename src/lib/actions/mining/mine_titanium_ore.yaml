@@ -6,9 +6,6 @@
   req:
     skill: "Mining"
     level: 10
-  inputs:
-    ids:
-    amounts:
   outputs:
     - id: titanium_ore
       min: 3

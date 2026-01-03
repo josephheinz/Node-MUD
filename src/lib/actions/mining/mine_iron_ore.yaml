@@ -6,9 +6,6 @@
   req:
     skill: "Mining"
     level: 1
-  inputs:
-    ids:
-    amounts:
   outputs:
     - id: iron_ore
       min: 3

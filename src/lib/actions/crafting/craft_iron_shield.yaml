@@ -7,10 +7,8 @@
     skill: 'Crafting'
     level: 5
   inputs:
-    ids:
-      - iron_bar
-    amounts:
-      - 10
+    - id: iron_bar
+      amount: 10
   outputs:
     - id: kite_shield
       min: 1

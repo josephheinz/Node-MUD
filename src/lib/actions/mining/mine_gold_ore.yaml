@@ -6,9 +6,6 @@
   req:
     skill: "Mining"
     level: 5
-  inputs:
-    ids:
-    amounts:
   outputs:
     - id: gold_ore
       min: 3

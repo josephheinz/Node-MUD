@@ -1,16 +1,14 @@
 - id: craft_titanium_sword
   name: Craft Titanium Sword
   icon:
-    image: "/images/actions/swordMold.svg"
-    color: "#bdbdbd"
+    image: '/images/actions/swordMold.svg'
+    color: '#bdbdbd'
   req:
     skill: 'Crafting'
     level: 10
   inputs:
-    ids:
-      - titanium_bar
-    amounts:
-      - 5
+    - id: titanium_bar
+      amount: 5
   outputs:
     - id: titanium_sword
       min: 1

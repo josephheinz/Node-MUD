@@ -1,16 +1,14 @@
 - id: smelt_iron_bar
   name: Smelt Iron Bar
   icon:
-    image: "/images/actions/foundryBucket.svg"
-    color: "#bdbdbd"
+    image: '/images/actions/foundryBucket.svg'
+    color: '#bdbdbd'
   req:
     skill: 'Crafting'
     level: 1
   inputs:
-    ids:
-      - iron_ore
-    amounts:
-      - 2
+    - id: iron_ore
+      amount: 2
   outputs:
     - id: iron_bar
       min: 1

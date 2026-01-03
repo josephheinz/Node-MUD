@@ -1,18 +1,16 @@
 - id: smelt_hardened_titanium_bar
   name: Smelt Hardened Titanium Bar
   icon:
-    image: "/images/actions/foundryBucket.svg"
-    color: "#bdbdbd"
+    image: '/images/actions/foundryBucket.svg'
+    color: '#bdbdbd'
   req:
     skill: 'Crafting'
     level: 15
   inputs:
-    ids:
-      - titanium_bar
-      - iron_bar
-    amounts:
-      - 1
-      - 2
+    - id: titanium_bar
+      amount: 1
+    - id: iron_bar
+      amount: 2
   outputs:
     - id: hardened_titanium_bar
       min: 1

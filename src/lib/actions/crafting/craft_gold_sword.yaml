@@ -7,10 +7,8 @@
     skill: 'Crafting'
     level: 5
   inputs:
-    ids:
-      - gold_bar
-    amounts:
-      - 5
+    - id: gold_bar
+      amount: 5
   outputs:
     - id: gold_sword
       min: 1
