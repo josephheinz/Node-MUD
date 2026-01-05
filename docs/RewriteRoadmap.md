@@ -8,7 +8,8 @@
 - [x] Equipping and unequipping items
 - [x] Websockets setup
 - [x] Chat, including ItemHover
-- [ ] Action loading and display
+- [x] Action loading 
+- [ ] Action display
 - [ ] Action queueing
 - [ ] Action inventory updating
 - [ ] Player skills loading
