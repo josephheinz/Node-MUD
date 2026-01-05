@@ -1,5 +1,5 @@
 - id: craft_iron_sword
-  name: Craft Iron Sword
+  name: Iron Sword
   icon:
     image: '/images/actions/swordMold.svg'
     color: '#bdbdbd'

@@ -1,5 +1,5 @@
 - id: craft_iron_shield
-  name: Craft Iron Shield
+  name: Iron Shield
   icon:
     image: '/images/items/armor/craftable/kiteShield.svg'
     color: '#bdbdbd'

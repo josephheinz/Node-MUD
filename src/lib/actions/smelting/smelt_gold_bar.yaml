@@ -1,5 +1,5 @@
 - id: smelt_gold_bar
-  name: Smelt Gold Bar
+  name: Gold Bar
   icon:
     image: '/images/actions/foundryBucket.svg'
     color: '#bdbdbd'

@@ -1,5 +1,5 @@
 - id: mine_titanium_ore
-  name: Mine Titanium Ore
+  name: Titanium Ore
   icon:
     image: "/images/actions/miner.svg"
     color: "#bdbdbd"

@@ -56,8 +56,19 @@ export type ActionCategory = keyof typeof actionCategories;
 export const actionCategories: Record<string, Array<string>> = {
 	Mining: ['mine_iron_ore', 'mine_gold_ore', 'mine_titanium_ore'],
 	Crafting: ['craft_iron_sword', 'craft_gold_sword', 'craft_titanium_sword', 'craft_iron_shield'],
-	Smelt: ['smelt_iron_bar', 'smelt_gold_bar', 'smelt_titanium_bar', 'smelt_hardened_titanium_bar']
+	Smelting: ['smelt_iron_bar', 'smelt_gold_bar', 'smelt_titanium_bar', 'smelt_hardened_titanium_bar']
 };
+
+export function getAction(id: string): Action | null {
+	if (actionRegistry[id]) return actionRegistry[id];
+	return null;
+}
+
+export function rollChance(item: ChanceItem): boolean {
+	// No chance means always succeeds
+	if (!item.chance || item.chance <= 1) return true;
+	return Math.floor(Math.random() * item.chance) === 0;
+}
 
 export const actionRegistry: Record<string, Action> = {};
 
@@ -74,4 +85,6 @@ export function initializeActionRegistry() {
 		let _action = (actions[action] as any).default ?? actions[action];
 		actionRegistry[id] = parseYamlToAction(_action);
 	}
+
+	console.log(actionRegistry)
 }

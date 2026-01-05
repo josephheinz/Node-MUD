@@ -7,16 +7,15 @@
 	import type { User } from '@supabase/supabase-js';
 	import { gameState, type Profile, sidebar } from '$lib/store.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar';
-	import * as Resizable from '$lib/components/ui/resizable';
 	import AppSidebar from '$lib/components/ui/sidebar.svelte';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
-	import DarkModeButton from '$lib/components/ui/darkModeButton.svelte';
 	import WebsocketManager from '$lib/components/auth/websocketManager.svelte';
-	import Chat from '$lib/components/ui/chat/chat.svelte';
+	import { initializeActionRegistry } from '$lib/types/action';
 
 	let { data, children }: { data: PageData; children: any } = $props();
 
 	initializeItemRegistry();
+	initializeActionRegistry();
 	let inv: Inventory = Inventory.load(data.inventory);
 	let eq: Equipment = Equipment.load(data.equipment);
 	let user: User | null = data.user;
@@ -41,7 +40,7 @@
 	<AppSidebar />
 
 	<div class="relative w-full">
-		<Sidebar.Trigger class="absolute z-10 backdrop-invert bg-transparent" />
+		<Sidebar.Trigger class="absolute z-10 " />
 		{@render children?.()}
 	</div>
 </Sidebar.Provider>

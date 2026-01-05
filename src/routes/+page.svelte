@@ -4,7 +4,8 @@
 	import HomeScreen from '$lib/components/ui/homeScreen.svelte';
 	import Equipment from '$lib/components/ui/character/equipment.svelte';
 	import * as Resizable from '$lib/components/ui/resizable';
-	import Chat from '$lib/components/chat/chat.svelte';
+	import Chat from '$lib/components/ui/chat/chat.svelte';
+	import Actions from '$lib/components/ui/action/actions.svelte';
 
 	let currentTab = $derived(tab.tab);
 
@@ -15,13 +16,15 @@
 
 <Resizable.PaneGroup direction="horizontal" class="size-full" autoSaveId="mainContentPaneGroup">
 	<Resizable.Pane defaultSize={75} minSize={60}>
-		<div class="inline-flex">
+		<div class="flex h-full items-start justify-start p-4">
 			{#if currentTab === 'Home'}
 				<HomeScreen />
 			{:else if currentTab === 'Inventory'}
 				<Inventory />
 			{:else if currentTab === 'Equipment'}
 				<Equipment />
+			{:else if currentTab === 'Actions'}
+				<Actions />
 			{/if}
 		</div>
 	</Resizable.Pane>

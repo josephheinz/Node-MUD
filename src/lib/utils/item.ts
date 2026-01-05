@@ -234,3 +234,8 @@ export function compareDbItems(a: DBItem, b: DBItem): boolean {
 
 	return isEqual(sa, sb);
 }
+
+export function getItem(id: string): Item | null {
+	if (itemRegistry[id]) return itemRegistry[id];
+	return null;
+}
