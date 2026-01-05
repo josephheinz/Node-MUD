@@ -2,16 +2,21 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { type Action, type ActionInput } from '$lib/types/action';
-	import type { Item } from '$lib/types/item';
+	import type { Inventory, Item } from '$lib/types/item';
 	import { formatNumber } from '$lib/utils/general';
 	import { getItem } from '$lib/utils/item';
 	import numeral from 'numeral';
 	import ItemHover from '../chat/itemHover.svelte';
+	import { gameState } from '$lib/store.svelte';
+	import { getInventoryCounts } from '$lib/utils/action';
+	import Label from '../label/label.svelte';
+	import Button from '../button/button.svelte';
 
 	const { action }: { action: Action } = $props();
 
 	let amount: number = $state(1);
 	let timeAmount: number = $derived(action.time * amount);
+	let inventory: Inventory = $derived(gameState.inventory);
 
 	let loadedInputs: { item: Item; amount: number }[] = $derived(
 		(Array.from(action.inputs)
@@ -31,19 +36,27 @@
 			})
 			.filter(Boolean) as { item: Item; min: number; max: number; chance?: number }[]
 	);
+	let inputsPresent = $derived.by(() => getInventoryCounts(inventory, loadedInputs));
+
+	let canAct = $derived.by(() => {
+		return loadedInputs.every((_, i) => inputsPresent[i].present >= inputsPresent[i].required);
+	});
 </script>
 
-<Dialog.Content>
+<Dialog.Content class="w-max min-w-72">
 	<Dialog.Header>
 		<Dialog.Title>{action.name}</Dialog.Title>
 	</Dialog.Header>
-	<div class="flex w-full flex-col gap-2">
+	<div class="flex w-full flex-col gap-4">
 		<div>
 			<h1 class="text-start text-lg font-semibold">Inputs:</h1>
 			<ul>
 				{#each loadedInputs as { item, amount }, index}
+					{@const itemsPresent = inputsPresent[index].present}
 					<li class="flex items-start justify-start gap-2 pl-4">
-						<span>{formatNumber(amount)}</span>
+						<span class={itemsPresent < amount ? 'text-rose-400' : ''}
+							>{formatNumber(itemsPresent)}/{formatNumber(amount)}</span
+						>
 						<ItemHover {item} />
 					</li>
 				{/each}
@@ -75,6 +88,12 @@
 			{Math.floor(timeAmount / 3600)}h {Math.floor((timeAmount % 3600) / 60)}m {timeAmount %
 				60}s</span
 		>
-		<Input type="number" bind:value={amount} step={1} min={1} />
+		<div class="flex gap-2">
+			<Label for="amount" class="text-md font-semibold">Amount:</Label>
+			<Input name="amount" type="number" bind:value={amount} step={1} min={1} />
+		</div>
+		<Button class="cursor-pointer disabled:cursor-not-allowed" disabled={!canAct}
+			>Add to Queue</Button
+		>
 	</div>
 </Dialog.Content>
