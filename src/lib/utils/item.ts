@@ -1,5 +1,5 @@
 import type { ITooltipData } from '$lib/components/tooltip.old';
-import type { EquippableModifier, StackableModifier } from '$lib/modifiers/basicModifiers';
+import { StackableModifier, type EquippableModifier } from '$lib/modifiers/basicModifiers';
 import { instantiateModifier, instantiateModifierFromHash } from '$lib/modifiers/modifiersRegistry';
 import {
 	Equipment,
@@ -238,4 +238,39 @@ export function compareDbItems(a: DBItem, b: DBItem): boolean {
 export function getItem(id: string): Item | null {
 	if (itemRegistry[id]) return itemRegistry[id];
 	return null;
+}
+
+export function tryStackItemInInventory(item: Item, inventory: Item[] | Inventory): Inventory {
+	const contents: Item[] = inventory instanceof Inventory ? inventory.contents : inventory;
+	const stackableModifier: StackableModifier | undefined = item.modifiers.find(m => m.type === "Stackable") as StackableModifier;
+
+	if (!stackableModifier) {
+		contents.push(item);
+		return new Inventory(contents);
+	}
+
+	if (!contents.some(i => i.id === item.id)) {
+		contents.push(item);
+		return new Inventory(contents);
+	}
+
+	contents.forEach((i: Item) => {
+		if (stackableModifier.amount === 0) return;
+		if (item.id != i.id) return;
+
+		const iStackable: StackableModifier | undefined = i.modifiers.find(m => m.type === "Stackable") as StackableModifier;
+		if (!iStackable) return;
+
+		const stackLeft: number = iStackable.stack - iStackable.amount;
+		if (stackLeft === 0) return;
+
+		iStackable.amount = iStackable.stack;
+		if (stackableModifier.amount <= stackLeft) {
+			stackableModifier.amount = 0;
+		} else {
+			stackableModifier.amount -= stackLeft;
+		}
+	});
+
+	return new Inventory(contents);
 }

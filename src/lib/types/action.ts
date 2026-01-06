@@ -64,12 +64,6 @@ export function getAction(id: string): Action | null {
 	return null;
 }
 
-export function rollChance(item: ChanceItem): boolean {
-	// No chance means always succeeds
-	if (!item.chance || item.chance <= 1) return true;
-	return Math.floor(Math.random() * item.chance) === 0;
-}
-
 export const actionRegistry: Record<string, Action> = {};
 
 export function initializeActionRegistry() {
