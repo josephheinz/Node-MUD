@@ -1,0 +1,13 @@
+- id: ancient_sword
+  name: Ancient Sword
+  icon:
+    ascii: '𐕣'
+    image: '/images/items/weapons/swords/ancientSword.png'
+  rarity: Legendary
+  stats:
+    damage: 100
+  modifiers:
+    - type: Equippable
+      slot: mainhand
+    - type: Reforgeable
+      group: Sword

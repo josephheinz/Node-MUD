@@ -1,0 +1,13 @@
+- id: runic_blade
+  name: Runic Blade
+  icon:
+    ascii: '𐕣'
+    image: '/images/items/weapons/swords/runicBlade.png'
+  rarity: Rare
+  stats:
+    damage: 25
+  modifiers:
+    - type: Equippable
+      slot: mainhand
+    - type: Reforgeable
+      group: Sword
