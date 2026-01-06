@@ -6,7 +6,7 @@ import { ReforgeableModifier, ReforgeModifier } from './reforges';
 import { CaduceusModifier } from './special';
 import { StarsModifier } from './stars';
 
-export const modifierRegistry: Record<string, IItemModifierClass> = {
+export const modifierRegistry: Record<string, IItemModifierClass> = {/* 
 	Stackable: StackableModifier,
 	Equippable: EquippableModifier,
 	Reforgeable: ReforgeableModifier,
@@ -15,7 +15,20 @@ export const modifierRegistry: Record<string, IItemModifierClass> = {
 	Caduceus: CaduceusModifier,
 	Enhancer: EnhancerModifier,
 	Enchantment: EnchantmentModifier
-};
+ */};
+
+export function initializeModifierRegistry() {
+	if (Object.keys(modifierRegistry).length > 0) return;
+
+	modifierRegistry.Stackable = StackableModifier;
+	modifierRegistry.Equippable = EquippableModifier;
+	modifierRegistry.Reforgeable = ReforgeableModifier;
+	modifierRegistry.Reforge = ReforgeModifier;
+	modifierRegistry.Stars = StarsModifier;
+	modifierRegistry.Caduceus = CaduceusModifier;
+	modifierRegistry.Enhancer = EnhancerModifier;
+	modifierRegistry.Enchantment = EnchantmentModifier;
+}
 
 export function instantiateModifier(raw: IRawModifierSpec): IItemModifier {
 	const ModClass = modifierRegistry[raw.type];

@@ -10,7 +10,7 @@
 	import AppSidebar from '$lib/components/ui/sidebar.svelte';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	import WebsocketManager from '$lib/components/auth/websocketManager.svelte';
-	import { initializeActionRegistry } from '$lib/types/action';
+	import { initializeActionRegistry, type DBQueueAction } from '$lib/types/action';
 
 	let { data, children }: { data: PageData; children: any } = $props();
 
@@ -20,11 +20,18 @@
 	let eq: Equipment = Equipment.load(data.equipment);
 	let user: User | null = data.user;
 	let profile: Profile | null = data.profile;
+	let queue: DBQueueAction[] | null = data.queue;
+	let started: Date | null = data.started;
 
 	gameState.equipment = eq;
 	gameState.user = user;
 	gameState.profile = profile;
 	gameState.inventory = inv;
+
+	gameState.queue.started = started;
+	gameState.queue.queue = queue;
+
+	console.log(gameState.queue);
 </script>
 
 <svelte:head>

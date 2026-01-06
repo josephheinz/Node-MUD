@@ -1,4 +1,5 @@
 import type { Profile } from '$lib/store.svelte';
+import type { DBQueueAction } from '$lib/types/action';
 import {
 	EmptyEquipment,
 	Equipment,
@@ -14,9 +15,9 @@ export async function load({ cookies, fetch, locals }): Promise<{
 	user: User | null;
 	inventory: DBItem[];
 	equipment: DBEquipment;
-	/* stats: typeof Stats;
 	queue: DBQueueAction[];
 	started: Date;
+	/* stats: typeof Stats;
 	skills: typeof PlayerSkills; */
 }> {
 	const supabase = locals.supabase;
@@ -28,10 +29,11 @@ export async function load({ cookies, fetch, locals }): Promise<{
 			profile: null,
 			user: null,
 			inventory: [],
-			equipment: new Equipment({}).serialize()
+			equipment: new Equipment({}).serialize(),
+			queue: [],
+			started: new Date(0)
 			/*
 			stats: Stats,
-			queue: [],
 			skills: PlayerSkills
 			*/
 		};
@@ -53,10 +55,11 @@ export async function load({ cookies, fetch, locals }): Promise<{
 			profile: null,
 			user: null,
 			inventory: [],
-			equipment: new Equipment({}).serialize()
+			equipment: new Equipment({}).serialize(),
+			queue: [],
+			started: new Date(0)
 			/*
 			stats: Stats,
-			queue: [],
 			skills: PlayerSkills
 			*/
 		};
@@ -86,11 +89,11 @@ export async function load({ cookies, fetch, locals }): Promise<{
 	}
 
 	// Load all user data in parallel
-	const [/* queueData, */ inventoryData, equipmentData /*statsData, skillsData */] =
+	const [inventoryData, equipmentData, queueData, /*statsData, skillsData */] =
 		await Promise.all([
-			//fetchUserData<{ queue: DBQueueAction[]; started: Date }>('action', userId),
 			fetchUserData<{ inventory: DBItem[] }>('inventory', userId, fetch),
-			fetchUserData<{ equipment: DBEquipment }>('equipment', userId, fetch)
+			fetchUserData<{ equipment: DBEquipment }>('equipment', userId, fetch),
+			fetchUserData<{ queue: DBQueueAction[]; started: Date }>('action', userId, fetch),
 			//fetchUserData<{ stats: typeof Stats }>('stats', userId),
 			//fetchUserData<{ skills: typeof PlayerSkills }>('skills', userId)
 		]);
@@ -99,10 +102,10 @@ export async function load({ cookies, fetch, locals }): Promise<{
 		profile,
 		user,
 		inventory: inventoryData?.inventory ?? [],
-		equipment: equipmentData?.equipment ?? EmptyEquipment
+		equipment: equipmentData?.equipment ?? EmptyEquipment,
+		queue: queueData?.queue ?? [],
+		started: queueData?.started ?? new Date(Date.now()),
 		//stats: statsData?.stats ?? Stats,
-		//queue: queueData?.queue ?? [],
-		//started: queueData?.started ?? new Date(Date.now()),
 		//skills: skillsData?.skills ?? PlayerSkills
 	};
 }

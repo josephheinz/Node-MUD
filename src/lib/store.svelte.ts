@@ -1,6 +1,7 @@
 import type { User } from '@supabase/supabase-js';
 import { Inventory, Equipment, type Item } from './types/item';
 import type { ChatMessage, messagePart } from './utils/chat';
+import type { DBQueueAction } from './types/action';
 
 export type Profile = {
 	id: string;
@@ -19,12 +20,17 @@ export const gameState = $state<{
 	inventory: Inventory;
 	equipment: Equipment;
 	playerCount: number;
+	queue: { started: Date; queue: DBQueueAction[] }
 }>({
 	user: null,
 	profile: null,
 	inventory: new Inventory([]),
 	equipment: new Equipment({}),
-	playerCount: 0
+	playerCount: 0,
+	queue: {
+		started: new Date(0),
+		queue: []
+	}
 });
 
 export const chatMessages: {

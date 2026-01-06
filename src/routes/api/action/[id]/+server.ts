@@ -24,6 +24,7 @@ export async function GET({ params, locals }) {
 	console.log(data);
 
 	const processedQueue: ProcessedQueue = processQueue(data.queue, data.started_at);
+	console.log(processedQueue)
 	const { data: invData, error: invError } = await supabase
 		.from("inventories")
 		.select("inventory_data")
