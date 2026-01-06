@@ -304,9 +304,7 @@ export const itemRegistry: Record<string, Item> = {};
 
 export function initializeItemRegistry() {
 	if (Object.keys(itemRegistry).length > 0) return; // Already initialized
-	initializeModifierRegistry(); // Initialize modifiers first!
-	console.log("initializing items");
-	console.log(JSON.stringify(modifierRegistry))
+	initializeModifierRegistry(); // Initialize modifiers first
 
 	const items = import.meta.glob('$lib/items/**/*', { eager: true, as: 'raw' });
 

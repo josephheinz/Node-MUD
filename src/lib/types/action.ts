@@ -79,6 +79,4 @@ export function initializeActionRegistry() {
 		let _action = (actions[action] as any).default ?? actions[action];
 		actionRegistry[id] = parseYamlToAction(_action);
 	}
-
-	console.log(actionRegistry)
 }

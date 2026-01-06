@@ -11,24 +11,18 @@ export async function GET({ params, locals }) {
 
 	if (!user || user?.id !== id) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-	const { data, error } = await supabase
-		.from('actions')
-		.select('*')
-		.eq('player_id', id)
-		.single();
+	const { data, error } = await supabase.from('actions').select('*').eq('player_id', id).single();
 
 	if (error) throw new Error(error.message);
 
 	if (!data) return Response.json({ queue: undefined, started: undefined }, { status: 404 });
 
-	console.log(data);
-
 	const processedQueue: ProcessedQueue = processQueue(data.queue, data.started_at);
-	console.log(processedQueue)
+
 	const { data: invData, error: invError } = await supabase
-		.from("inventories")
-		.select("inventory_data")
-		.eq("player_id", id)
+		.from('inventories')
+		.select('inventory_data')
+		.eq('player_id', id)
 		.single();
 	if (invError) throw new Error(invError.message);
 
@@ -77,7 +71,7 @@ export async function GET({ params, locals }) {
 		{
 			queue: updatedQueue,
 			started: updateQueueData.started_at,
-			inventory: updatedInv
+			inventory: updatedDBInv
 		},
 		{ status: 200 }
 	);

@@ -5,6 +5,7 @@ import {
 	Equipment,
 	initializeItemRegistry,
 	type DBEquipment,
+	type DBInventory,
 	type DBItem
 } from '$lib/types/item';
 import { fetchUserData } from '$lib/utils/general.js';
@@ -89,22 +90,25 @@ export async function load({ cookies, fetch, locals }): Promise<{
 	}
 
 	// Load all user data in parallel
-	const [inventoryData, equipmentData, queueData, /*statsData, skillsData */] =
-		await Promise.all([
-			fetchUserData<{ inventory: DBItem[] }>('inventory', userId, fetch),
-			fetchUserData<{ equipment: DBEquipment }>('equipment', userId, fetch),
-			fetchUserData<{ queue: DBQueueAction[]; started: Date }>('action', userId, fetch),
-			//fetchUserData<{ stats: typeof Stats }>('stats', userId),
-			//fetchUserData<{ skills: typeof PlayerSkills }>('skills', userId)
-		]);
+	const [queueData, inventoryData, equipmentData /*statsData, skillsData */] = await Promise.all([
+		fetchUserData<{ queue: DBQueueAction[]; started: Date; inventory: DBInventory }>(
+			'action',
+			userId,
+			fetch
+		),
+		fetchUserData<{ inventory: DBItem[] }>('inventory', userId, fetch),
+		fetchUserData<{ equipment: DBEquipment }>('equipment', userId, fetch)
+		//fetchUserData<{ stats: typeof Stats }>('stats', userId),
+		//fetchUserData<{ skills: typeof PlayerSkills }>('skills', userId)
+	]);
 
 	return {
 		profile,
 		user,
-		inventory: inventoryData?.inventory ?? [],
+		inventory: queueData?.inventory ?? inventoryData?.inventory ?? [],
 		equipment: equipmentData?.equipment ?? EmptyEquipment,
 		queue: queueData?.queue ?? [],
-		started: queueData?.started ?? new Date(Date.now()),
+		started: queueData?.started ?? new Date(Date.now())
 		//stats: statsData?.stats ?? Stats,
 		//skills: skillsData?.skills ?? PlayerSkills
 	};

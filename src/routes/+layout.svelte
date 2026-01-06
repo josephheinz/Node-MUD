@@ -30,8 +30,6 @@
 
 	gameState.queue.started = started;
 	gameState.queue.queue = queue;
-
-	console.log(gameState.queue);
 </script>
 
 <svelte:head>

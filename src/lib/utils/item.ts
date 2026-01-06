@@ -242,14 +242,16 @@ export function getItem(id: string): Item | null {
 
 export function tryStackItemInInventory(item: Item, inventory: Item[] | Inventory): Inventory {
 	const contents: Item[] = inventory instanceof Inventory ? inventory.contents : inventory;
-	const stackableModifier: StackableModifier | undefined = item.modifiers.find(m => m.type === "Stackable") as StackableModifier;
+	const stackableModifier: StackableModifier | undefined = item.modifiers.find(
+		(m) => m.type === 'Stackable'
+	) as StackableModifier;
 
 	if (!stackableModifier) {
 		contents.push(item);
 		return new Inventory(contents);
 	}
 
-	if (!contents.some(i => i.id === item.id)) {
+	if (!contents.some((i) => i.id === item.id)) {
 		contents.push(item);
 		return new Inventory(contents);
 	}
@@ -258,19 +260,27 @@ export function tryStackItemInInventory(item: Item, inventory: Item[] | Inventor
 		if (stackableModifier.amount === 0) return;
 		if (item.id != i.id) return;
 
-		const iStackable: StackableModifier | undefined = i.modifiers.find(m => m.type === "Stackable") as StackableModifier;
+		const iStackable: StackableModifier | undefined = i.modifiers.find(
+			(m) => m.type === 'Stackable'
+		) as StackableModifier;
 		if (!iStackable) return;
 
 		const stackLeft: number = iStackable.stack - iStackable.amount;
-		if (stackLeft === 0) return;
+		if (stackLeft === 0) {
+			return;
+		}
 
-		iStackable.amount = iStackable.stack;
+		iStackable.amount = Math.min(iStackable.stack, iStackable.amount + stackableModifier.amount);
 		if (stackableModifier.amount <= stackLeft) {
+			console.log('Nothing left to stack');
 			stackableModifier.amount = 0;
 		} else {
+			console.log('more to stack');
 			stackableModifier.amount -= stackLeft;
 		}
 	});
+
+	if (stackableModifier.amount > 0) contents.push(item);
 
 	return new Inventory(contents);
 }
