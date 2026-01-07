@@ -2,13 +2,13 @@
 	import { gameState } from '$lib/store.svelte';
 	import { getAction, type Action, type DBQueueAction } from '$lib/types/action';
 	import * as Card from '../card';
-	import Progress from '../progress/progress.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import QueueDialog from './queueDialog.svelte';
 	import * as Empty from '$lib/components/ui/empty';
-	import { faEyeDropperEmpty, faLocust } from '@fortawesome/free-solid-svg-icons';
+	import {  faLocust } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { formatNumber } from '$lib/utils/general';
+	import QueueProgressBar from './queueProgressBar.svelte';
 
 	let queue: DBQueueAction[] = $derived(gameState.queue.queue);
 	let started: Date = $derived(gameState.queue.started);
@@ -45,7 +45,7 @@
 	{@const nextAction : Action | undefined = loadedQueue.entries().next().value?.[1]}
 	{@const nextIndex : number | undefined = loadedQueue.entries().next().value?.[0]}
 	<Card.Content class="flex flex-col items-start justify-start gap-2">
-		<Progress value={Math.floor(Math.random() * 100)} />
+		<QueueProgressBar {queue} {started} {loadedQueue} />
 		<span class="text-sm text-card-foreground"
 			>Current action: {formatNumber(queue[currentIndex].amount)} {currentAction.name}</span
 		>
