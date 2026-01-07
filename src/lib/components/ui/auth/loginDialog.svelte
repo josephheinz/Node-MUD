@@ -6,15 +6,17 @@
 	import Button from '../button/button.svelte';
 	import Label from '../label/label.svelte';
 	import Input from '../input/input.svelte';
+	import { signup, login } from '$lib/remote/auth.remote';
 
 	let tab = $state<'login' | 'signup'>('login');
 
-	let emailVal: string = $state('');
-	let passVal: string = $state('');
 	let passRepVal: string = $state('');
 	let errorText: string = $state('');
 	let successText: string = $state('');
+	let action = $derived(tab === 'login' ? login : signup);
+	$inspect(action);
 
+	/* 
 	async function login() {
 		let loginData = {
 			email: emailVal,
@@ -54,53 +56,32 @@
 			email: emailVal,
 			password: passVal
 		};
+	} */
 
-		fetch('/api/auth/signup', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(loginData)
-		})
-			.then(async (response) => {
-				let responseJson = await response.json();
-				if (!response.ok) {
-					errorText = responseJson.msg;
-					throw new Error(JSON.stringify(response));
-				}
-				return responseJson;
-			})
-			.then((data) => {
-				successText = 'Successfully signed up! A confirmation email has been sent to your inbox';
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-	}
-
-	function handleSubmit() {
+	/* function handleSubmit() {
 		if (tab === 'login') login();
 		else signup();
-	}
+	} */
 </script>
 
 <Dialog.Root>
-	<form onsubmit={handleSubmit}></form>
 	<Dialog.Trigger class={buttonVariants({ variant: 'outline' })}
-		><Fa icon={faArrowRightToBracket} /> Login</Dialog.Trigger
+		><Fa icon={faArrowRightToBracket} />Login</Dialog.Trigger
 	>
 	<Dialog.Content>
-		{#if tab === 'login'}
-			{@render loginContent()}
-		{:else}
-			{@render signupContent()}
-		{/if}
-		{#if errorText.trim() !== ''}
-			<span class="text-rose-500">{errorText}</span>
-		{/if}
-		{#if successText.trim() !== ''}
-			<span class="text-blue-500">{successText}</span>
-		{/if}
+		<form {...action}>
+			{#if tab === 'login'}
+				{@render loginContent()}
+			{:else}
+				{@render signupContent()}
+			{/if}
+			{#if errorText.trim() !== ''}
+				<span class="text-rose-500">{errorText}</span>
+			{/if}
+			{#if successText.trim() !== ''}
+				<span class="text-blue-500">{successText}</span>
+			{/if}
+		</form>
 	</Dialog.Content>
 </Dialog.Root>
 
@@ -124,10 +105,8 @@
 			<Label for="passwordrep">Password (Repeat)</Label>
 			<Input
 				id="passwordrep"
-				name="passwordrep"
-				type="password"
 				placeholder="Securepass1!"
-				bind:value={passRepVal}
+				{...signup.fields.passwordRepeat.as('password')}
 			/>
 		</div>
 	</div>
@@ -140,10 +119,8 @@
 		<Input
 			id="email"
 			placeholder="example@example.com"
-			name="email"
-			type="email"
 			required={true}
-			bind:value={emailVal}
+			{...tab === 'login' ? login.fields.email.as('email') : signup.fields.email.as('email')}
 		/>
 	</div>
 	<div class="grid gap-3">
@@ -151,10 +128,10 @@
 		<Input
 			id="password"
 			placeholder="Securepass1!"
-			name="password"
-			type="password"
 			required={true}
-			bind:value={passVal}
+			{...tab === 'login'
+				? login.fields.password.as('password')
+				: signup.fields.password.as('password')}
 		/>
 	</div>
 {/snippet}
@@ -170,6 +147,6 @@
 			>
 		</span>
 		<Dialog.Close class={buttonVariants({ variant: 'outline' })}>Cancel</Dialog.Close>
-		<Button onclick={handleSubmit}>{_tab === 'login' ? 'Login' : 'Sign up'}</Button>
+		<Button type="submit">{_tab === 'login' ? 'Login' : 'Sign up'}</Button>
 	</Dialog.Footer>
 {/snippet}

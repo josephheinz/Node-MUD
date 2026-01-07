@@ -14,6 +14,11 @@
 	let inventory: Inventory = $state(initInventory ?? gameState.inventory);
 	let pageNumber: number = $state(1);
 	let page: Item[] = $derived.by(() => inventory.paginate()[pageNumber - 1]);
+
+	$effect(() => {
+		if (initInventory) return;
+		inventory = gameState.inventory;
+	});
 </script>
 
 <Card.Root class="aspect-square p-2 select-none">

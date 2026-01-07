@@ -15,18 +15,9 @@
 	import UserAvatar from '../userAvatar.svelte';
 	import { toggleMode, mode } from 'mode-watcher';
 	import { capitalizeFirstLetter } from '$lib/utils/general';
+	import { logout } from '$lib/remote/auth.remote';
 
 	let { profile }: { profile: Profile } = $props();
-
-	async function signout() {
-		fetch('/api/auth/signout', { method: 'POST' }).then(async (response) => {
-			let json = await response.json();
-			if (!response.ok) {
-				throw new Error('HTTP error! status:', json.msg);
-			}
-			window.location.reload();
-		});
-	}
 </script>
 
 <DropdownMenu.Root>
@@ -55,9 +46,13 @@
 				<Fa icon={mode.current === 'dark' ? faMoon : faSun} />
 				{capitalizeFirstLetter(mode.current ?? 'system')}
 			</DropdownMenu.Item>
-			<DropdownMenu.Item onclick={signout} class="flex items-center gap-2" variant="destructive">
-				<Fa icon={faArrowRightFromBracket} /> Sign Out
-			</DropdownMenu.Item>
+			<form {...logout}>
+				<button type="submit" class="w-full">
+					<DropdownMenu.Item class="flex items-center gap-2" variant="destructive">
+						<Fa icon={faArrowRightFromBracket} /> Sign Out
+					</DropdownMenu.Item>
+				</button>
+			</form>
 		</DropdownMenu.Group>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

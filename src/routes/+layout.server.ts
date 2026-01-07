@@ -1,3 +1,6 @@
+import { getQueue } from '$lib/remote/actions.remote.js';
+import { getEquipment } from '$lib/remote/equipment.remote.js';
+import { getInventory } from '$lib/remote/inventory.remote.js';
 import type { Profile } from '$lib/store.svelte';
 import type { DBQueueAction } from '$lib/types/action';
 import {
@@ -5,13 +8,11 @@ import {
 	Equipment,
 	initializeItemRegistry,
 	type DBEquipment,
-	type DBInventory,
 	type DBItem
 } from '$lib/types/item';
-import { fetchUserData } from '$lib/utils/general.js';
 import type { User } from '@supabase/supabase-js';
 
-export async function load({ cookies, fetch, locals }): Promise<{
+export async function load({ cookies, locals }): Promise<{
 	profile: Profile | null;
 	user: User | null;
 	inventory: DBItem[];
@@ -91,13 +92,9 @@ export async function load({ cookies, fetch, locals }): Promise<{
 
 	// Load all user data in parallel
 	const [queueData, inventoryData, equipmentData /*statsData, skillsData */] = await Promise.all([
-		fetchUserData<{ queue: DBQueueAction[]; started: Date; inventory: DBInventory }>(
-			'action',
-			userId,
-			fetch
-		),
-		fetchUserData<{ inventory: DBItem[] }>('inventory', userId, fetch),
-		fetchUserData<{ equipment: DBEquipment }>('equipment', userId, fetch)
+		getQueue(userId),
+		getInventory(userId),
+		getEquipment(userId)
 		//fetchUserData<{ stats: typeof Stats }>('stats', userId),
 		//fetchUserData<{ skills: typeof PlayerSkills }>('skills', userId)
 	]);
