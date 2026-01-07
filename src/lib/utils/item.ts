@@ -272,10 +272,8 @@ export function tryStackItemInInventory(item: Item, inventory: Item[] | Inventor
 
 		iStackable.amount = Math.min(iStackable.stack, iStackable.amount + stackableModifier.amount);
 		if (stackableModifier.amount <= stackLeft) {
-			console.log('Nothing left to stack');
 			stackableModifier.amount = 0;
 		} else {
-			console.log('more to stack');
 			stackableModifier.amount -= stackLeft;
 		}
 	});

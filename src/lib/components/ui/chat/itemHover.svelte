@@ -8,9 +8,11 @@
 
 <div
 	class="test-sm inline-flex cursor-default items-center gap-2 rounded-md border-2 border-ring bg-card px-1 text-card-foreground"
-	style={`color:${item.rarity};`}
+	style={`border:2px solid ${item.rarity};`}
 	use:tooltip={getItemData(item, false)}
 >
 	<img src={item.icon} alt={item.name} class="inline-block size-4" />
-	{item.name}
+	<span>
+		{@html getItemData(item).title}
+	</span>
 </div>
