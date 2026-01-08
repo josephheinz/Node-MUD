@@ -16,6 +16,9 @@
 	import { toggleMode, mode } from 'mode-watcher';
 	import { capitalizeFirstLetter } from '$lib/utils/general';
 	import { logout } from '$lib/remote/auth.remote';
+	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
+	import { toast } from 'svelte-sonner';
 
 	let { profile }: { profile: Profile } = $props();
 </script>
@@ -46,7 +49,16 @@
 				<Fa icon={mode.current === 'dark' ? faMoon : faSun} />
 				{capitalizeFirstLetter(mode.current ?? 'system')}
 			</DropdownMenu.Item>
-			<form {...logout}>
+			<form
+				{...logout.enhance(async ({ submit }) => {
+					try {
+						await submit();
+						location.reload();
+					} catch (e) {
+						toast.error('Something went wrong logging out');
+					}
+				})}
+			>
 				<button type="submit" class="w-full">
 					<DropdownMenu.Item class="flex items-center gap-2" variant="destructive">
 						<Fa icon={faArrowRightFromBracket} /> Sign Out

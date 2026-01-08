@@ -25,7 +25,7 @@ export const login = form(loginAuthSchema, async ({ email, password }) => {
 
     if (error != null) {
         console.warn(error);
-        return { success: false, msg: error.message }
+        return { success: false, msg: error.message, redirect: "/" }
     }
 
     if (data.session) {
@@ -38,8 +38,7 @@ export const login = form(loginAuthSchema, async ({ email, password }) => {
         });
     }
 
-
-    return { success: true }
+    return { success: true, redirect: "/" }
 });
 
 export const getSession = query(async () => {

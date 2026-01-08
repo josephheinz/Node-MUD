@@ -6,7 +6,10 @@
 	import Button from '../button/button.svelte';
 	import Label from '../label/label.svelte';
 	import Input from '../input/input.svelte';
-	import { signup, login } from '$lib/remote/auth.remote';
+	import { signup, login, getSession } from '$lib/remote/auth.remote';
+	import { invalidateAll } from '$app/navigation';
+	import { enhance } from '$app/forms';
+	import { toast } from 'svelte-sonner';
 
 	let tab = $state<'login' | 'signup'>('login');
 
@@ -14,7 +17,6 @@
 	let errorText: string = $state('');
 	let successText: string = $state('');
 	let action = $derived(tab === 'login' ? login : signup);
-	$inspect(action);
 
 	/* 
 	async function login() {
@@ -69,7 +71,16 @@
 		><Fa icon={faArrowRightToBracket} />Login</Dialog.Trigger
 	>
 	<Dialog.Content>
-		<form {...action}>
+		<form
+			{...action.enhance(async ({ submit }) => {
+				try {
+					await submit();
+					location.reload();
+				} catch (e) {
+					toast.error('Something went wrong logging in');
+				}
+			})}
+		>
 			{#if tab === 'login'}
 				{@render loginContent()}
 			{:else}
