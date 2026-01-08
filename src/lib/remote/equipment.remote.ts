@@ -77,6 +77,7 @@ export const getEquipment = query(z.uuidv4(), async (id) => {
     }
 
     if (data) {
+        const equipment: Equipment = Equipment.load(data.equipment_data as DBEquipment)
         return { equipment: data.equipment_data };
     }
 

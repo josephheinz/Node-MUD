@@ -5,7 +5,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import QueueDialog from './queueDialog.svelte';
 	import * as Empty from '$lib/components/ui/empty';
-	import {  faLocust } from '@fortawesome/free-solid-svg-icons';
+	import { faLocust } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { formatNumber } from '$lib/utils/general';
 	import QueueProgressBar from './queueProgressBar.svelte';
@@ -47,7 +47,7 @@
 	<Card.Content class="flex flex-col items-start justify-start gap-2">
 		<QueueProgressBar {queue} {started} {loadedQueue} />
 		<span class="text-sm text-card-foreground"
-			>Current action: {formatNumber(queue[currentIndex].amount)} {currentAction.name}</span
+			>{formatNumber(queue[currentIndex].amount)} {currentAction.name}</span
 		>
 	</Card.Content>
 	{#if nextAction && nextIndex}

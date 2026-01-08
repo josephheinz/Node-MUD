@@ -5,6 +5,7 @@
 	import type { Inventory } from '$lib/types/item';
 	import type { Item } from '$lib/types/item';
 	import ItemRenderer from '../itemRenderer.svelte';
+	import { getInventory } from '$lib/remote/inventory.remote';
 
 	const {
 		inventory: initInventory,
@@ -26,11 +27,19 @@
 		<Card.Title>{!display ? 'Your ' : ''}Inventory</Card.Title>
 	</Card.Header>
 	<Card.Content>
-		<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
-			{#each page as item (item.uid)}
-				<ItemRenderer {item} equipFlags={{ equippable: !display }} />
-			{/each}
-		</div>
+		<svelte:boundary>
+			{#snippet pending()}
+				<span>Loading</span>
+			{/snippet}
+			<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
+				{#each (await getInventory(gameState.user?.id!)).paginate()[pageNumber - 1] as item (item.uid)}
+					<ItemRenderer {item} equipFlags={{ equippable: !display }} />
+				{/each}
+				<!-- {#each page as item (item.uid)}
+					<ItemRenderer {item} equipFlags={{ equippable: !display }} />
+				{/each} -->
+			</div>
+		</svelte:boundary>
 	</Card.Content>
 	<Card.Footer>
 		<Pagination.Root count={inventory.contents.length} perPage={25} bind:page={pageNumber}>

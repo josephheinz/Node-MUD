@@ -30,6 +30,7 @@
 
 	gameState.queue.started = started;
 	gameState.queue.queue = queue;
+	$inspect(gameState);
 </script>
 
 <svelte:head>

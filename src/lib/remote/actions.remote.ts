@@ -69,6 +69,8 @@ export const getQueue = query(z.uuidv4(), async (id) => {
         .single();
     if (updateQueueErr) throw new Error(updateQueueErr.message);
 
+    console.log(updatedQueue)
+
     return {
         queue: updatedQueue,
         started: updateQueueData.started_at as Date,

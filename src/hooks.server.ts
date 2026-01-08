@@ -19,7 +19,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const raw = event.cookies.get('supabase.session');
 
-	/* if (raw) {
+	if (raw) {
 		try {
 			const session = JSON.parse(raw);
 
@@ -27,7 +27,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		} catch (e) {
 			console.error('Invalid supabase.session cookie');
 		}
-	} */
+	}
 
 	event.locals.supabase = supabase;
 

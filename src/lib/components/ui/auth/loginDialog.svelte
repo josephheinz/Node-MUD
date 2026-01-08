@@ -6,64 +6,14 @@
 	import Button from '../button/button.svelte';
 	import Label from '../label/label.svelte';
 	import Input from '../input/input.svelte';
-	import { signup, login, getSession } from '$lib/remote/auth.remote';
-	import { invalidateAll } from '$app/navigation';
-	import { enhance } from '$app/forms';
+	import { signup, login } from '$lib/remote/auth.remote';
 	import { toast } from 'svelte-sonner';
 
 	let tab = $state<'login' | 'signup'>('login');
 
-	let passRepVal: string = $state('');
 	let errorText: string = $state('');
 	let successText: string = $state('');
 	let action = $derived(tab === 'login' ? login : signup);
-
-	/* 
-	async function login() {
-		let loginData = {
-			email: emailVal,
-			password: passVal
-		};
-
-		fetch('/api/auth/login', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(loginData)
-		})
-			.then(async (response) => {
-				let responseJSON = await response.json();
-				if (!response.ok) {
-					errorText = responseJSON.msg;
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-				return responseJSON;
-			})
-			.then((data) => {
-				window.location.reload();
-			})
-			.catch((err) => {
-				console.error(err);
-			});
-	}
-
-	async function signup() {
-		if (passVal !== passRepVal) {
-			errorText = 'Passwords must match';
-			return;
-		}
-
-		let loginData = {
-			email: emailVal,
-			password: passVal
-		};
-	} */
-
-	/* function handleSubmit() {
-		if (tab === 'login') login();
-		else signup();
-	} */
 </script>
 
 <Dialog.Root>

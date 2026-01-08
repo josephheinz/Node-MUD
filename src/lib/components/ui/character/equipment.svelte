@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getEquipment } from '$lib/remote/equipment.remote';
 	import { gameState } from '$lib/store.svelte';
 	import type { Equipment, EquipmentSlot, Item } from '$lib/types/item';
 	import * as Card from '../card';
@@ -28,11 +29,18 @@
 		<Card.Title>{!display ? 'Your ' : ''}Equipment</Card.Title>
 	</Card.Header>
 	<Card.Content>
-		<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
-			{#each equipment.export() as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
-				{@render equipmentSlot(slot as EquipmentSlot, item)}
-			{/each}
-		</div>
+		<svelte:boundary>
+			{#snippet pending()}
+				<span>Loading</span>
+			{/snippet}
+			<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
+				{#each (await getEquipment(gameState.user?.id!)).equipment as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
+					{@render equipmentSlot(slot as EquipmentSlot, item)}
+				{/each}<!-- 
+				{#each equipment.export() as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
+				{/each} -->
+			</div>
+		</svelte:boundary>
 	</Card.Content>
 </Card.Root>
 
