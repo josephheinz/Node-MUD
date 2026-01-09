@@ -32,7 +32,7 @@
 				<span>Loading</span>
 			{/snippet}
 			<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
-				{#each (await getInventory(gameState.user?.id!)).paginate()[pageNumber - 1] as item (item.uid)}
+				{#each (await getInventory(gameState.user?.id!)).inventory?.paginate()[pageNumber - 1] as item (item.uid)}
 					<ItemRenderer {item} equipFlags={{ equippable: !display }} />
 				{/each}
 				<!-- {#each page as item (item.uid)}

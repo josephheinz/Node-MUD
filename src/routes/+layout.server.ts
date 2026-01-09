@@ -102,8 +102,8 @@ export async function load({ cookies, locals }): Promise<{
 	return {
 		profile,
 		user,
-		inventory: queueData?.inventory ?? inventoryData?.inventory ?? [],
-		equipment: equipmentData?.equipment ?? EmptyEquipment,
+		inventory: queueData?.inventory ?? inventoryData?.inventory?.serialize() ?? [],
+		equipment: equipmentData?.equipment?.serialize() ?? new Equipment({}).serialize(),
 		queue: queueData?.queue ?? [],
 		started: queueData?.started ?? new Date(Date.now())
 		//stats: statsData?.stats ?? Stats,

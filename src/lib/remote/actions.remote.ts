@@ -1,80 +1,83 @@
-import { getRequestEvent, query } from "$app/server";
-import { supabase } from "$lib/auth/supabaseClient";
-import type { DBQueueAction } from "$lib/types/action";
-import { Inventory, type DBInventory, type Item } from "$lib/types/item";
-import { processQueue, type ProcessedQueue } from "$lib/utils/action";
-import { tryStackItemInInventory } from "$lib/utils/item";
-import * as z from "zod";
+import { getRequestEvent, query } from '$app/server';
+import type { DBQueueAction } from '$lib/types/action';
+import { Inventory, type DBInventory, type Item } from '$lib/types/item';
+import { processQueue, type ProcessedQueue } from '$lib/utils/action';
+import { tryStackItemInInventory } from '$lib/utils/item';
+import * as z from 'zod';
 
 export const getQueue = query(z.uuidv4(), async (id) => {
-    const { locals } = getRequestEvent();
+	const { locals } = getRequestEvent();
 
-    const user = locals.user;
+	const { user, supabase } = locals;
 
-    if (!user) return { error: 'Unauthorized', queue: undefined, started: undefined }
+	if (!user) return { error: 'Unauthorized', queue: undefined, started: undefined };
 
-    const { data, error } = await supabase.from('actions').select('*').eq('player_id', id).single();
+	const { data, error } = await supabase.from('actions').select('*').eq('player_id', id).single();
+	console.log(data);
 
-    if (error) throw new Error(error.message);
+	if (error) throw new Error(error.message);
 
-    if (!data) return { queue: undefined, started: undefined, error: "User does not have any actions in the database" }
+	if (!data)
+		return {
+			queue: undefined,
+			started: undefined,
+			error: 'User does not have any actions in the database'
+		};
 
-    const processedQueue: ProcessedQueue = processQueue(data.queue, data.started_at);
+	const processedQueue: ProcessedQueue = processQueue(data.queue, data.started_at);
 
-    const { data: invData, error: invError } = await supabase
-        .from('inventories')
-        .select('inventory_data')
-        .eq('player_id', id)
-        .single();
-    if (invError) throw new Error(invError.message);
+	const { data: invData, error: invError } = await supabase
+		.from('inventories')
+		.select('inventory_data')
+		.eq('player_id', id)
+		.single();
+	if (invError) throw new Error(invError.message);
 
-    // loading skills here in the future
-    const inventory: Inventory = Inventory.load(invData.inventory_data);
+	// loading skills here in the future
+	const inventory: Inventory = Inventory.load(invData.inventory_data);
 
-    let updatedInv: Inventory = new Inventory(inventory.contents);
-    processedQueue.outputs.items.forEach((output: Item) => {
-        updatedInv = new Inventory(tryStackItemInInventory(output, updatedInv).contents);
-    });
-    let updatedDBInv: DBInventory = updatedInv.serialize();
+	let updatedInv: Inventory = new Inventory(inventory.contents);
+	processedQueue.outputs.items.forEach((output: Item) => {
+		updatedInv = new Inventory(tryStackItemInInventory(output, updatedInv).contents);
+	});
+	let updatedDBInv: DBInventory = updatedInv.serialize();
 
-    const updatedQueue: DBQueueAction[] = processedQueue.queue;
+	const updatedQueue: DBQueueAction[] = processedQueue.queue;
 
-    if (data.started_at != null && updatedQueue.length <= 0) {
-        const { error: updateStartErr } = await supabase
-            .from('actions')
-            .update({ started_at: null })
-            .eq('player_id', id);
+	if (data.started_at != null && updatedQueue.length <= 0) {
+		const { error: updateStartErr } = await supabase
+			.from('actions')
+			.update({ started_at: null })
+			.eq('player_id', id);
 
-        if (updateStartErr) throw new Error(updateStartErr.message);
-    } else if (data.started_at != null && updatedQueue.length >= 1) {
-        const { error: updateStartErr } = await supabase
-            .from('actions')
-            .update({ started_at: new Date(Date.now()) })
-            .eq('player_id', id);
+		if (updateStartErr) throw new Error(updateStartErr.message);
+	} else if (data.started_at != null && updatedQueue.length >= 1) {
+		const { error: updateStartErr } = await supabase
+			.from('actions')
+			.update({ started_at: new Date(Date.now()) })
+			.eq('player_id', id);
 
-        if (updateStartErr) throw new Error(updateStartErr.message);
-    }
+		if (updateStartErr) throw new Error(updateStartErr.message);
+	}
 
-    const { error: updateInvErr } = await supabase
-        .from('inventories')
-        .update({ inventory_data: updatedDBInv })
-        .eq('player_id', id);
-    if (updateInvErr) throw new Error(updateInvErr.message);
+	const { error: updateInvErr } = await supabase
+		.from('inventories')
+		.update({ inventory_data: updatedDBInv })
+		.eq('player_id', id);
+	if (updateInvErr) throw new Error(updateInvErr.message);
 
-    const { data: updateQueueData, error: updateQueueErr } = await supabase
-        .from('actions')
-        .update({ queue: updatedQueue })
-        .eq('player_id', id)
-        .select('*')
-        .single();
-    if (updateQueueErr) throw new Error(updateQueueErr.message);
+	const { data: updateQueueData, error: updateQueueErr } = await supabase
+		.from('actions')
+		.update({ queue: updatedQueue })
+		.eq('player_id', id)
+		.select('*')
+		.single();
+	if (updateQueueErr) throw new Error(updateQueueErr.message);
 
-    console.log(updatedQueue)
-
-    return {
-        queue: updatedQueue,
-        started: updateQueueData.started_at as Date,
-        inventory: updatedDBInv,
-        lastUpdated: Date.now()
-    }
+	return {
+		queue: updatedQueue,
+		started: updateQueueData.started_at as Date,
+		inventory: updatedDBInv,
+		lastUpdated: Date.now()
+	};
 });

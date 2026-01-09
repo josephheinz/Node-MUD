@@ -1,7 +1,10 @@
 import * as _ from 'radashi';
 import type { StatList } from './stats';
 import { encodeDBItem, loadDbItem } from '$lib/utils/item';
-import { initializeModifierRegistry, instantiateModifier, modifierRegistry } from '$lib/modifiers/modifiersRegistry';
+import {
+	initializeModifierRegistry,
+	instantiateModifier
+} from '$lib/modifiers/modifiersRegistry';
 import { parse } from 'yaml';
 
 export type RarityKey = keyof typeof Rarity;
@@ -43,7 +46,7 @@ export interface IItemModifierClass<T extends IItemModifier = IItemModifier> {
 	//hash(): string;
 	fromHash(hash: string): T;
 
-	new(...args: any[]): T;
+	new (...args: any[]): T;
 }
 
 export type Item = {

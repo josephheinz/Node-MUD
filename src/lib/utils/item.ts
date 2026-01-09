@@ -5,6 +5,7 @@ import {
 	Equipment,
 	Inventory,
 	Rarity,
+	initializeItemRegistry,
 	itemRegistry,
 	type DBItem,
 	type EquipmentSlot,
@@ -15,12 +16,14 @@ import {
 import * as _ from 'radashi';
 import { formatNumber } from './general';
 import { isEqual } from 'radashi';
+import { getInventory } from '$lib/remote/inventory.remote';
+import { getEquipment } from '$lib/remote/equipment.remote';
 
 export async function Equip(
 	item: Item,
 	userId?: string
 ): Promise<{ inventory?: Inventory; equipment?: Equipment }> {
-	if (!userId) console.error('No user logged in');
+	if (!userId) throw new Error('No user logged in');
 
 	const res = await fetch(`/api/equipment/${userId}/equip`, {
 		method: 'POST',
@@ -135,10 +138,14 @@ export function encodeDBItem(item: Item): DBItem {
 }
 
 export function loadDbItem(item: DBItem): Item {
+	initializeItemRegistry();
 	// check to see if its outdated
 	canonicalizeDbItem(item);
 
-	const base = _.cloneDeep(itemRegistry[item.id]) as Item;
+	const base = structuredClone<Item>(itemRegistry[item.id]);
+	base.modifiers = base.modifiers.map(instantiateModifier);
+	/* 	const base = _.cloneDeep(itemRegistry[item.id]) as Item;
+	 */
 	if (!base) throw new Error(`Unknown item id: ${item.id}`);
 
 	const dbMods: IItemModifier[] = item.modifiers?.map(instantiateModifierFromHash) ?? [];

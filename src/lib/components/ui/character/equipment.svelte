@@ -34,7 +34,7 @@
 				<span>Loading</span>
 			{/snippet}
 			<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
-				{#each (await getEquipment(gameState.user?.id!)).equipment as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
+				{#each (await getEquipment(gameState.user?.id!)).equipment?.export() as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
 					{@render equipmentSlot(slot as EquipmentSlot, item)}
 				{/each}<!-- 
 				{#each equipment.export() as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
