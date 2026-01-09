@@ -32,11 +32,7 @@
 					{/each}
 				</div>
 			{/snippet}
-			<span>{JSON.stringify((await getEquipment()).export())}</span>
 			<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
-				{#each (await getEquipment()).export() as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
-					{@render equipmentSlot(slot as EquipmentSlot, item)}
-				{/each}
 				{#each (await getEquipment()).export() as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
 					{@render equipmentSlot(slot as EquipmentSlot, item)}
 				{/each}

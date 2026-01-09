@@ -9,11 +9,7 @@ export const transport: Transport = {
 			return value.serialize();
 		},
 		decode: (data) => {
-			console.log(data)
-			const serialized: DBEquipment = Equipment.serialize(data);
-			const final: Equipment = Equipment.load(serialized);
-			console.log(`serialized: ${JSON.stringify(serialized)}\n\n\nfinal: ${JSON.stringify(final)}`)
-			return final;
+			return Equipment.load(data);
 		}
 	},
 	Item: {

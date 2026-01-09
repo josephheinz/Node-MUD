@@ -1,11 +1,9 @@
 import * as _ from 'radashi';
 import type { StatList } from './stats';
 import { encodeDBItem, loadDbItem } from '$lib/utils/item';
-import {
-	initializeModifierRegistry,
-	instantiateModifier
-} from '$lib/modifiers/modifiersRegistry';
+import { initializeModifierRegistry, instantiateModifier } from '$lib/modifiers/modifiersRegistry';
 import { parse } from 'yaml';
+import { capitalizeFirstLetter } from '$lib/utils/general';
 
 export type RarityKey = keyof typeof Rarity;
 
@@ -46,7 +44,7 @@ export interface IItemModifierClass<T extends IItemModifier = IItemModifier> {
 	//hash(): string;
 	fromHash(hash: string): T;
 
-	new(...args: any[]): T;
+	new (...args: any[]): T;
 }
 
 export type Item = {
@@ -221,7 +219,6 @@ export class Equipment {
 	}
 
 	public serialize(): DBEquipment {
-		console.log(this);
 		return {
 			Head: this._head ? encodeDBItem(this._head) : null,
 			Body: this._body ? encodeDBItem(this._body) : null,
@@ -234,55 +231,20 @@ export class Equipment {
 		};
 	}
 
-	public static hydrate(equipment: DBEquipment): Equipment {
-		return new Equipment({
-			Head: equipment.Head ? loadDbItem(equipment.Head) : undefined,
-			Body: equipment.Body ? loadDbItem(equipment.Body) : undefined,
-			Legs: equipment.Legs ? loadDbItem(equipment.Legs) : undefined,
-			Offhand: equipment.Offhand ? loadDbItem(equipment.Offhand) : undefined,
-			Mainhand: equipment.Mainhand ? loadDbItem(equipment.Mainhand) : undefined,
-			Necklace: equipment.Necklace ? loadDbItem(equipment.Necklace) : undefined,
-			Ring: equipment.Ring ? loadDbItem(equipment.Ring) : undefined,
-			Hands: equipment.Hands ? loadDbItem(equipment.Hands) : undefined
-		});
-	}
-
-	public static serialize(equipment: Equipment): DBEquipment {
-		console.log(equipment);
-		const db: DBEquipment =
-		{
-			Head: equipment._head ? encodeDBItem(equipment._head) : null,
-			Body: equipment._body ? encodeDBItem(equipment._body) : null,
-			Legs: equipment._legs ? encodeDBItem(equipment._legs) : null,
-			Offhand: equipment._offhand ? encodeDBItem(equipment._offhand) : null,
-			Mainhand: equipment.Mainhand ? encodeDBItem(equipment.Mainhand) : null,
-			Necklace: equipment._necklace ? encodeDBItem(equipment._necklace) : null,
-			Ring: equipment._ring ? encodeDBItem(equipment._ring) : null,
-			Hands: equipment._hands ? encodeDBItem(equipment._hands) : null
-		};
-		console.log("db: ", db)
-		return db;
-	}
-
-	public static load(dbEquip: DBEquipment | Equipment): Equipment {
+	public static load(dbEquip: DBEquipment): Equipment {
 		let equipment: Record<string, Item | null> = {};
-		console.log(equipment)
 		Object.entries(dbEquip).forEach(([slot, item]) => {
 			if (item === null) {
 				equipment[slot] = null;
 				return;
 			}
 
-			equipment[slot] = loadDbItem(item);
+			equipment[capitalizeFirstLetter(slot)] = loadDbItem(item);
 		});
 
-		const _new =
-			new Equipment({
-				...equipment
-			});
-		console.log(_new)
-
-		return _new
+		return new Equipment({
+			...equipment
+		});
 	}
 
 	public export(): Array<[EquipmentSlot, Item | null]> {
