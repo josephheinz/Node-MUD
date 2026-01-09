@@ -38,18 +38,15 @@
 		</div>
 		{#if loadedQueue.size > 1}
 			<span>Upcoming actions: </span>
-			{#each loadedQueue.entries() as [index, action]}
-				{#if index !== currentIndex}
-					<div class="flex flex-col items-start justify-start text-xs text-muted-foreground">
-						<span
+			<div class="flex flex-col items-start justify-start gap-1">
+				{#each loadedQueue.entries() as [index, action]}
+					{#if index !== currentIndex}
+						<span class="text-sm text-muted-foreground"
 							>{action.name} x{formatNumber(queue[index].amount)}
-							<Dialog.Trigger class="rounded-sm border-1 border-ring px-1"
-								>&bullet;&bullet;&bullet;</Dialog.Trigger
-							></span
-						>
-					</div>
-				{/if}
-			{/each}
+						</span>
+					{/if}
+				{/each}
+			</div>
 		{/if}
 	</svelte:boundary>
 {/snippet}

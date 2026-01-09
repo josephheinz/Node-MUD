@@ -12,6 +12,7 @@
 	import Label from '../label/label.svelte';
 	import Button from '../button/button.svelte';
 	import { queueAction } from '$lib/remote/actions.remote';
+	import { toast } from 'svelte-sonner';
 
 	const { action }: { action: Action } = $props();
 
@@ -48,13 +49,24 @@
 	<Dialog.Header>
 		<Dialog.Title>{action.name}</Dialog.Title>
 	</Dialog.Header>
-	<form class="flex w-full flex-col gap-4" {...queueAction}>
+	<form
+		class="flex w-full flex-col gap-4"
+		{...queueAction.enhance(async ({ submit }) => {
+			try {
+				await submit();
+				toast.success(`Successfully queued ${amount} ${action.name}`);
+				amount = 1;
+			} catch (e) {
+				toast.error('Something went wrong queueing an item');
+			}
+		})}
+	>
 		<div>
 			<h1 class="text-start text-lg font-semibold">Inputs:</h1>
 			<ul>
 				{#each loadedInputs as { item, amount }, index}
 					{@const itemsPresent = inputsPresent[index].present}
-					<li class="flex items-start justify-start gap-2 pl-4">
+					<li class="my-1 flex items-start justify-start gap-2 pl-4">
 						<span class={itemsPresent < amount ? 'text-rose-400' : ''}
 							>{formatNumber(itemsPresent)}/{formatNumber(amount)}</span
 						>
@@ -72,7 +84,7 @@
 				{#each loadedOutputs as { item, min, max, chance }, index}
 					{@const chanceDecimal = chance ? 1 / (chance as number) : 1}
 					{@const chancePercent = numeral(chanceDecimal).format('0[.][0000]%')}
-					<li class="flex items-start justify-start gap-2 pl-4">
+					<li class="my-1 flex items-start justify-start gap-2 pl-4">
 						<span
 							>{min != max
 								? `${formatNumber(min)} - ${formatNumber(max)}`
