@@ -4,13 +4,16 @@ import type { Inventory, Item } from '$lib/types/item';
 import { loadDbItem, tryStackItemInInventory } from './item';
 
 export type ProcessedQueue = {
-	outputs: { items: Item[] },
-	queue: DBQueueAction[]
-}
+	outputs: { items: Item[] };
+	queue: DBQueueAction[];
+};
 
-export const TEN_HOUR_ACTION_LIMIT: number = 10 * 60 * 60 * 1000 // ten hours times 60 minutes times 60 seconds times 1000 milliseconds
+export const TEN_HOUR_ACTION_LIMIT: number = 10 * 60 * 60 * 1000; // ten hours times 60 minutes times 60 seconds times 1000 milliseconds
 
-export function checkQueueCompletion(queue: DBQueueAction[], started_at: Date): { status: string; timings: { start: number; now: number; total: number; } } {
+export function checkQueueCompletion(
+	queue: DBQueueAction[],
+	started_at: Date
+): { status: string; timings: { start: number; now: number; total: number } } {
 	let totalActionTime: number = 0;
 	queue.forEach((action: DBQueueAction) => {
 		const loadedAction: Action | null = getAction(action.id);
@@ -23,11 +26,20 @@ export function checkQueueCompletion(queue: DBQueueAction[], started_at: Date): 
 	const now: number = Date.now();
 	const totalActionTimeMilliseconds: number = totalActionTime * 1000;
 
-	if (now - startedMilliseconds > totalActionTimeMilliseconds && totalActionTimeMilliseconds < TEN_HOUR_ACTION_LIMIT) {
-		return { status: "Complete", timings: { start: startedMilliseconds, now, total: totalActionTimeMilliseconds } };
+	if (
+		now - startedMilliseconds > totalActionTimeMilliseconds &&
+		totalActionTimeMilliseconds < TEN_HOUR_ACTION_LIMIT
+	) {
+		return {
+			status: 'Complete',
+			timings: { start: startedMilliseconds, now, total: totalActionTimeMilliseconds }
+		};
 	}
 
-	return { status: "Active", timings: { start: startedMilliseconds, now, total: totalActionTimeMilliseconds } };
+	return {
+		status: 'Active',
+		timings: { start: startedMilliseconds, now, total: totalActionTimeMilliseconds }
+	};
 }
 
 export function completeAction(action: Action): { items: Item[] } {
@@ -51,7 +63,7 @@ export function processQueue(queue: DBQueueAction[], started_at: Date) {
 
 	let outputs: { items: Item[] } = { items: [] };
 
-	if (completion.status === "Complete") {
+	if (completion.status === 'Complete') {
 		queue.forEach((action: DBQueueAction) => {
 			const loadedAction: Action | null = getAction(action.id);
 			if (!loadedAction) return;
@@ -64,7 +76,7 @@ export function processQueue(queue: DBQueueAction[], started_at: Date) {
 			}
 		});
 		queue.length = 0;
-	} else if (completion.status === "Active") {
+	} else if (completion.status === 'Active') {
 		let timeDifference: number = completion.timings.now - completion.timings.start;
 		let currentTimeDeficit: number = 0;
 		while (currentTimeDeficit < timeDifference && queue.length >= 1) {
@@ -79,7 +91,7 @@ export function processQueue(queue: DBQueueAction[], started_at: Date) {
 			action.amount--;
 			if (action.amount <= 0) queue.shift();
 
-			outputs = { items: [...outputs.items, ...completeAction(loadedAction).items] }
+			outputs = { items: [...outputs.items, ...completeAction(loadedAction).items] };
 		}
 	}
 
@@ -111,6 +123,15 @@ export function getInventoryCounts(
 			present: count
 		};
 	});
+}
+
+export function loadDbQueue(queue: DBQueueAction[]): Map<number, Action> {
+	let _: Map<number, Action> = new Map();
+	queue.forEach((a: DBQueueAction, index) => {
+		const act: Action | null = getAction(a.id);
+		if (act) _.set(index, act);
+	});
+	return _;
 }
 
 export function rollValue(item: ChanceItem): number {

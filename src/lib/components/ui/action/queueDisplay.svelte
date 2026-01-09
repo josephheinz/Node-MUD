@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { gameState } from '$lib/store.svelte';
-	import { getAction, type Action, type DBQueueAction } from '$lib/types/action';
+	import { type Action } from '$lib/types/action';
 	import * as Card from '../card';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import QueueDialog from './queueDialog.svelte';
@@ -9,43 +8,51 @@
 	import Fa from 'svelte-fa';
 	import { formatNumber } from '$lib/utils/general';
 	import QueueProgressBar from './queueProgressBar.svelte';
-
-	let queue: DBQueueAction[] = $derived(gameState.queue.queue);
-	let started: Date = $derived(gameState.queue.started);
-	let loadedQueue: Map<number, Action> = $derived.by(() => {
-		let _: Map<number, Action> = new Map();
-		queue.forEach((a: DBQueueAction, index) => {
-			const act: Action | null = getAction(a.id);
-			if (act) _.set(index, act);
-		});
-		return _;
-	});
+	import { loadDbQueue } from '$lib/utils/action';
+	import { getQueue } from '$lib/remote/actions.remote';
+	import Skeleton from '../skeleton/skeleton.svelte';
 </script>
 
-<Dialog.Root>
-	<Card.Root class="h-max max-h-64 select-none">
-		<Dialog.Trigger class="w-full text-left">
+<svelte:boundary>
+	{@const loadedQueue = loadDbQueue((await getQueue()).queue)}
+	{#snippet pending()}
+		<Card.Root class="h-max max-h-64 select-none">
 			<Card.Header class="w-full cursor-pointer">
-				<Card.Title>Action Queue</Card.Title>
+				<Card.Title>Loading Queue...</Card.Title>
 			</Card.Header>
-		</Dialog.Trigger>
-		{#if loadedQueue.size > 0}
-			{@render queueNotEmpty()}
-		{:else}
-			{@render queueEmpty()}
-		{/if}
-	</Card.Root>
-	<QueueDialog {queue} {started} {loadedQueue} />
-</Dialog.Root>
+			<Card.Content>
+				<Skeleton class="h-26 w-full" />
+			</Card.Content>
+		</Card.Root>
+	{/snippet}
+	<Dialog.Root>
+		<Card.Root class="h-max max-h-64 select-none">
+			<Dialog.Trigger class="w-full text-left">
+				<Card.Header class="w-full cursor-pointer">
+					<Card.Title>Action Queue</Card.Title>
+				</Card.Header>
+			</Dialog.Trigger>
+			{#if loadedQueue.size > 0}
+				{@render queueNotEmpty()}
+			{:else}
+				{@render queueEmpty()}
+			{/if}
+		</Card.Root>
+		<QueueDialog />
+	</Dialog.Root>
+</svelte:boundary>
 
 {#snippet queueNotEmpty()}
+	{@const queue = (await getQueue()).queue}
+	{@const loadedQueue = loadDbQueue((await getQueue()).queue)}
+
 	{@const currentAction: Action = loadedQueue.entries().next().value?.[1]!}
 	{@const currentIndex: number = loadedQueue.entries().next().value?.[0]!}
 
 	{@const nextAction : Action | undefined = loadedQueue.entries().next().value?.[1]}
 	{@const nextIndex : number | undefined = loadedQueue.entries().next().value?.[0]}
 	<Card.Content class="flex flex-col items-start justify-start gap-2">
-		<QueueProgressBar {queue} {started} {loadedQueue} />
+		<QueueProgressBar queueData={await getQueue()} />
 		<span class="text-sm text-card-foreground"
 			>{formatNumber(queue[currentIndex].amount)} {currentAction.name}</span
 		>

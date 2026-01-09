@@ -1,16 +1,15 @@
 <script lang="ts">
-	import type { Action, DBQueueAction } from '$lib/types/action';
+	import type { Action } from '$lib/types/action';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Empty from '$lib/components/ui/empty';
 	import Fa from 'svelte-fa';
 	import { faLocust } from '@fortawesome/free-solid-svg-icons';
 	import { formatNumber } from '$lib/utils/general';
+	import { loadDbQueue } from '$lib/utils/action';
+	import { getQueue } from '$lib/remote/actions.remote';
 
-	const {
-		queue,
-		started,
-		loadedQueue
-	}: { queue: DBQueueAction[]; started: Date; loadedQueue: Map<number, Action> } = $props();
+	let loadedQueuePromise = $derived(getQueue());
+	let loadedQueue = $derived(loadDbQueue((await loadedQueuePromise).queue));
 </script>
 
 <Dialog.Content>
@@ -25,28 +24,34 @@
 </Dialog.Content>
 
 {#snippet queueNotEmpty()}
-	{@const currentAction: Action = loadedQueue.entries().next().value?.[1]!}
-	{@const currentIndex: number = loadedQueue.entries().next().value?.[0]!}
-	<div class="flex flex-col items-start justify-start gap-2">
-		<span class="text-sm text-card-foreground"
-			>Current action: {formatNumber(queue[currentIndex].amount)} {currentAction.name}</span
-		>
-	</div>
-	{#if loadedQueue.size > 1}
-		<span>Upcoming actions: </span>
-		{#each loadedQueue.entries() as [index, action]}
-			{#if index !== currentIndex}
-				<div class="flex flex-col items-start justify-start text-xs text-muted-foreground">
-					<span
-						>{action.name} x{formatNumber(queue[index].amount)}
-						<Dialog.Trigger class="rounded-sm border-1 border-ring px-1"
-							>&bullet;&bullet;&bullet;</Dialog.Trigger
-						></span
-					>
-				</div>
-			{/if}
-		{/each}
-	{/if}
+	<svelte:boundary>
+		{#snippet pending()}
+			<span>Loading queue</span>
+		{/snippet}
+		{@const queue = (await getQueue()).queue}
+		{@const currentAction: Action = loadedQueue.entries().next().value?.[1]!}
+		{@const currentIndex: number = loadedQueue.entries().next().value?.[0]!}
+		<div class="flex flex-col items-start justify-start gap-2">
+			<span class="text-sm text-card-foreground"
+				>Current action: {formatNumber(queue[currentIndex].amount)} {currentAction.name}</span
+			>
+		</div>
+		{#if loadedQueue.size > 1}
+			<span>Upcoming actions: </span>
+			{#each loadedQueue.entries() as [index, action]}
+				{#if index !== currentIndex}
+					<div class="flex flex-col items-start justify-start text-xs text-muted-foreground">
+						<span
+							>{action.name} x{formatNumber(queue[index].amount)}
+							<Dialog.Trigger class="rounded-sm border-1 border-ring px-1"
+								>&bullet;&bullet;&bullet;</Dialog.Trigger
+							></span
+						>
+					</div>
+				{/if}
+			{/each}
+		{/if}
+	</svelte:boundary>
 {/snippet}
 
 {#snippet queueEmpty()}

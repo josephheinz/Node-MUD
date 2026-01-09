@@ -3,25 +3,22 @@ import type { DBQueueAction } from '$lib/types/action';
 import { Inventory, type DBInventory, type Item } from '$lib/types/item';
 import { processQueue, type ProcessedQueue } from '$lib/utils/action';
 import { tryStackItemInInventory } from '$lib/utils/item';
+import { redirect } from '@sveltejs/kit';
 import * as z from 'zod';
 
-export const getQueue = query(z.uuidv4(), async (id) => {
+export const getQueue = query(async () => {
 	const { locals } = getRequestEvent();
 
 	const { user, supabase } = locals;
 
-	if (!user) return { error: 'Unauthorized', queue: undefined, started: undefined };
+	if (!user) redirect(307, '/');
+	const id = user.id;
 
 	const { data, error } = await supabase.from('actions').select('*').eq('player_id', id).single();
 
 	if (error) throw new Error(error.message);
 
-	if (!data)
-		return {
-			queue: undefined,
-			started: undefined,
-			error: 'User does not have any actions in the database'
-		};
+	if (!data) throw new Error('No actions found in the data base');
 
 	const processedQueue: ProcessedQueue = processQueue(data.queue, data.started_at);
 
