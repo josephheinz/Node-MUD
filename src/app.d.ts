@@ -1,3 +1,4 @@
+import type { Profile } from '$lib/store.svelte';
 import { WebSocketHelper } from './lib/websocketManager';
 
 declare global {
@@ -6,6 +7,7 @@ declare global {
 			supabase: import('@supabase/supabase-js').SupabaseClient;
 			user: import('@supabase/supabase-js').User | null;
 			ws: WebSocketHelper;
+			profile: Profile | null;
 		}
 	}
 	interface MessageData {
@@ -13,15 +15,15 @@ declare global {
 		timestamp: Date;
 		type: 'text' | 'system' | 'notification';
 		message_type?:
-			| 'text'
-			| 'image'
-			| 'video'
-			| 'audio'
-			| 'file'
-			| 'link'
-			| 'code'
-			| 'quote'
-			| 'mention';
+		| 'text'
+		| 'image'
+		| 'video'
+		| 'audio'
+		| 'file'
+		| 'link'
+		| 'code'
+		| 'quote'
+		| 'mention';
 		status: 'success' | 'error' | 'info' | 'warning';
 	}
 	interface WSMessage<T = MessageData> {

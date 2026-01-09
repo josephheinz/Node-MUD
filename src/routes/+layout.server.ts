@@ -1,4 +1,4 @@
-import { getQueue } from '$lib/remote/actions.remote.js';
+/* import { getQueue } from '$lib/remote/actions.remote.js';
 import { getEquipment } from '$lib/remote/equipment.remote.js';
 import { getInventory } from '$lib/remote/inventory.remote.js';
 import type { Profile } from '$lib/store.svelte';
@@ -20,7 +20,7 @@ export async function load({ cookies, locals }): Promise<{
 	queue: DBQueueAction[];
 	started: Date;
 	/* stats: typeof Stats;
-	skills: typeof PlayerSkills; */
+	skills: typeof PlayerSkills; 
 }> {
 	const supabase = locals.supabase;
 	initializeItemRegistry();
@@ -37,7 +37,7 @@ export async function load({ cookies, locals }): Promise<{
 			/*
 			stats: Stats,
 			skills: PlayerSkills
-			*/
+			
 		};
 	}
 
@@ -63,7 +63,7 @@ export async function load({ cookies, locals }): Promise<{
 			/*
 			stats: Stats,
 			skills: PlayerSkills
-			*/
+			
 		};
 	}
 
@@ -91,7 +91,7 @@ export async function load({ cookies, locals }): Promise<{
 	}
 
 	// Load all user data in parallel
-	const [queueData, inventoryData, equipmentData /*statsData, skillsData */] = await Promise.all([
+	const [queueData, inventoryData, equipmentData /*statsData, skillsData ] = await Promise.all([
 		getQueue(userId),
 		getInventory(userId),
 		getEquipment(userId)
@@ -110,3 +110,4 @@ export async function load({ cookies, locals }): Promise<{
 		//skills: skillsData?.skills ?? PlayerSkills
 	};
 }
+ */

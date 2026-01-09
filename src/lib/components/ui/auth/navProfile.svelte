@@ -1,15 +1,17 @@
 <script lang="ts">
-	import { gameState, type Profile } from '$lib/store.svelte';
-	import type { User } from '@supabase/supabase-js';
 	import ProfileDropdown from './profileDropdown.svelte';
-	import LoginDialog from './loginDialog.svelte';
-
-	let user: User | null = $derived(gameState.user);
-	let profile: Profile | null = $derived(gameState.profile);
+	import { getProfile, getUser } from '$lib/remote/auth.remote';
+	import { Skeleton } from '$lib/components/ui/skeleton/index';
 </script>
 
-{#if profile && user}
-	<ProfileDropdown {profile} />
-{:else}
-	<LoginDialog />
-{/if}
+<svelte:boundary>
+	{#snippet pending()}
+		<div class="flex h-max w-full justify-start gap-4 px-4">
+			<Skeleton class="size-8 rounded-full" />
+			<Skeleton class="h-4/5 grow rounded-full" />
+		</div>
+	{/snippet}
+	{#if (await getProfile()) && (await getUser())}
+		<ProfileDropdown />
+	{/if}
+</svelte:boundary>

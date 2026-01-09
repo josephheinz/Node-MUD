@@ -16,62 +16,71 @@
 	let action = $derived(tab === 'login' ? login : signup);
 </script>
 
-<Dialog.Root>
-	<Dialog.Trigger class={buttonVariants({ variant: 'outline' })}
-		><Fa icon={faArrowRightToBracket} />Login</Dialog.Trigger
-	>
-	<Dialog.Content>
-		<form
-			{...action.enhance(async ({ submit }) => {
-				try {
-					await submit();
-					location.reload();
-				} catch (e) {
-					toast.error('Something went wrong logging in');
-				}
-			})}
+<svelte:boundary>
+	{#snippet pending()}
+		<span>Loading</span>
+	{/snippet}
+	<Dialog.Root>
+		<Dialog.Trigger class={buttonVariants({ variant: 'outline' })}
+			><Fa icon={faArrowRightToBracket} />Login</Dialog.Trigger
 		>
-			{#if tab === 'login'}
-				{@render loginContent()}
-			{:else}
-				{@render signupContent()}
-			{/if}
-			{#if errorText.trim() !== ''}
-				<span class="text-rose-500">{errorText}</span>
-			{/if}
-			{#if successText.trim() !== ''}
-				<span class="text-blue-500">{successText}</span>
-			{/if}
-		</form>
-	</Dialog.Content>
-</Dialog.Root>
+		<Dialog.Content>
+			<form
+				{...action.enhance(async ({ submit }) => {
+					try {
+						await submit();
+						location.href = '/home';
+					} catch (e) {
+						toast.error('Something went wrong logging in');
+					}
+				})}
+			>
+				{#if tab === 'login'}
+					{@render loginContent()}
+				{:else}
+					{@render signupContent()}
+				{/if}
+				{#if errorText.trim() !== ''}
+					<span class="text-rose-500">{errorText}</span>
+				{/if}
+				{#if successText.trim() !== ''}
+					<span class="text-blue-500">{successText}</span>
+				{/if}
+			</form>
+		</Dialog.Content>
+	</Dialog.Root>
+</svelte:boundary>
 
 {#snippet loginContent()}
-	<Dialog.Header>
-		<Dialog.Title>Login</Dialog.Title>
-	</Dialog.Header>
-	<div class="grid gap-4">
-		{@render emailFirstPass()}
+	<div class="flex flex-col gap-4">
+		<Dialog.Header>
+			<Dialog.Title>Login</Dialog.Title>
+		</Dialog.Header>
+		<div class="grid gap-4">
+			{@render emailFirstPass()}
+		</div>
+		{@render footer(tab)}
 	</div>
-	{@render footer(tab)}
 {/snippet}
 
 {#snippet signupContent()}
-	<Dialog.Header>
-		<Dialog.Title>Sign Up</Dialog.Title>
-	</Dialog.Header>
-	<div class="grid gap-4">
-		{@render emailFirstPass()}
-		<div class="grid gap-3">
-			<Label for="passwordrep">Password (Repeat)</Label>
-			<Input
-				id="passwordrep"
-				placeholder="Securepass1!"
-				{...signup.fields.passwordRepeat.as('password')}
-			/>
+	<div class="flex flex-col gap-4">
+		<Dialog.Header>
+			<Dialog.Title>Sign Up</Dialog.Title>
+		</Dialog.Header>
+		<div class="grid gap-4">
+			{@render emailFirstPass()}
+			<div class="grid gap-3">
+				<Label for="passwordrep">Password (Repeat)</Label>
+				<Input
+					id="passwordrep"
+					placeholder="Securepass1!"
+					{...signup.fields.passwordRepeat.as('password')}
+				/>
+			</div>
 		</div>
+		{@render footer(tab)}
 	</div>
-	{@render footer(tab)}
 {/snippet}
 
 {#snippet emailFirstPass()}

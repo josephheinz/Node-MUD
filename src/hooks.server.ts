@@ -1,6 +1,7 @@
 import type { Handle } from '@sveltejs/kit';
 import { createClient } from '@supabase/supabase-js';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+import type { Profile } from '$lib/store.svelte';
 
 // @ts-expect-error - server is available in dev mode
 const server = globalThis.__sveltekit_server__;
@@ -36,6 +37,19 @@ export const handle: Handle = async ({ event, resolve }) => {
 	} = await supabase.auth.getUser();
 
 	event.locals.user = user;
+
+	const { data, error } = await supabase
+		.from("profiles")
+		.select("*")
+		.eq("id", user?.id)
+		.single();
+
+	if (!data || error) {
+		console.error(error?.message);
+		event.locals.profile = null;
+	} else {
+		event.locals.profile = data as Profile;
+	}
 
 	return resolve(event);
 };

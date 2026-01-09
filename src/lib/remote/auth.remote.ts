@@ -1,8 +1,10 @@
 import { goto, refreshAll } from "$app/navigation";
 import { form, getRequestEvent, query } from "$app/server";
 import { supabase } from "$lib/auth/supabaseClient";
+import type { Profile } from "$lib/store.svelte";
 import { redirect } from "@sveltejs/kit";
 import * as z from "zod";
+import type { IApiSettings } from "../../routes/profile/[username]/+layout.server";
 
 const loginAuthSchema = z.object({
     email: z.string(),
@@ -85,7 +87,6 @@ export const logout = form(async () => {
     cookies.delete('supabase.session', { path: '/' });
 
     redirect(308, "/");
-    return { success: true }
 });
 
 export const signup = form(signupAuthSchema, async ({ email, password, passwordRepeat }) => {
@@ -109,4 +110,96 @@ export const signup = form(signupAuthSchema, async ({ email, password, passwordR
     }
 
     return { success: true };
+});
+
+export const getUser = query(async () => {
+    const { locals } = getRequestEvent();
+    if (!locals.user) {
+        redirect(307, "/");
+    }
+    return locals.user;
+});
+
+export const getProfile = query(async () => {
+    const { locals } = getRequestEvent();
+    if (!locals.profile) {
+        redirect(307, "/");
+    }
+    return locals.profile;
+});
+
+export const getProfileOrUndefined = query(async () => {
+    const { locals } = getRequestEvent();
+    if (!locals.profile) {
+        return undefined;
+    }
+    return locals.profile;
+});
+
+export const getProfileById = query(z.uuidv4(), async (id) => {
+    const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+    if (!data || error) {
+        return undefined;
+    }
+
+    return data as Profile;
+});
+
+export const getProfileByUsername = query(z.string(), async (username) => {
+    const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("username", username)
+        .single();
+
+    if (!data || error) {
+        return undefined;
+    }
+
+    return data as Profile;
+});
+
+export const getProfileAndApiSettingsByUsername = query(z.string(), async (username) => {
+    const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("username", username)
+        .single();
+
+    if (!data || error) {
+        throw new Error("Profile not found")
+    }
+    const profile: Profile = data;
+
+    const { data: apiData, error: apiError } = await supabase
+        .from("profile_settings")
+        .select("*")
+        .eq("profile_id", profile.id)
+        .single();
+
+    if (!apiData || apiError) {
+        throw new Error(`Api settings not found ${JSON.stringify(apiData)}`)
+    }
+    const apiSettings: IApiSettings = apiData;
+
+    return { profile, apiSettings };
+});
+
+export const getApiSettings = query(z.uuidv4(), async (id) => {
+    const { data, error } = await supabase
+        .from("profiles_settings")
+        .select("*")
+        .eq("profile_id", id)
+        .single();
+
+    if (!data || error) {
+        return undefined;
+    }
+
+    return data as IApiSettings;
 });

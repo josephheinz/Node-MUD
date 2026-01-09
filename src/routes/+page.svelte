@@ -1,37 +1,20 @@
 <script lang="ts">
-	import { tab } from '$lib/store.svelte';
-	import Inventory from '$lib/components/ui/character/inventory.svelte';
+	import LoginDialog from '$lib/components/ui/auth/loginDialog.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
 	import HomeScreen from '$lib/components/ui/homeScreen.svelte';
-	import Equipment from '$lib/components/ui/character/equipment.svelte';
-	import * as Resizable from '$lib/components/ui/resizable';
-	import Chat from '$lib/components/ui/chat/chat.svelte';
-	import Actions from '$lib/components/ui/action/actions.svelte';
-
-	let currentTab = $derived(tab.tab);
-
-	$effect(() => {
-		currentTab = tab.tab;
-	});
+	import { getProfileOrUndefined } from '$lib/remote/auth.remote';
 </script>
 
-<Resizable.PaneGroup direction="horizontal" class="size-full" autoSaveId="mainContentPaneGroup">
-	<Resizable.Pane defaultSize={75} minSize={60}>
-		<div class="flex h-full items-start justify-start p-4">
-			{#if currentTab === 'Home'}
-				<HomeScreen />
-			{:else if currentTab === 'Inventory'}
-				<Inventory />
-			{:else if currentTab === 'Equipment'}
-				<Equipment />
-			{:else if currentTab === 'Actions'}
-				<Actions />
-			{/if}
-		</div>
-	</Resizable.Pane>
-
-	<Resizable.Handle />
-
-	<Resizable.Pane defaultSize={25} minSize={20} maxSize={40}>
-		<Chat />
-	</Resizable.Pane>
-</Resizable.PaneGroup>
+<div class="flex size-full flex-col items-center justify-center">
+	<svelte:boundary>
+		{#snippet pending()}
+			<span>Loading...</span>
+		{/snippet}
+		{#if await getProfileOrUndefined()}
+			<HomeScreen />
+			<Button href="/home" variant="link">Continue to game</Button>
+		{:else}
+			<LoginDialog />
+		{/if}
+	</svelte:boundary>
+</div>

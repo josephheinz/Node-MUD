@@ -1,16 +1,11 @@
 <script lang="ts">
 	import { getEquipment } from '$lib/remote/equipment.remote';
-	import { gameState } from '$lib/store.svelte';
-	import type { Equipment, EquipmentSlot, Item } from '$lib/types/item';
+	import type { EquipmentSlot, Item } from '$lib/types/item';
 	import * as Card from '../card';
 	import ItemRenderer from '../itemRenderer.svelte';
+	import Skeleton from '../skeleton/skeleton.svelte';
 
-	const {
-		equipment: initEquipment,
-		display = false
-	}: { display?: boolean; equipment?: Equipment } = $props();
-
-	let equipment: Equipment = $state(initEquipment ?? gameState.equipment);
+	const { display = false }: { display?: boolean } = $props();
 
 	const slotGridSpots: Record<EquipmentSlot, string> = {
 		Head: 'col-start-3 row-start-1',
@@ -31,14 +26,20 @@
 	<Card.Content>
 		<svelte:boundary>
 			{#snippet pending()}
-				<span>Loading</span>
+				<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
+					{#each { length: 25 }}
+						<Skeleton class="size-16 rounded-md" />
+					{/each}
+				</div>
 			{/snippet}
+			<span>{JSON.stringify((await getEquipment()).export())}</span>
 			<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
-				{#each (await getEquipment(gameState.user?.id!)).equipment?.export() as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
+				{#each (await getEquipment()).export() as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
 					{@render equipmentSlot(slot as EquipmentSlot, item)}
-				{/each}<!-- 
-				{#each equipment.export() as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
-				{/each} -->
+				{/each}
+				{#each (await getEquipment()).export() as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
+					{@render equipmentSlot(slot as EquipmentSlot, item)}
+				{/each}
 			</div>
 		</svelte:boundary>
 	</Card.Content>

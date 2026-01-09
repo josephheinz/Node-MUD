@@ -15,56 +15,58 @@
 	import UserAvatar from '../userAvatar.svelte';
 	import { toggleMode, mode } from 'mode-watcher';
 	import { capitalizeFirstLetter } from '$lib/utils/general';
-	import { logout } from '$lib/remote/auth.remote';
-	import { enhance } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
+	import { getProfile, logout } from '$lib/remote/auth.remote';
 	import { toast } from 'svelte-sonner';
-
-	let { profile }: { profile: Profile } = $props();
 </script>
 
-<DropdownMenu.Root>
-	<DropdownMenu.Trigger class="select-none">
-		<Button
-			variant="outline"
-			size="lg"
-			class="flex w-full cursor-pointer items-center justify-start gap-2 px-2"
-		>
-			<UserAvatar {profile} />
-			<span class="grow text-left">
-				{profile.display_name ?? `@${profile.username}`}
-			</span>
-			<ChevronUpDown />
-		</Button>
-	</DropdownMenu.Trigger>
-	<DropdownMenu.Content align="end">
-		<DropdownMenu.Label>Your Account</DropdownMenu.Label>
-		<DropdownMenu.Group>
-			<DropdownMenu.Item>
-				<a href={`/profile/${profile.username}`} class="flex items-center gap-2">
-					<Fa icon={faUser} />Profile
-				</a>
-			</DropdownMenu.Item>
-			<DropdownMenu.Item onclick={toggleMode}>
-				<Fa icon={mode.current === 'dark' ? faMoon : faSun} />
-				{capitalizeFirstLetter(mode.current ?? 'system')}
-			</DropdownMenu.Item>
-			<form
-				{...logout.enhance(async ({ submit }) => {
-					try {
-						await submit();
-						location.reload();
-					} catch (e) {
-						toast.error('Something went wrong logging out');
-					}
-				})}
+<svelte:boundary>
+	{#snippet pending()}
+		<span>Loading</span>
+	{/snippet}
+	{@const profile = await getProfile()}
+	<DropdownMenu.Root>
+		<DropdownMenu.Trigger class="select-none">
+			<Button
+				variant="outline"
+				size="lg"
+				class="flex w-full cursor-pointer items-center justify-start gap-2 px-2"
 			>
-				<button type="submit" class="w-full">
-					<DropdownMenu.Item class="flex items-center gap-2" variant="destructive">
-						<Fa icon={faArrowRightFromBracket} /> Sign Out
-					</DropdownMenu.Item>
-				</button>
-			</form>
-		</DropdownMenu.Group>
-	</DropdownMenu.Content>
-</DropdownMenu.Root>
+				<UserAvatar />
+				<span class="grow text-left">
+					{profile.display_name ?? `@${profile.username}`}
+				</span>
+				<ChevronUpDown />
+			</Button>
+		</DropdownMenu.Trigger>
+		<DropdownMenu.Content align="end">
+			<DropdownMenu.Label>Your Account</DropdownMenu.Label>
+			<DropdownMenu.Group>
+				<DropdownMenu.Item>
+					<a href={`/profile/${profile.username}`} class="flex items-center gap-2">
+						<Fa icon={faUser} />Profile
+					</a>
+				</DropdownMenu.Item>
+				<DropdownMenu.Item onclick={toggleMode}>
+					<Fa icon={mode.current === 'dark' ? faMoon : faSun} />
+					{capitalizeFirstLetter(mode.current ?? 'system')}
+				</DropdownMenu.Item>
+				<form
+					{...logout.enhance(async ({ submit }) => {
+						try {
+							await submit();
+							location.href = '/';
+						} catch (e) {
+							toast.error('Something went wrong logging out');
+						}
+					})}
+				>
+					<button type="submit" class="w-full">
+						<DropdownMenu.Item class="flex items-center gap-2" variant="destructive">
+							<Fa icon={faArrowRightFromBracket} /> Sign Out
+						</DropdownMenu.Item>
+					</button>
+				</form>
+			</DropdownMenu.Group>
+		</DropdownMenu.Content>
+	</DropdownMenu.Root>
+</svelte:boundary>

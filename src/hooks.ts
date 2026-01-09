@@ -1,5 +1,5 @@
 import type { Transport } from '@sveltejs/kit';
-import { Equipment, Inventory } from '$lib/types/item';
+import { Equipment, Inventory, type DBEquipment } from '$lib/types/item';
 import { encodeDBItem, loadDbItem } from '$lib/utils/item';
 
 export const transport: Transport = {
@@ -9,7 +9,11 @@ export const transport: Transport = {
 			return value.serialize();
 		},
 		decode: (data) => {
-			return Equipment.load(data);
+			console.log(data)
+			const serialized: DBEquipment = Equipment.serialize(data);
+			const final: Equipment = Equipment.load(serialized);
+			console.log(`serialized: ${JSON.stringify(serialized)}\n\n\nfinal: ${JSON.stringify(final)}`)
+			return final;
 		}
 	},
 	Item: {

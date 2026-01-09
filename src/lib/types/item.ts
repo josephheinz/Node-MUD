@@ -46,7 +46,7 @@ export interface IItemModifierClass<T extends IItemModifier = IItemModifier> {
 	//hash(): string;
 	fromHash(hash: string): T;
 
-	new (...args: any[]): T;
+	new(...args: any[]): T;
 }
 
 export type Item = {
@@ -129,25 +129,25 @@ export class Equipment {
 	private _hands: Item | null = null;
 
 	constructor(initValues: {
-		head?: Item;
-		body?: Item;
-		legs?: Item;
-		offhand?: Item;
-		mainhand?: Item;
-		necklace?: Item;
-		ring?: Item;
-		hands?: Item;
+		Head?: Item;
+		Body?: Item;
+		Legs?: Item;
+		Offhand?: Item;
+		Mainhand?: Item;
+		Necklace?: Item;
+		Ring?: Item;
+		Hands?: Item;
 	}) {
 		// Holy vomit
 		// maybe ill figure out a better way to do this in the future
-		this._head = initValues.head ? initValues.head : null;
-		this._body = initValues.body ? initValues.body : null;
-		this._legs = initValues.legs ? initValues.legs : null;
-		this._offhand = initValues.offhand ? initValues.offhand : null;
-		this._mainhand = initValues.mainhand ? initValues.mainhand : null;
-		this._necklace = initValues.necklace ? initValues.necklace : null;
-		this._ring = initValues.ring ? initValues.ring : null;
-		this._hands = initValues.hands ? initValues.hands : null;
+		this._head = initValues.Head ? initValues.Head : null;
+		this._body = initValues.Body ? initValues.Body : null;
+		this._legs = initValues.Legs ? initValues.Legs : null;
+		this._offhand = initValues.Offhand ? initValues.Offhand : null;
+		this._mainhand = initValues.Mainhand ? initValues.Mainhand : null;
+		this._necklace = initValues.Necklace ? initValues.Necklace : null;
+		this._ring = initValues.Ring ? initValues.Ring : null;
+		this._hands = initValues.Hands ? initValues.Hands : null;
 	}
 
 	get Head() {
@@ -221,6 +221,7 @@ export class Equipment {
 	}
 
 	public serialize(): DBEquipment {
+		console.log(this);
 		return {
 			Head: this._head ? encodeDBItem(this._head) : null,
 			Body: this._body ? encodeDBItem(this._body) : null,
@@ -233,9 +234,39 @@ export class Equipment {
 		};
 	}
 
-	public static load(dbEquip: DBEquipment): Equipment {
-		let equipment: Record<string, Item | null> = {};
+	public static hydrate(equipment: DBEquipment): Equipment {
+		return new Equipment({
+			Head: equipment.Head ? loadDbItem(equipment.Head) : undefined,
+			Body: equipment.Body ? loadDbItem(equipment.Body) : undefined,
+			Legs: equipment.Legs ? loadDbItem(equipment.Legs) : undefined,
+			Offhand: equipment.Offhand ? loadDbItem(equipment.Offhand) : undefined,
+			Mainhand: equipment.Mainhand ? loadDbItem(equipment.Mainhand) : undefined,
+			Necklace: equipment.Necklace ? loadDbItem(equipment.Necklace) : undefined,
+			Ring: equipment.Ring ? loadDbItem(equipment.Ring) : undefined,
+			Hands: equipment.Hands ? loadDbItem(equipment.Hands) : undefined
+		});
+	}
 
+	public static serialize(equipment: Equipment): DBEquipment {
+		console.log(equipment);
+		const db: DBEquipment =
+		{
+			Head: equipment._head ? encodeDBItem(equipment._head) : null,
+			Body: equipment._body ? encodeDBItem(equipment._body) : null,
+			Legs: equipment._legs ? encodeDBItem(equipment._legs) : null,
+			Offhand: equipment._offhand ? encodeDBItem(equipment._offhand) : null,
+			Mainhand: equipment.Mainhand ? encodeDBItem(equipment.Mainhand) : null,
+			Necklace: equipment._necklace ? encodeDBItem(equipment._necklace) : null,
+			Ring: equipment._ring ? encodeDBItem(equipment._ring) : null,
+			Hands: equipment._hands ? encodeDBItem(equipment._hands) : null
+		};
+		console.log("db: ", db)
+		return db;
+	}
+
+	public static load(dbEquip: DBEquipment | Equipment): Equipment {
+		let equipment: Record<string, Item | null> = {};
+		console.log(equipment)
 		Object.entries(dbEquip).forEach(([slot, item]) => {
 			if (item === null) {
 				equipment[slot] = null;
@@ -245,9 +276,13 @@ export class Equipment {
 			equipment[slot] = loadDbItem(item);
 		});
 
-		return new Equipment({
-			...equipment
-		});
+		const _new =
+			new Equipment({
+				...equipment
+			});
+		console.log(_new)
+
+		return _new
 	}
 
 	public export(): Array<[EquipmentSlot, Item | null]> {

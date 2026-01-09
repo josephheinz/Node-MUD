@@ -13,7 +13,6 @@ export const getQueue = query(z.uuidv4(), async (id) => {
 	if (!user) return { error: 'Unauthorized', queue: undefined, started: undefined };
 
 	const { data, error } = await supabase.from('actions').select('*').eq('player_id', id).single();
-	console.log(data);
 
 	if (error) throw new Error(error.message);
 

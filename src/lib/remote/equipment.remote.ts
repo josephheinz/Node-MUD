@@ -11,7 +11,7 @@ import {
 	type Item
 } from '$lib/types/item';
 import { canonicalizeDbItem, determineSlot, loadDbItem } from '$lib/utils/item';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { isEqual } from 'radashi';
 import * as z from 'zod';
 
@@ -83,13 +83,17 @@ const DBItemSchema = z.object({
 
 const DBInventorySchema = z.array(DBItemSchema);
 
-export const getEquipment = query(z.uuidv4(), async (id) => {
+export const getEquipment = query(async () => {
 	const { locals } = getRequestEvent();
+
+	if (!locals.user) {
+		redirect(307, "/");
+	}
 
 	const { data, error } = await locals.supabase
 		.from('inventories')
 		.select('equipment_data')
-		.eq('player_id', id)
+		.eq('player_id', locals.user.id)
 		.single();
 
 	if (error) {
@@ -98,11 +102,12 @@ export const getEquipment = query(z.uuidv4(), async (id) => {
 
 	if (data) {
 		const equipment: Equipment = Equipment.load(data.equipment_data as DBEquipment);
-		return { equipment };
+		console.log(equipment, data.equipment_data)
+		return equipment;
 	}
 
-	return { equipment: undefined };
-});
+	throw new Error("Equipment not found in database");
+})
 
 const DBEquipmentSchema = z.object({
 	Head: DBItemSchema.nullable(),

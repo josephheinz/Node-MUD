@@ -18,7 +18,7 @@
 		{
 			tab: 'Home',
 			icon: faHome,
-			href: '/'
+			href: '/home'
 		},
 		{
 			tab: 'Inventory',

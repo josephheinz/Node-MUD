@@ -1,13 +1,19 @@
-import { query } from '$app/server';
+import { getRequestEvent, query } from '$app/server';
 import { supabase } from '$lib/auth/supabaseClient';
 import { Inventory } from '$lib/types/item';
-import * as z from 'zod';
+import { redirect } from '@sveltejs/kit';
 
-export const getInventory = query(z.uuidv4(), async (id) => {
+export const getInventory = query(async () => {
+	const { locals } = getRequestEvent();
+
+	if (!locals.user) {
+		redirect(307, "/");
+	}
+
 	const { data, error } = await supabase
 		.from('inventories')
 		.select('inventory_data')
-		.eq('player_id', id)
+		.eq('player_id', locals.user.id)
 		.single();
 
 	if (error) {
@@ -16,8 +22,8 @@ export const getInventory = query(z.uuidv4(), async (id) => {
 
 	if (data) {
 		const inventory = Inventory.load(data.inventory_data);
-		return { inventory };
+		return inventory;
 	}
 
-	return { inventory: undefined };
+	throw new Error("Inventory not found in database");
 });

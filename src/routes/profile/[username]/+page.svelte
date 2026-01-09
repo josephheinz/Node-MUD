@@ -7,7 +7,12 @@
 	import ProfileHeader from '$lib/components/ui/profile/profileHeader.svelte';
 	import ProfileBody from '$lib/components/ui/profile/profileBody.svelte';
 	import type { User } from '@supabase/supabase-js';
-	import { onMount } from 'svelte';
+	import {
+		getApiSettings,
+		getProfileAndApiSettingsByUsername,
+		getProfileByUsername
+	} from '$lib/remote/auth.remote';
+	import { page } from '$app/state';
 
 	const {
 		data
@@ -21,21 +26,30 @@
 
 	let profile = $derived(data.profile);
 	let apiSettings = $derived(data.api_settings);
+
+	let username: string = $derived(page.params.username ?? '');
 </script>
 
-<title>{profile?.display_name ?? `@${profile?.username}`}'s Profile</title>
+<svelte:boundary>
+	{#snippet pending()}
+		<title>Loading...</title>
+		<span>Loading...</span>
+	{/snippet}
+	{@const { profile, apiSettings } = await getProfileAndApiSettingsByUsername(username)}
+	<title>{profile?.display_name ?? `@${profile?.username}`}'s Profile</title>
 
-{#if profile && apiSettings}
-	<ProfileHeader bind:profile />
-	<ProfileBody {data} />
-{:else}
-	<Empty.Root>
-		<Empty.Header>
-			<Empty.Media>
-				<Fa icon={faSkull} class="text-4xl" />
-			</Empty.Media>
-			<Empty.Title>This profile does not exist</Empty.Title>
-			<Empty.Description>Are you sure you spelled it right?</Empty.Description>
-		</Empty.Header>
-	</Empty.Root>
-{/if}
+	{#if profile && apiSettings}
+		<ProfileHeader {profile} />
+		<ProfileBody {data} />
+	{:else}
+		<Empty.Root>
+			<Empty.Header>
+				<Empty.Media>
+					<Fa icon={faSkull} class="text-4xl" />
+				</Empty.Media>
+				<Empty.Title>This profile does not exist</Empty.Title>
+				<Empty.Description>Are you sure you spelled it right?</Empty.Description>
+			</Empty.Header>
+		</Empty.Root>
+	{/if}
+</svelte:boundary>
