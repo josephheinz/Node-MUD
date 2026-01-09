@@ -1,5 +1,5 @@
-import { getRequestEvent, query } from '$app/server';
-import type { DBQueueAction } from '$lib/types/action';
+import { form, getRequestEvent, query } from '$app/server';
+import { getAction, type DBQueueAction } from '$lib/types/action';
 import { Inventory, type DBInventory, type Item } from '$lib/types/item';
 import { processQueue, type ProcessedQueue } from '$lib/utils/action';
 import { tryStackItemInInventory } from '$lib/utils/item';
@@ -76,4 +76,41 @@ export const getQueue = query(async () => {
 		inventory: updatedDBInv,
 		lastUpdated: Date.now()
 	};
+});
+
+const queueActionSchema = z.object({
+	id: z.string(),
+	amount: z.int()
+});
+
+export const queueAction = form(queueActionSchema, async (data) => {
+	const { locals } = getRequestEvent();
+
+	const { user, supabase } = locals;
+
+	if (!user) redirect(307, '/');
+	if (!getAction(data.id)) throw new Error(`Invalid action id: ${data.id}`);
+	const id = user.id;
+
+	const { data: currentQueue, error } = await supabase
+		.from('actions')
+		.select('queue')
+		.eq('player_id', id)
+		.single();
+
+	if (!data || error) {
+		throw new Error('Queue not found on the database');
+	}
+
+	const updatedQueue: DBQueueAction[] = [
+		...currentQueue.queue,
+		{ id: data.id, amount: data.amount }
+	];
+
+	const { error: updateQueueErr } = await supabase
+		.from('actions')
+		.update({ queue: updatedQueue })
+		.eq('player_id', id);
+
+	if (updateQueueErr) throw new Error(updateQueueErr.message);
 });

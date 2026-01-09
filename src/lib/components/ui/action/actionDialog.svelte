@@ -11,6 +11,7 @@
 	import { getInventoryCounts } from '$lib/utils/action';
 	import Label from '../label/label.svelte';
 	import Button from '../button/button.svelte';
+	import { queueAction } from '$lib/remote/actions.remote';
 
 	const { action }: { action: Action } = $props();
 
@@ -47,7 +48,7 @@
 	<Dialog.Header>
 		<Dialog.Title>{action.name}</Dialog.Title>
 	</Dialog.Header>
-	<div class="flex w-full flex-col gap-4">
+	<form class="flex w-full flex-col gap-4" {...queueAction}>
 		<div>
 			<h1 class="text-start text-lg font-semibold">Inputs:</h1>
 			<ul>
@@ -90,10 +91,11 @@
 		>
 		<div class="flex gap-2">
 			<Label for="amount" class="text-md font-semibold">Amount:</Label>
-			<Input name="amount" type="number" bind:value={amount} step={1} min={1} />
+			<Input step={1} min={1} {...queueAction.fields.amount.as('number')} bind:value={amount} />
 		</div>
-		<Button class="cursor-pointer disabled:cursor-not-allowed" disabled={!canAct}
+		<input type="hidden" {...queueAction.fields.id.as('text')} value={action.id} />
+		<Button class="cursor-pointer disabled:cursor-not-allowed" disabled={!canAct} type="submit"
 			>Add to Queue</Button
 		>
-	</div>
+	</form>
 </Dialog.Content>

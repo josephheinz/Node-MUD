@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getQueue } from '$lib/remote/actions.remote';
+	import { getInventory } from '$lib/remote/inventory.remote';
 	import type { Action, DBQueueAction } from '$lib/types/action';
 	import type { DBInventory } from '$lib/types/item';
 	import { loadDbQueue } from '$lib/utils/action';
@@ -88,6 +89,7 @@
 	async function tryUpdateQueue() {
 		try {
 			await getQueue().refresh();
+			await getInventory().refresh();
 		} catch (e) {
 			console.error(e);
 		}
