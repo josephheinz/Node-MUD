@@ -13,26 +13,11 @@
 
 	initializeItemRegistry();
 	initializeActionRegistry();
-	/* let inv: Inventory = Inventory.load(data.inventory);
-	let eq: Equipment = Equipment.load(data.equipment);
-	let user: User | null = data.user;
-	let profile: Profile | null = data.profile;
-	let queue: DBQueueAction[] | null = data.queue;
-	let started: Date | null = data.started;
-
-	gameState.equipment = eq;
-	gameState.user = user;
-	gameState.profile = profile;
-	gameState.inventory = inv;
-
-	gameState.queue.started = started;
-	gameState.queue.queue = queue;
-	$inspect(gameState); */
 </script>
 
 <svelte:boundary>
 	{#snippet pending()}
-		<span>Loading</span>
+		<div></div>
 	{/snippet}
 	<WebsocketManager user={await getUser()} />
 </svelte:boundary>

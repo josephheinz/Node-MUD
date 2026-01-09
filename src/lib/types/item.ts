@@ -12,7 +12,7 @@ export enum Rarity {
 	Uncommon = '#32a852',
 	Rare = '#5b8dfa',
 	Epic = '#d335f3',
-	Legendary = '#dbd82b',
+	Legendary = '#EFBF04',
 	Mythic = '#fd89e8',
 	Divine = '#3fe9ff',
 	Special = '#ff5252'
