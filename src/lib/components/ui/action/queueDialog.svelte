@@ -1,15 +1,26 @@
 <script lang="ts">
-	import type { Action } from '$lib/types/action';
+	import type { Action, DBQueueAction } from '$lib/types/action';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Empty from '$lib/components/ui/empty';
 	import Fa from 'svelte-fa';
-	import { faLocust } from '@fortawesome/free-solid-svg-icons';
+	import { faLocust, faTrash } from '@fortawesome/free-solid-svg-icons';
 	import { formatNumber } from '$lib/utils/general';
 	import { loadDbQueue } from '$lib/utils/action';
-	import { getQueue } from '$lib/remote/actions.remote';
+	import { deleteFromQueue, getQueue } from '$lib/remote/actions.remote';
 
-	let loadedQueuePromise = $derived(getQueue());
-	let loadedQueue = $derived(loadDbQueue((await loadedQueuePromise).queue));
+	let loadedQueuePromise = $derived(await getQueue());
+	let loadedQueue = $derived(loadDbQueue(loadedQueuePromise.queue));
+
+	async function removeFromQueue(index: number) {
+		if (!loadedQueue.has(index)) return;
+
+		const queue = await getQueue();
+
+		const updatedQueue: DBQueueAction[] = queue.queue.splice(index, 1);
+
+		await deleteFromQueue(updatedQueue);
+		await getQueue().refresh();
+	}
 </script>
 
 <Dialog.Content>
@@ -41,9 +52,18 @@
 			<div class="flex flex-col items-start justify-start gap-1">
 				{#each loadedQueue.entries() as [index, action]}
 					{#if index !== currentIndex}
-						<span class="text-sm text-muted-foreground"
-							>{action.name} x{formatNumber(queue[index].amount)}
-						</span>
+						<div class="flex w-full items-center justify-between">
+							<span class="text-sm text-muted-foreground"
+								>{action.name} x{formatNumber(queue[index].amount)}
+							</span>
+							<button
+								onclick={() => {
+									removeFromQueue(index);
+								}}
+							>
+								<Fa icon={faTrash} class="text-rose-400" />
+							</button>
+						</div>
 					{/if}
 				{/each}
 			</div>

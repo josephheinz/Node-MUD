@@ -15,7 +15,7 @@ export class ReforgeModifier implements IItemModifier {
 
 	constructor(reforge: IReforge | string) {
 		if (typeof reforge === 'string') this._reforge = Reforges[reforge];
-		else this._reforge = reforge;
+		else this._reforge = Reforges[reforge.name];
 		this.statChanges = this._reforge.stats;
 		this.displayName = `${this._reforge.name} Reforge`;
 	}
@@ -37,7 +37,7 @@ export class ReforgeModifier implements IItemModifier {
 	}
 
 	static fromJSON(raw: IRawModifierSpec): ReforgeModifier {
-		return new ReforgeModifier(raw.reforge);
+		return new ReforgeModifier(raw.reforge ?? raw._reforge);
 	}
 
 	hash(): string {

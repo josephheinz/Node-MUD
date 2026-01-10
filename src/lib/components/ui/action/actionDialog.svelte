@@ -11,7 +11,7 @@
 	import { getInventoryCounts } from '$lib/utils/action';
 	import Label from '../label/label.svelte';
 	import Button from '../button/button.svelte';
-	import { queueAction } from '$lib/remote/actions.remote';
+	import { getQueue, queueAction } from '$lib/remote/actions.remote';
 	import { toast } from 'svelte-sonner';
 
 	const { action }: { action: Action } = $props();
@@ -56,6 +56,7 @@
 				await submit();
 				toast.success(`Successfully queued ${amount} ${action.name}`);
 				amount = 1;
+				await getQueue().refresh();
 			} catch (e) {
 				toast.error('Something went wrong queueing an item');
 			}

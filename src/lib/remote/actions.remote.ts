@@ -1,4 +1,4 @@
-import { form, getRequestEvent, query } from '$app/server';
+import { command, form, getRequestEvent, query } from '$app/server';
 import { getAction, type DBQueueAction } from '$lib/types/action';
 import { Inventory, type DBInventory, type Item } from '$lib/types/item';
 import { processQueue, type ProcessedQueue } from '$lib/utils/action';
@@ -94,7 +94,7 @@ export const queueAction = form(queueActionSchema, async (data) => {
 
 	const { data: currentQueue, error } = await supabase
 		.from('actions')
-		.select('queue')
+		.select('queue, started_at')
 		.eq('player_id', id)
 		.single();
 
@@ -109,8 +109,32 @@ export const queueAction = form(queueActionSchema, async (data) => {
 
 	const { error: updateQueueErr } = await supabase
 		.from('actions')
-		.update({ queue: updatedQueue })
+		.update({ queue: updatedQueue, started_at: currentQueue.started_at ?? new Date(Date.now()) })
 		.eq('player_id', id);
 
 	if (updateQueueErr) throw new Error(updateQueueErr.message);
+});
+
+const updatedQueueSchema = z.array(
+	z.object({
+		id: z.string(),
+		amount: z.int()
+	})
+);
+
+export const deleteFromQueue = command(updatedQueueSchema, async (updatedQueue) => {
+	const { locals } = getRequestEvent();
+
+	const { user, supabase } = locals;
+
+	if (!user) throw new Error();
+	const id = user.id;
+
+	const { data, error } = await supabase
+		.from('actions')
+		.update({ queue: updatedQueue })
+		.eq('player_id', id)
+		.select()
+		.single();
+	if (error) throw new Error(error.message);
 });
