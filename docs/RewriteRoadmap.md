@@ -9,9 +9,9 @@
 - [x] Websockets setup
 - [x] Chat, including ItemHover
 - [x] Action loading 
-- [ ] Action display
-- [ ] Action queueing
-- [ ] Action inventory updating
+- [x] Action display
+- [x] Action queueing
+- [x] Action inventory updating
 - [ ] Player skills loading
 - [ ] Action skills updating
 - [ ] Reforging items
