@@ -8,11 +8,17 @@
 	import WebsocketManager from '$lib/components/auth/websocketManager.svelte';
 	import { initializeActionRegistry } from '$lib/types/action';
 	import { getUser } from '$lib/remote/auth.remote';
+	import { updateQueue } from '$lib/remote/actions.remote';
+	import { onMount } from 'svelte';
 
 	let { children }: { children: any } = $props();
 
 	initializeItemRegistry();
 	initializeActionRegistry();
+
+	onMount(async () => {
+		await updateQueue();
+	});
 </script>
 
 <svelte:boundary>

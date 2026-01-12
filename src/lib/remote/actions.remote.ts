@@ -5,6 +5,7 @@ import { processQueue, type ProcessedQueue } from '$lib/utils/action';
 import { tryStackItemInInventory } from '$lib/utils/item';
 import { redirect } from '@sveltejs/kit';
 import * as z from 'zod';
+import { getInventory } from './inventory.remote';
 
 export const getQueue = query(async () => {
 	const { locals } = getRequestEvent();
@@ -20,37 +21,111 @@ export const getQueue = query(async () => {
 
 	if (!data) throw new Error('No actions found in the data base');
 
-	const processedQueue: ProcessedQueue = processQueue(data.queue, data.started_at);
+	let started: Date | null = data.started_at;
+	if (started == null && data.queue.length > 0) {
+		started = new Date(Date.now());
+	}
 
-	const { data: invData, error: invError } = await supabase
-		.from('inventories')
-		.select('inventory_data')
-		.eq('player_id', id)
-		.single();
-	if (invError) throw new Error(invError.message);
+	console.log(data.queue, data.started_at)
+	return {
+		queue: data.queue as DBQueueAction[],
+		started
+	};
+	/* 
+		const processedQueue: ProcessedQueue = processQueue(data.queue, data.started_at);
+	
+		const { data: invData, error: invError } = await supabase
+			.from('inventories')
+			.select('inventory_data')
+			.eq('player_id', id)
+			.single();
+		if (invError) throw new Error(invError.message);
+	
+		// loading skills here in the future
+		const inventory: Inventory = Inventory.load(invData.inventory_data);
+	
+		let updatedInv: Inventory = new Inventory(inventory.contents);
+		processedQueue.outputs.items.forEach((output: Item) => {
+			updatedInv = new Inventory(tryStackItemInInventory(output, updatedInv).contents);
+		});
+		let updatedDBInv: DBInventory = updatedInv.serialize();
+	
+		const updatedQueue: DBQueueAction[] = processedQueue.queue;
+	
+		if (data.started_at != null && updatedQueue.length <= 0) {
+			const { error: updateStartErr } = await supabase
+				.from('actions')
+				.update({ started_at: null })
+				.eq('player_id', id);
+	
+			if (updateStartErr) throw new Error(updateStartErr.message);
+		} else if (data.started_at != null && updatedQueue.length >= 1) {
+			const { error: updateStartErr } = await supabase
+				.from('actions')
+				.update({ started_at: new Date(Date.now()) })
+				.eq('player_id', id);
+	
+			if (updateStartErr) throw new Error(updateStartErr.message);
+		}
+	
+		const { error: updateInvErr } = await supabase
+			.from('inventories')
+			.update({ inventory_data: updatedDBInv })
+			.eq('player_id', id);
+		if (updateInvErr) throw new Error(updateInvErr.message);
+	
+		const { data: updateQueueData, error: updateQueueErr } = await supabase
+			.from('actions')
+			.update({ queue: updatedQueue })
+			.eq('player_id', id)
+			.select('*')
+			.single();
+		if (updateQueueErr) throw new Error(updateQueueErr.message);
+	
+		return {
+			queue: updatedQueue,
+			started: updateQueueData.started_at as Date,
+			inventory: updatedDBInv,
+			lastUpdated: Date.now()
+		}; */
+});
 
-	// loading skills here in the future
-	const inventory: Inventory = Inventory.load(invData.inventory_data);
+export const updateQueue = command(async () => {
+	const { locals } = getRequestEvent();
 
-	let updatedInv: Inventory = new Inventory(inventory.contents);
+	const { user, supabase } = locals;
+
+	if (!user) redirect(307, '/');
+	const id = user.id;
+
+	const queue = await getQueue();
+	const inventory = await getInventory();
+
+	if (queue.started === null) return;
+
+	const processedQueue = processQueue(queue.queue, queue.started);
+
+	let updatedInv = new Inventory(inventory.contents);
 	processedQueue.outputs.items.forEach((output: Item) => {
 		updatedInv = new Inventory(tryStackItemInInventory(output, updatedInv).contents);
 	});
-	let updatedDBInv: DBInventory = updatedInv.serialize();
 
+	let updatedDBInv: DBInventory = updatedInv.serialize();
 	const updatedQueue: DBQueueAction[] = processedQueue.queue;
 
-	if (data.started_at != null && updatedQueue.length <= 0) {
+	if (updatedQueue.length <= 0) {
 		const { error: updateStartErr } = await supabase
 			.from('actions')
 			.update({ started_at: null })
 			.eq('player_id', id);
 
 		if (updateStartErr) throw new Error(updateStartErr.message);
-	} else if (data.started_at != null && updatedQueue.length >= 1) {
+	} else if (updatedQueue.length >= 1) {
+		const started_at = new Date(new Date(queue.started).getTime() + processedQueue.elapsedTime)
+
 		const { error: updateStartErr } = await supabase
 			.from('actions')
-			.update({ started_at: new Date(Date.now()) })
+			.update({ started_at })
 			.eq('player_id', id);
 
 		if (updateStartErr) throw new Error(updateStartErr.message);
@@ -62,20 +137,11 @@ export const getQueue = query(async () => {
 		.eq('player_id', id);
 	if (updateInvErr) throw new Error(updateInvErr.message);
 
-	const { data: updateQueueData, error: updateQueueErr } = await supabase
+	const { error: updateQueueErr } = await supabase
 		.from('actions')
 		.update({ queue: updatedQueue })
-		.eq('player_id', id)
-		.select('*')
-		.single();
+		.eq('player_id', id);
 	if (updateQueueErr) throw new Error(updateQueueErr.message);
-
-	return {
-		queue: updatedQueue,
-		started: updateQueueData.started_at as Date,
-		inventory: updatedDBInv,
-		lastUpdated: Date.now()
-	};
 });
 
 const queueActionSchema = z.object({
@@ -109,7 +175,7 @@ export const queueAction = form(queueActionSchema, async (data) => {
 
 	const { error: updateQueueErr } = await supabase
 		.from('actions')
-		.update({ queue: updatedQueue, started_at: currentQueue.started_at ?? new Date(Date.now()) })
+		.update({ queue: updatedQueue, started_at: currentQueue.started_at != null ? currentQueue.started_at : new Date(Date.now()) })
 		.eq('player_id', id);
 
 	if (updateQueueErr) throw new Error(updateQueueErr.message);
@@ -130,11 +196,9 @@ export const deleteFromQueue = command(updatedQueueSchema, async (updatedQueue) 
 	if (!user) throw new Error();
 	const id = user.id;
 
-	const { data, error } = await supabase
+	const { error } = await supabase
 		.from('actions')
 		.update({ queue: updatedQueue })
-		.eq('player_id', id)
-		.select()
-		.single();
+		.eq('player_id', id);
 	if (error) throw new Error(error.message);
 });

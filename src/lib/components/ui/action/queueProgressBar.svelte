@@ -1,21 +1,22 @@
 <script lang="ts">
-	import { getQueue } from '$lib/remote/actions.remote';
+	import { getQueue, updateQueue } from '$lib/remote/actions.remote';
 	import { getInventory } from '$lib/remote/inventory.remote';
-	import type { Action, DBQueueAction } from '$lib/types/action';
-	import type { DBInventory } from '$lib/types/item';
+	import type { DBQueueAction } from '$lib/types/action';
 	import { loadDbQueue } from '$lib/utils/action';
+	import { cloneDeep, isEqual } from 'radashi';
 	import Progress from '../progress/progress.svelte';
+	import { onMount } from 'svelte';
 
 	const {
 		queueData
 	}: {
 		queueData: {
 			queue: DBQueueAction[];
-			started: Date;
-			inventory: DBInventory;
-			lastUpdated: number;
+			started: Date | null;
 		};
 	} = $props();
+
+	onMount(() => console.log(queueData));
 
 	let loadedQueue = $derived(loadDbQueue(queueData.queue));
 
@@ -67,6 +68,8 @@
 
 			let timeDiffMilliseconds: number = now - startTime;
 
+			console.log(timeDiffMilliseconds);
+
 			let actionTimeMilliseconds: number =
 				(loadedQueue.entries().next().value?.[1].time ?? 0) * 1000;
 
@@ -77,8 +80,8 @@
 
 				isUpdating = true;
 
-				await new Promise((resolve) => setTimeout(resolve, 100));
-
+				/* 				await new Promise((resolve) => setTimeout(resolve, 100));
+				 */
 				await tryUpdateQueue();
 
 				isUpdating = false;
@@ -88,8 +91,31 @@
 
 	async function tryUpdateQueue() {
 		try {
-			await getQueue().refresh();
-			await getInventory().refresh();
+			await updateQueue();
+			let updatedQueue = await getQueue();
+			console.log(updatedQueue.queue, queueData.queue);
+			const originalQueue = cloneDeep(queueData.queue);
+
+			if (!isEqual(updatedQueue.queue, originalQueue)) {
+				await getQueue().refresh();
+				await getInventory().refresh();
+				elapsedPercent = 0;
+				return;
+			}
+
+			do {
+				await new Promise((resolve) => setTimeout(resolve, 5000));
+				await updateQueue();
+				updatedQueue = await getQueue();
+				console.log(await getQueue());
+				console.log(originalQueue, updatedQueue);
+			} while (isEqual<{ id: string; amount: number }[]>(updatedQueue.queue, originalQueue));
+
+			if (!isEqual(updatedQueue.queue, originalQueue)) {
+				await getQueue().refresh();
+				await getInventory().refresh();
+				elapsedPercent = 0;
+			}
 		} catch (e) {
 			console.error(e);
 		}

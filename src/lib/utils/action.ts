@@ -42,8 +42,8 @@ export function checkQueueCompletion(
 	};
 }
 
-export function completeAction(action: Action): { items: Item[] } {
-	let outputs: { items: Item[] } = { items: [] };
+export function completeAction(action: Action): { items: Item[]; time: number } {
+	let outputs: { items: Item[]; time: number } = { items: [], time: action.time * 1000 };
 
 	action.outputs.items.forEach((item: ChanceItem) => {
 		if (rollChance(item)) {
@@ -62,6 +62,7 @@ export function processQueue(queue: DBQueueAction[], started_at: Date) {
 	const completion = checkQueueCompletion(queue, started_at);
 
 	let outputs: { items: Item[] } = { items: [] };
+	let elapsedTime: number = 0;
 
 	if (completion.status === 'Complete') {
 		queue.forEach((action: DBQueueAction) => {
@@ -71,6 +72,8 @@ export function processQueue(queue: DBQueueAction[], started_at: Date) {
 			for (let i = 0; i < action.amount; i++) {
 				const result = completeAction(loadedAction);
 
+				elapsedTime += result.time;
+
 				outputs.items.push(...result.items);
 				// addXp
 			}
@@ -79,23 +82,33 @@ export function processQueue(queue: DBQueueAction[], started_at: Date) {
 	} else if (completion.status === 'Active') {
 		let timeDifference: number = completion.timings.now - completion.timings.start;
 		let currentTimeDeficit: number = 0;
-		while (currentTimeDeficit < timeDifference && queue.length >= 1) {
+		do {
 			let action = queue[0];
 			const loadedAction: Action | null = getAction(action.id);
 			if (!loadedAction) continue;
 
 			currentTimeDeficit += loadedAction.time * 1000;
+			elapsedTime = currentTimeDeficit
 
-			if (currentTimeDeficit > timeDifference) break;
+			console.log(currentTimeDeficit, "/", timeDifference)
+			if (currentTimeDeficit > timeDifference) {
+				console.log(`Current time deficit: ${currentTimeDeficit}\nTime difference: ${timeDifference}`)
+				elapsedTime = currentTimeDeficit;
+				break;
+			}
 
 			action.amount--;
 			if (action.amount <= 0) queue.shift();
 
 			outputs = { items: [...outputs.items, ...completeAction(loadedAction).items] };
 		}
+		while (currentTimeDeficit < timeDifference && queue.length >= 1)
+
 	}
 
-	return { outputs, queue };
+	console.log(`Elapsed time: ${elapsedTime}\nOutputs: ${JSON.stringify(outputs)}\n\n`)
+
+	return { outputs, queue, elapsedTime };
 }
 
 export function getInventoryCounts(

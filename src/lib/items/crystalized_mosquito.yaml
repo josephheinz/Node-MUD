@@ -2,7 +2,7 @@
   name: Crystalized Mosquito
   icon:
     ascii: "o"
-    image: "/images/items/crystalizedMosquito.svg"
+    image: "/images/items/crystalizedMosquito.png"
   rarity: Rare
   modifiers:
     - type: Enhancer

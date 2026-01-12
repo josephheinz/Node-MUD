@@ -7,6 +7,8 @@ export interface IApiSettings {
 	equipment_api: boolean;
 }
 
+export const prerender = true;
+
 export async function load({ params, locals }) {
 	const { username } = params;
 

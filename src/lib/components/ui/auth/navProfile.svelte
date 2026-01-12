@@ -1,6 +1,5 @@
 <script lang="ts">
 	import ProfileDropdown from './profileDropdown.svelte';
-	import { getProfile, getUser } from '$lib/remote/auth.remote';
 	import { Skeleton } from '$lib/components/ui/skeleton/index';
 </script>
 
@@ -11,7 +10,5 @@
 			<Skeleton class="h-4/5 grow rounded-full" />
 		</div>
 	{/snippet}
-	{#if (await getProfile()) && (await getUser())}
-		<ProfileDropdown />
-	{/if}
+	<ProfileDropdown />
 </svelte:boundary>

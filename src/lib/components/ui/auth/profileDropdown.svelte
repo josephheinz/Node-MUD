@@ -1,12 +1,9 @@
 <script lang="ts">
-	import * as Avatar from '../avatar';
 	import * as DropdownMenu from '../dropdown-menu';
-	import type { Profile } from '$lib/store.svelte';
 	import Fa from 'svelte-fa';
 	import {
 		faArrowRightFromBracket,
 		faMoon,
-		faSort,
 		faSun,
 		faUser
 	} from '@fortawesome/free-solid-svg-icons';
@@ -17,11 +14,15 @@
 	import { capitalizeFirstLetter } from '$lib/utils/general';
 	import { getProfile, logout } from '$lib/remote/auth.remote';
 	import { toast } from 'svelte-sonner';
+	import Skeleton from '../skeleton/skeleton.svelte';
 </script>
 
 <svelte:boundary>
 	{#snippet pending()}
-		<span>Loading</span>
+		<div class="flex h-10 w-full justify-start gap-4 px-4">
+			<Skeleton class="aspect-square h-full rounded-full" />
+			<Skeleton class="h-4/5 grow rounded-full" />
+		</div>
 	{/snippet}
 	{@const profile = await getProfile()}
 	<DropdownMenu.Root>

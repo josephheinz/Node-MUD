@@ -55,8 +55,8 @@
 			try {
 				await submit();
 				toast.success(`Successfully queued ${amount} ${action.name}`);
-				amount = 1;
 				await getQueue().refresh();
+				amount = 1;
 			} catch (e) {
 				toast.error('Something went wrong queueing an item');
 			}
