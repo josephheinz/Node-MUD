@@ -9,7 +9,7 @@ export type ProcessedQueue = {
 };
 
 export const TEN_HOUR_ACTION_LIMIT: number = 10 * 60 * 60 * 1000; // ten hours times 60 minutes times 60 seconds times 1000 milliseconds
-
+/* 
 export function checkQueueCompletion(
 	queue: DBQueueAction[],
 	started_at: Date
@@ -42,21 +42,7 @@ export function checkQueueCompletion(
 	};
 }
 
-export function completeAction(action: Action): { items: Item[]; time: number } {
-	let outputs: { items: Item[]; time: number } = { items: [], time: action.time * 1000 };
 
-	action.outputs.items.forEach((item: ChanceItem) => {
-		if (rollChance(item)) {
-			const amount: number = rollValue(item);
-			for (let i = 0; i < amount; i++) {
-				const loadedItem: Item = loadDbItem({ id: item.id });
-				outputs.items = tryStackItemInInventory(loadedItem, outputs.items).contents;
-			}
-		}
-	});
-
-	return outputs;
-}
 
 export function processQueue(queue: DBQueueAction[], started_at: Date) {
 	const completion = checkQueueCompletion(queue, started_at);
@@ -109,7 +95,7 @@ export function processQueue(queue: DBQueueAction[], started_at: Date) {
 	console.log(`Elapsed time: ${elapsedTime}\nOutputs: ${JSON.stringify(outputs)}\n\n`)
 
 	return { outputs, queue, elapsedTime };
-}
+} */
 
 export function getInventoryCounts(
 	inventory: Inventory,
@@ -155,4 +141,100 @@ export function rollChance(item: ChanceItem): boolean {
 	// No chance means always succeeds
 	if (!item.chance || item.chance <= 1) return true;
 	return Math.floor(Math.random() * item.chance) === 0;
+}
+
+export type QueueCompletedData = {
+	id: string;
+	amount: number;
+	outputs: {
+		items: Item[]
+	}
+};
+
+export function processQueueUntilNow(queue: DBQueueAction[], currentActionStart: Date): { queue: DBQueueAction[]; completed: QueueCompletedData[]; currentActionStart: number } {
+	const now = Date.now();
+	const currentActionTime: number = currentActionStart.getTime();
+	const elapsed = now - currentActionTime;
+
+	let outputs: { items: Item[] } = { items: [] };
+	let timeUsed: number = 0;
+	let completed: QueueCompletedData[] = [];
+
+	do {
+		let dbAction = queue[0];
+		let action: Action = getAction(dbAction.id)!;
+
+		const actionTimeMS = action.time * 1000;
+
+		if (timeUsed + actionTimeMS > elapsed) break;
+
+		timeUsed += actionTimeMS;
+
+		dbAction.amount--;
+
+		outputs = { items: [...outputs.items, ...completeAction(action).items] };
+
+		if (dbAction.amount <= 0) {
+			completed.push({
+				...dbAction,
+				outputs
+			});
+			outputs.items.length = 0;
+			queue.shift();
+		}
+
+	} while (timeUsed < elapsed && queue.length > 0)
+
+	const newStartedAt = currentActionTime + timeUsed;
+
+
+	return { queue, completed, currentActionStart: newStartedAt };
+}
+
+export function getQueueProgress(
+	queue: DBQueueAction[],
+	currentActionStartedAt: number
+): {
+	progress: number; // 0-1 for current action
+	nextPollIn: number | null; // ms until next action completes
+	estimatedCompletion: number | null;
+} {
+	if (queue.length === 0) {
+		return { progress: 0, nextPollIn: null, estimatedCompletion: null };
+	}
+
+	const now = Date.now();
+	const action = queue[0];
+	const loadedAction = getAction(action.id);
+
+	if (!loadedAction) {
+		return { progress: 0, nextPollIn: 0, estimatedCompletion: null };
+	}
+
+	const actionDuration = loadedAction.time * 1000;
+	const elapsed = now - currentActionStartedAt;
+	const progress = Math.min(1, elapsed / actionDuration);
+	const remaining = Math.max(0, actionDuration - elapsed);
+
+	return {
+		progress,
+		nextPollIn: remaining,
+		estimatedCompletion: currentActionStartedAt + actionDuration
+	};
+}
+
+export function completeAction(action: Action): { items: Item[]; time: number } {
+	let outputs: { items: Item[]; time: number } = { items: [], time: action.time * 1000 };
+
+	action.outputs.items.forEach((item: ChanceItem) => {
+		if (rollChance(item)) {
+			const amount: number = rollValue(item);
+			for (let i = 0; i < amount; i++) {
+				const loadedItem: Item = loadDbItem({ id: item.id });
+				outputs.items = tryStackItemInInventory(loadedItem, outputs.items).contents;
+			}
+		}
+	});
+
+	return outputs;
 }

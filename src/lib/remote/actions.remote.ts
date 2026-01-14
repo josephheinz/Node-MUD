@@ -1,147 +1,183 @@
 import { command, form, getRequestEvent, query } from '$app/server';
 import { getAction, type DBQueueAction } from '$lib/types/action';
-import { Inventory, type DBInventory, type Item } from '$lib/types/item';
-import { processQueue, type ProcessedQueue } from '$lib/utils/action';
-import { tryStackItemInInventory } from '$lib/utils/item';
+import { getQueueProgress, processQueueUntilNow } from '$lib/utils/action';
 import { redirect } from '@sveltejs/kit';
 import * as z from 'zod';
 import { getInventory } from './inventory.remote';
+import { Inventory } from '$lib/types/item';
+import { encodeDBItem, tryStackItemInInventory } from '$lib/utils/item';
 
+/* 
 export const getQueue = query(async () => {
 	const { locals } = getRequestEvent();
-
 	const { user, supabase } = locals;
 
 	if (!user) redirect(307, '/');
-	const id = user.id;
 
-	const { data, error } = await supabase.from('actions').select('*').eq('player_id', id).single();
+	const { data, error } = await supabase
+		.from('actions')
+		.select('*')
+		.eq('player_id', user.id)
+		.single();
 
 	if (error) throw new Error(error.message);
+	if (!data) throw new Error('No actions found in the database');
 
-	if (!data) throw new Error('No actions found in the data base');
-
-	let started: Date | null = data.started_at;
-	if (started == null && data.queue.length > 0) {
-		started = new Date(Date.now());
+	const queue: DBQueueAction[] = data.queue;
+    
+	// If queue is empty, return early
+	if (queue.length === 0) {
+		return {
+			queue: [],
+			currentActionStartedAt: null,
+			completed: [],
+			progress: 0,
+			nextPollIn: null,
+			estimatedCompletion: null,
+			currentActionDuration: null
+		};
 	}
 
-	console.log(data.queue, data.started_at)
-	return {
-		queue: data.queue as DBQueueAction[],
-		started
-	};
-	/* 
-		const processedQueue: ProcessedQueue = processQueue(data.queue, data.started_at);
-	
+	const currentStartedAt = data.started_at ? new Date(data.started_at).getTime() : Date.now();
+	const result = processQueueUntilNow(queue, currentStartedAt);
+
+	// If actions completed, update database
+	if (result.completed.length > 0) {
 		const { data: invData, error: invError } = await supabase
 			.from('inventories')
 			.select('inventory_data')
-			.eq('player_id', id)
+			.eq('player_id', user.id)
 			.single();
 		if (invError) throw new Error(invError.message);
-	
-		// loading skills here in the future
-		const inventory: Inventory = Inventory.load(invData.inventory_data);
-	
-		let updatedInv: Inventory = new Inventory(inventory.contents);
-		processedQueue.outputs.items.forEach((output: Item) => {
-			updatedInv = new Inventory(tryStackItemInInventory(output, updatedInv).contents);
+
+		let updatedInv = Inventory.load(invData.inventory_data);
+		result.completed.forEach(completion => {
+			completion.outputs.items.forEach(item => {
+				updatedInv = new Inventory(tryStackItemInInventory(item, updatedInv).contents);
+			});
 		});
-		let updatedDBInv: DBInventory = updatedInv.serialize();
-	
-		const updatedQueue: DBQueueAction[] = processedQueue.queue;
-	
-		if (data.started_at != null && updatedQueue.length <= 0) {
-			const { error: updateStartErr } = await supabase
-				.from('actions')
-				.update({ started_at: null })
-				.eq('player_id', id);
-	
-			if (updateStartErr) throw new Error(updateStartErr.message);
-		} else if (data.started_at != null && updatedQueue.length >= 1) {
-			const { error: updateStartErr } = await supabase
-				.from('actions')
-				.update({ started_at: new Date(Date.now()) })
-				.eq('player_id', id);
-	
-			if (updateStartErr) throw new Error(updateStartErr.message);
-		}
-	
-		const { error: updateInvErr } = await supabase
+
+		await supabase
 			.from('inventories')
-			.update({ inventory_data: updatedDBInv })
-			.eq('player_id', id);
-		if (updateInvErr) throw new Error(updateInvErr.message);
-	
-		const { data: updateQueueData, error: updateQueueErr } = await supabase
+			.update({ inventory_data: updatedInv.serialize() })
+			.eq('player_id', user.id);
+
+		await supabase
 			.from('actions')
-			.update({ queue: updatedQueue })
-			.eq('player_id', id)
-			.select('*')
-			.single();
-		if (updateQueueErr) throw new Error(updateQueueErr.message);
-	
-		return {
-			queue: updatedQueue,
-			started: updateQueueData.started_at as Date,
-			inventory: updatedDBInv,
-			lastUpdated: Date.now()
-		}; */
-});
-
-export const updateQueue = command(async () => {
-	const { locals } = getRequestEvent();
-
-	const { user, supabase } = locals;
-
-	if (!user) redirect(307, '/');
-	const id = user.id;
-
-	const queue = await getQueue();
-	const inventory = await getInventory();
-
-	if (queue.started === null) return;
-
-	const processedQueue = processQueue(queue.queue, queue.started);
-
-	let updatedInv = new Inventory(inventory.contents);
-	processedQueue.outputs.items.forEach((output: Item) => {
-		updatedInv = new Inventory(tryStackItemInInventory(output, updatedInv).contents);
-	});
-
-	let updatedDBInv: DBInventory = updatedInv.serialize();
-	const updatedQueue: DBQueueAction[] = processedQueue.queue;
-
-	if (updatedQueue.length <= 0) {
-		const { error: updateStartErr } = await supabase
-			.from('actions')
-			.update({ started_at: null })
-			.eq('player_id', id);
-
-		if (updateStartErr) throw new Error(updateStartErr.message);
-	} else if (updatedQueue.length >= 1) {
-		const started_at = new Date(new Date(queue.started).getTime() + processedQueue.elapsedTime)
-
-		const { error: updateStartErr } = await supabase
-			.from('actions')
-			.update({ started_at })
-			.eq('player_id', id);
-
-		if (updateStartErr) throw new Error(updateStartErr.message);
+			.update({
+				queue: result.queue,
+				started_at: result.queue.length > 0 ? new Date(result.currentActionStartedAt) : null
+			})
+			.eq('player_id', user.id);
 	}
 
-	const { error: updateInvErr } = await supabase
-		.from('inventories')
-		.update({ inventory_data: updatedDBInv })
-		.eq('player_id', id);
-	if (updateInvErr) throw new Error(updateInvErr.message);
+	const progress = getQueueProgress(result.queue, result.currentActionStartedAt);
 
-	const { error: updateQueueErr } = await supabase
-		.from('actions')
-		.update({ queue: updatedQueue })
-		.eq('player_id', id);
-	if (updateQueueErr) throw new Error(updateQueueErr.message);
+	// Get current action duration for client-side progress calculation
+	let currentActionDuration = null;
+	if (result.queue.length > 0) {
+		const loadedAction = getAction(result.queue[0].id);
+		if (loadedAction) {
+			currentActionDuration = loadedAction.time * 1000;
+		}
+	}
+
+	return {
+		queue: result.queue,
+		currentActionStartedAt: result.queue.length > 0 ? result.currentActionStartedAt : null,
+		completed: result.completed.map(completion => ({
+			actionId: completion.actionId,
+			amount: completion.amount,
+			outputs: {
+				items: completion.outputs.items.map(item => encodeDBItem(item))
+			}
+		})),
+		progress: progress.progress,
+		nextPollIn: progress.nextPollIn,
+		estimatedCompletion: progress.estimatedCompletion,
+		currentActionDuration
+	};
+});*/
+
+export const getQueue = query(async () => {
+	const { locals } = getRequestEvent();
+	const { user, supabase } = locals;
+
+	if (!user) redirect(307, "/");
+
+	const { data, error } = await supabase
+		.from("actions")
+		.select("started_at, queue")
+		.eq("player_id", user.id)
+		.single();
+
+	if (error) throw new Error(error.message);
+	if (!data) throw new Error('No actions found in the database');
+
+	const queue: DBQueueAction[] = data.queue;
+
+	if (queue.length === 0) return {
+		queue: [],
+		currentActionStartedAt: null,
+		completed: [],
+		progress: 0,
+		nextPollIn: null,
+		estimatedCompletion: null,
+		currentActionDuration: null
+	}
+
+	const currentStartedAt = data.started_at ? new Date(data.started_at) : new Date(Date.now());
+	const result = processQueueUntilNow(queue, currentStartedAt);
+
+	if (result.completed.length > 0) {
+		let updatedInv = await getInventory();
+
+		result.completed.forEach((completion) => {
+			completion.outputs.items.forEach(item => {
+				updatedInv = new Inventory(tryStackItemInInventory(item, updatedInv).contents);
+			});
+		});
+
+		await supabase
+			.from("inventories")
+			.update({ inventory_data: updatedInv.serialize() })
+			.eq("player_id", user.id);
+
+		await supabase
+			.from("actions")
+			.update({
+				queue: result.queue,
+				started_at: result.queue.length > 0 ? new Date(result.currentActionStart) : null
+			})
+			.eq("player_id", user.id)
+	}
+
+	const progress = getQueueProgress(result.queue, result.currentActionStart);
+
+	// Get current action duration for client-side progress calculation
+	let currentActionDuration = null;
+	if (result.queue.length > 0) {
+		const loadedAction = getAction(result.queue[0].id);
+		if (loadedAction) {
+			currentActionDuration = loadedAction.time * 1000;
+		}
+	}
+
+	return {
+		queue: result.queue,
+		currentActionStartedAt: result.queue.length > 0 ? result.currentActionStart : null,
+		completed: result.completed.map(completion => ({
+			actionId: completion.id,
+			amount: completion.amount,
+			outputs: {
+				items: completion.outputs.items.map(item => encodeDBItem(item))
+			}
+		})),
+		progress: progress.progress,
+		nextPollIn: progress.nextPollIn,
+		estimatedCompletion: progress.estimatedCompletion,
+		currentActionDuration
+	};
 });
 
 const queueActionSchema = z.object({
