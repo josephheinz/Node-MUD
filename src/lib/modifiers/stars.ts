@@ -1,4 +1,5 @@
 import { type IItemModifier, type IRawModifierSpec } from '$lib/types/item';
+import type { StatList } from '$lib/types/stats';
 import { intToBlackCircledNumber, intToCircledNumber } from '$lib/utils/general';
 
 const STAR_COLORS = [
@@ -14,7 +15,13 @@ export class StarsModifier implements IItemModifier {
 	type = 'Stars';
 	priority = 999;
 
-	constructor(public stars: number) {}
+	statChanges: StatList = {
+		damage: { amount: 1, operation: "multiplicative" }
+	};
+
+	constructor(public stars: number) {
+		this.statChanges["damage"].amount = 1 + (stars / 50)
+	}
 
 	modifyName(baseName: string): string {
 		const tier = Math.floor((this.stars - 1) / 5); // 0-based tier

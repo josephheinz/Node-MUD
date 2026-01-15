@@ -5,6 +5,7 @@ import {
 	Equipment,
 	Inventory,
 	Rarity,
+	computeItemStats,
 	initializeItemRegistry,
 	itemRegistry,
 	type DBItem,
@@ -14,10 +15,9 @@ import {
 	type Item
 } from '$lib/types/item';
 import * as _ from 'radashi';
-import { formatNumber } from './general';
+import { capitalizeFirstLetter, formatNumber } from './general';
 import { isEqual } from 'radashi';
-import { getInventory } from '$lib/remote/inventory.remote';
-import { getEquipment } from '$lib/remote/equipment.remote';
+import { Stats } from '$lib/types/stats';
 
 export async function Equip(
 	item: Item,
@@ -92,6 +92,9 @@ export function getItemData(item: Item, equippable: boolean = false): ITooltipDa
 	let equipMsg: string = '';
 	if (slot && equippable) equipMsg = `Slot: ${slot}<br/>`;
 
+	let stats = computeItemStats(item);
+	let statsString = '';
+
 	const stackableModifier: StackableModifier | undefined = item.modifiers.find(
 		(m) => m.type == 'Stackable'
 	) as StackableModifier;
@@ -101,9 +104,17 @@ export function getItemData(item: Item, equippable: boolean = false): ITooltipDa
 		stackString = `Stack: ${formatNumber(stackableModifier.amount)} / ${formatNumber(stackableModifier.stack)}</br>`;
 	}
 
+	for (const key in stats) {
+		const s = stats[key];
+		if (s.base || s.added > 0) {
+			//${Stats[key] ? `<span style="color:${Stats[key].color};">${Stats[key].icon} </span>` : ""}
+			statsString += `${capitalizeFirstLetter(key)}: ${s.base + s.added}<span style="color:oklch(90.5% 0.182 98.111);">${s.added > 0 ? ` (+${s.added})` : ''}</span><br/>`;
+		}
+	}
+
 	return {
 		title: itemName,
-		body: `${stackString}${equipMsg}${itemDesc}<br/>${descriptor}`
+		body: `${stackString}${equipMsg}${statsString}${itemDesc}<br/>${descriptor}`
 	};
 }
 

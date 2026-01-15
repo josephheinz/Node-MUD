@@ -1,8 +1,11 @@
 <script lang="ts">
 	import type { Profile } from '$lib/store.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 	import Fa from 'svelte-fa';
 	import UserAvatar from '../userAvatar.svelte';
 	import { BadgeReferences } from '$lib/utils/chat';
+	import { buttonVariants } from '../button';
+	import { capitalizeFirstLetter } from '$lib/utils/general';
 
 	let { profile = $bindable() }: { profile: Profile } = $props();
 </script>
@@ -29,7 +32,19 @@
 				{profile.display_name ?? profile.username}
 				<span class="flex items-center justify-evenly gap-1.5 text-xl">
 					{#each profile.badges as badge}
-						<Fa icon={BadgeReferences[badge].icon} color={BadgeReferences[badge].color} />
+						<Tooltip.Provider>
+							<Tooltip.Root>
+								<Tooltip.Trigger
+									><Fa
+										icon={BadgeReferences[badge].icon}
+										color={BadgeReferences[badge].color}
+									/></Tooltip.Trigger
+								>
+								<Tooltip.Content>
+									<span>{capitalizeFirstLetter(badge)}</span>
+								</Tooltip.Content>
+							</Tooltip.Root>
+						</Tooltip.Provider>
 					{/each}
 				</span>
 			</h1>

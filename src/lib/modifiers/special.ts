@@ -6,10 +6,10 @@ export class CaduceusModifier implements IItemModifier {
 	priority = 999;
 
 	statChanges: StatList = {
-		'crit damage': 50,
-		'crit chance': 10,
-		strength: 25,
-		damage: 10
+		'crit damage': { amount: 50, operation: "additive" },
+		'crit chance': { amount: 10, operation: "additive" },
+		strength: { amount: 25, operation: "additive" },
+		damage: { amount: 1.2, operation: "multiplicative" }
 	};
 
 	modifyName(baseName: string): string {

@@ -85,10 +85,10 @@ export class ReforgeableModifier implements IItemModifier {
 }
 
 export const Reforges: Record<string, IReforge> = {
-	Sharp: { name: 'Sharp', stats: { damage: 10 } },
-	Heroic: { name: 'Heroic', stats: { damage: 20 } },
-	Hardened: { name: 'Hardened', stats: { defense: 10 } },
-	Crystalized: { name: 'Crystalized', stats: { damage: 20, defense: 20 } }
+	Sharp: { name: 'Sharp', stats: { damage: { amount: 1.1, operation: "multiplicative" } } },
+	Heroic: { name: 'Heroic', stats: { damage: { amount: 20, operation: "additive" } } },
+	Hardened: { name: 'Hardened', stats: { defense: { amount: 20, operation: "additive" } } },
+	Crystalized: { name: 'Crystalized', stats: { damage: { amount: 20, operation: "additive" }, defense: { amount: 20, operation: "additive" } } }
 };
 
 export const ReforgeGroups: Record<string, IReforge[]> = {

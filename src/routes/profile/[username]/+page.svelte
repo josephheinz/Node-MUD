@@ -13,6 +13,7 @@
 		getProfileByUsername
 	} from '$lib/remote/auth.remote';
 	import { page } from '$app/state';
+	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 
 	const {
 		data
@@ -32,8 +33,11 @@
 
 <svelte:boundary>
 	{#snippet pending()}
-		<title>Loading...</title>
-		<span>Loading...</span>
+		<title> Loading... </title>
+		<div class="absolute flex size-full flex-col items-center justify-center gap-8 bg-background">
+			<h1 class="text-4xl font-black">Loading</h1>
+			<Spinner class="size-12" />
+		</div>
 	{/snippet}
 	{@const { profile, apiSettings } = await getProfileAndApiSettingsByUsername(username)}
 	<title>{profile?.display_name ?? `@${profile?.username}`}'s Profile</title>

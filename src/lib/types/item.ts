@@ -1,5 +1,5 @@
 import * as _ from 'radashi';
-import type { StatList } from './stats';
+import type { Stat, StatList } from './stats';
 import { encodeDBItem, loadDbItem } from '$lib/utils/item';
 import { initializeModifierRegistry, instantiateModifier } from '$lib/modifiers/modifiersRegistry';
 import { parse } from 'yaml';
@@ -44,7 +44,7 @@ export interface IItemModifierClass<T extends IItemModifier = IItemModifier> {
 	//hash(): string;
 	fromHash(hash: string): T;
 
-	new (...args: any[]): T;
+	new(...args: any[]): T;
 }
 
 export type Item = {
@@ -288,6 +288,14 @@ export function parseYAMLToItem(yamlString: string): Item {
 	let item = parse(yamlString)[0];
 	const modifiers: IItemModifier[] = (item.modifiers || []).map(instantiateModifier);
 
+	let baseStats: StatList = {};
+	if (item.stats) {
+		console.log(item.stats)
+		Object.entries(item.stats).forEach(([stat, amount]) => {
+			baseStats[stat] = { amount: Number(amount), operation: "additive" }
+		})
+	}
+
 	return {
 		uid: crypto.randomUUID(),
 		id: item.id,
@@ -295,9 +303,97 @@ export function parseYAMLToItem(yamlString: string): Item {
 		rarity: Rarity[item.rarity as RarityKey],
 		icon: item.icon.image,
 		modifiers,
-		baseStats: item.stats,
+		baseStats,
 		desc: item.description
 	};
+}
+
+export function computeItemStats(item: Item): Record<string, { base: number; added: number }> {
+	const stats: Record<string, { base: number; added: number }> = {};
+	const baseStats = item.baseStats ?? {};
+	const modifiers = item.modifiers ?? [];
+
+	// Single pass: collect additive and multiplicative modifiers per stat
+	const statData: Record<string, {
+		base: number;
+		modAdditive: number;
+		modMultiplicative: number;
+		reforgeAdditive: number;
+		reforgeMultiplicative: number;
+	}> = {};
+
+	// Initialize with base stats
+	for (const key in baseStats) {
+		statData[key] = {
+			base: baseStats[key]?.amount ?? 0,
+			modAdditive: 0,
+			modMultiplicative: 1,
+			reforgeAdditive: 0,
+			reforgeMultiplicative: 1
+		};
+	}
+
+	// Single pass through modifiers
+	for (const mod of modifiers) {
+		if (!mod.statChanges) continue;
+
+		for (const key in mod.statChanges) {
+			const value = mod.statChanges[key];
+			if (!value || value.amount === 0) continue;
+
+			// Initialize stat if not seen before
+			if (!statData[key]) {
+				statData[key] = {
+					base: baseStats[key]?.amount ?? 0,
+					modAdditive: 0,
+					modMultiplicative: 1,
+					reforgeAdditive: 0,
+					reforgeMultiplicative: 1
+				};
+			}
+
+			const isReforge = mod.type === "Reforge";
+			const isMultiplicative = value.operation === "multiplicative";
+
+			if (isReforge) {
+				if (isMultiplicative) {
+					statData[key].reforgeMultiplicative *= value.amount;
+				} else {
+					statData[key].reforgeAdditive += value.amount;
+				}
+			} else {
+				if (isMultiplicative) {
+					statData[key].modMultiplicative *= value.amount;
+				} else {
+					statData[key].modAdditive += value.amount;
+				}
+			}
+		}
+	}
+
+	// Helper function to round to avoid floating point errors
+	const round = (num: number, decimals: number = 2): number => {
+		return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
+	};
+
+	// Compute final stats: (base + additive) * multiplicative
+	for (const key in statData) {
+		const data = statData[key];
+
+		// Calculate final value: (base + additive) * multiplicative
+		const totalAdditive = data.modAdditive + data.reforgeAdditive;
+		const totalMultiplicative = data.modMultiplicative * data.reforgeMultiplicative;
+
+		const baseWithAdditive = data.base + totalAdditive;
+		const finalValue = baseWithAdditive * totalMultiplicative;
+
+		stats[key] = {
+			base: round(data.base),
+			added: round(finalValue - data.base)
+		};
+	}
+
+	return stats;
 }
 
 export const itemRegistry: Record<string, Item> = {};
