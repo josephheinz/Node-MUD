@@ -124,11 +124,11 @@ export function getInventoryCounts(
 	});
 }
 
-export function loadDbQueue(queue: DBQueueAction[]): Map<number, Action> {
-	let _: Map<number, Action> = new Map();
+export function loadDbQueue(queue: DBQueueAction[]): Action[] {
+	let _: Action[] = []
 	queue.forEach((a: DBQueueAction, index) => {
 		const act: Action | null = getAction(a.id);
-		if (act) _.set(index, act);
+		if (act) _.push(act);
 	});
 	return _;
 }

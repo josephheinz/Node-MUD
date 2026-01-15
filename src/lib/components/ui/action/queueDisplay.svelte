@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { type Action, type DBQueueAction } from '$lib/types/action';
+	import { type DBQueueAction } from '$lib/types/action';
 	import * as Card from '../card';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import QueueDialog from './queueDialog.svelte';
 	import * as Empty from '$lib/components/ui/empty';
 	import { faLocust } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
@@ -43,7 +42,7 @@
 	{/snippet}
 	{@const queue = await getQueue()}
 	<Dialog.Root>
-		<Card.Root class="h-64 select-none">
+		<Card.Root class="h-max select-none">
 			<Dialog.Trigger class="w-full text-left">
 				<Card.Header class="w-full cursor-pointer">
 					<Card.Title>Action Queue</Card.Title>
@@ -59,9 +58,34 @@
 </svelte:boundary>
 
 {#snippet queueNotEmpty(queue: QueueData)}
-	<Card.Content>
-		
+	{@const loadedQueue = loadDbQueue(queue.queue)}
+	{@const currentAction = loadedQueue[0]}
+	{@const nextAction = loadedQueue.length > 1 ? loadedQueue[1] : null}
+	<Card.Content class="flex flex-col items-start justify-start gap-2">
+		<span class="text-md text-card-foreground">
+			{currentAction.name}
+			x{formatNumber(queue.queue[0].amount)}
+		</span>
+		<QueueProgressBar
+			queueData={{
+				currentActionStartedAt: queue.currentActionStartedAt ?? null,
+				currentActionDuration: queue.currentActionDuration ?? null,
+				progress: queue.progress ?? 0,
+				actionTime: currentAction.time
+			}}
+		/>
 	</Card.Content>
+	{#if nextAction}
+		<Card.Footer class=" flex flex-col items-start justify-start text-xs text-muted-foreground">
+			<span>Upcoming actions:</span>
+			<span>
+				{nextAction.name} x{formatNumber(queue.queue[1].amount)}
+				<Dialog.Trigger class="rounded-sm border-1 border-ring px-1">
+					&bullet;&bullet;&bullet;
+				</Dialog.Trigger>
+			</span>
+		</Card.Footer>
+	{/if}
 {/snippet}
 
 {#snippet queueEmpty()}
