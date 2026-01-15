@@ -108,7 +108,8 @@ export function getItemData(item: Item, equippable: boolean = false): ITooltipDa
 		const s = stats[key];
 		if (s.base || s.added > 0) {
 			//${Stats[key] ? `<span style="color:${Stats[key].color};">${Stats[key].icon} </span>` : ""}
-			statsString += `${capitalizeFirstLetter(key)}: ${s.base + s.added}<span style="color:oklch(90.5% 0.182 98.111);">${s.added > 0 ? ` (+${s.added})` : ''}</span><br/>`;
+			//style="color:oklch(90.5% 0.182 98.111);"
+			statsString += `${capitalizeFirstLetter(key)}: ${s.base + s.added}<span class="text-muted-foreground">${s.added > 0 ? ` (+${s.added})` : ''}</span><br/>`;
 		}
 	}
 
