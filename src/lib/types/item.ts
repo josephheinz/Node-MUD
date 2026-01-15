@@ -290,7 +290,6 @@ export function parseYAMLToItem(yamlString: string): Item {
 
 	let baseStats: StatList = {};
 	if (item.stats) {
-		console.log(item.stats)
 		Object.entries(item.stats).forEach(([stat, amount]) => {
 			baseStats[stat] = { amount: Number(amount), operation: "additive" }
 		})

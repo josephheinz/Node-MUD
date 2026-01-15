@@ -26,7 +26,10 @@ const RaritySchema = z.enum([
 	'Special'
 ]);
 
-const StatListSchema = z.record(z.string(), z.number());
+const StatListSchema = z.record(z.string(), z.object({
+	amount: z.number(),
+	operation: z.enum(["additive", "multiplicative"])
+}));
 
 const RawModifierSpecSchema = z
 	.object({
@@ -102,7 +105,6 @@ export const getEquipment = query(async () => {
 
 	if (data) {
 		const equipment: Equipment = Equipment.load(data.equipment_data as DBEquipment);
-		console.log(equipment, data.equipment_data)
 		return equipment;
 	}
 

@@ -75,8 +75,6 @@ export const getSession = query(async () => {
 export const logout = form(async () => {
     const { cookies } = getRequestEvent();
 
-    console.log("logging out");
-
     const { error } = await supabase.auth.signOut();
 
     if (error) {
@@ -91,8 +89,6 @@ export const logout = form(async () => {
 
 export const signup = form(signupAuthSchema, async ({ email, password, passwordRepeat }) => {
     if (password != passwordRepeat) return { success: false }
-
-    console.log("signing up");
 
     const { data: _, error } = await supabase.auth.signUp({
         email,
