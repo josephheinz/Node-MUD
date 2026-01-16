@@ -4,7 +4,6 @@
 	import Fa from 'svelte-fa';
 	import UserAvatar from '../userAvatar.svelte';
 	import { BadgeReferences } from '$lib/utils/chat';
-	import { buttonVariants } from '../button';
 	import { capitalizeFirstLetter } from '$lib/utils/general';
 
 	let { profile = $bindable() }: { profile: Profile } = $props();

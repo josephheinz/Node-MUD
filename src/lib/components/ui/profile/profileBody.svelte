@@ -1,58 +1,56 @@
 <script lang="ts">
 	import type { Profile } from '$lib/store.svelte';
-	import {
-		EmptyEquipment,
-		Equipment as TEquipment,
-		Inventory as TInventory,
-		type Item
-	} from '$lib/types/item';
-	import { onMount } from 'svelte';
+	import { Equipment as TEquipment, Inventory as TInventory } from '$lib/types/item';
 	import type { IApiSettings } from '../../../../routes/profile/[username]/+layout.server';
-	import { getEquipment, getInventory } from '$lib/utils/general';
 	import Inventory from '../character/inventory.svelte';
 	import Equipment from '../character/equipment.svelte';
-	import type { User } from '@supabase/supabase-js';
-	import { userPrefersMode } from 'mode-watcher';
+	import Spinner from '../spinner/spinner.svelte';
+	import DisplayInventory from '../character/displayInventory.svelte';
+	import DisplayEquipment from '../character/displayEquipment.svelte';
 
 	const {
 		data
 	}: {
 		data: {
 			profile: Profile | undefined;
-			api_settings: IApiSettings | undefined;
-			user: User | null;
+			apiSettings: IApiSettings | undefined;
+			equipment: TEquipment | undefined;
+			inventory: TInventory | undefined;
+			isUser: boolean;
 		};
 	} = $props();
 
-	let inventory: TInventory | undefined = $state(undefined);
-	let equipment: TEquipment | undefined = $state(undefined);
-	let user: User | null = $state(data.user);
-	let profile: Profile | undefined = $state(data.profile);
-	let api_settings: IApiSettings | undefined = $state(data.api_settings);
-
-	let isLoading = $state(true);
-
-	onMount(async () => {
-		inventory = await getInventory(`${data.profile?.id}`);
-		equipment = await getEquipment(`${data.profile?.id}`);
-		isLoading = false;
-	});
+	let inventory = data.inventory;
+	let user = data.isUser;
+	let equipment = data.equipment;
+	let api_settings = data.apiSettings;
+	let profile = data.profile;
 </script>
 
-<div class="flex items-center justify-start gap-4 p-4">
-	{#if isLoading}
-		<span>Loading...</span>
-	{:else if profile && api_settings}
-		{#if user?.id === profile.id}
-			<Inventory {inventory} display={true} />
-			<Equipment {equipment} display={true} />
-		{:else}
-			{#if api_settings.inventory_api}
-				<Inventory {inventory} display={true} />
-			{/if}
-			{#if api_settings.equipment_api}
-				<Equipment {equipment} display={true} />
+<svelte:boundary>
+	{#snippet pending()}
+		<div class="flex flex-col items-center justify-center gap-4">
+			<h1 class="text-4xl font-black">Loading...</h1>
+			<Spinner class="size-8" />
+		</div>
+	{/snippet}
+	<div class="flex items-center justify-start gap-4 p-4">
+		{#if profile && api_settings}
+			{#if user}
+				{#if inventory}
+					<DisplayInventory {inventory} display={true} />
+				{/if}
+				{#if equipment}
+					<DisplayEquipment {equipment} display={true} />
+				{/if}
+			{:else}
+				{#if api_settings.inventory_api && inventory}
+					<DisplayInventory {inventory} display={true} />
+				{/if}
+				{#if api_settings.equipment_api && equipment}
+					<DisplayEquipment {equipment} display={true} />
+				{/if}
 			{/if}
 		{/if}
-	{/if}
-</div>
+	</div>
+</svelte:boundary>

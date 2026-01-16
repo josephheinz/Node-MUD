@@ -111,6 +111,27 @@ export const getEquipment = query(async () => {
 	throw new Error("Equipment not found in database");
 })
 
+export const getEquipmentById = query(z.uuidv4(), async (id) => {
+	const { locals } = getRequestEvent();
+
+	const { data, error } = await locals.supabase
+		.from('inventories')
+		.select('equipment_data')
+		.eq('player_id', id)
+		.single();
+
+	if (error) {
+		throw new Error(error.message);
+	}
+
+	if (data) {
+		const equipment: Equipment = Equipment.load(data.equipment_data as DBEquipment);
+		return equipment;
+	}
+
+	throw new Error("Equipment not found in database");
+})
+
 const DBEquipmentSchema = z.object({
 	Head: DBItemSchema.nullable(),
 	Body: DBItemSchema.nullable(),

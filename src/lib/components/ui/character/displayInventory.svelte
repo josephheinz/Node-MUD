@@ -6,17 +6,14 @@
 	import { getInventory } from '$lib/remote/inventory.remote';
 	import Skeleton from '../skeleton/skeleton.svelte';
 
-	const {
-		inventory: initInventory,
-		display = false
-	}: { display?: boolean; inventory?: Inventory } = $props();
+	const { inventory, display = true }: { display?: boolean; inventory: Inventory } = $props();
 
 	let pageNumber: number = $state(1);
 </script>
 
 <Card.Root class="aspect-square p-2 select-none">
 	<Card.Header>
-		<Card.Title>{!display ? 'Your ' : ''}Inventory</Card.Title>
+		<Card.Title>Inventory</Card.Title>
 	</Card.Header>
 	<Card.Content>
 		<svelte:boundary>
@@ -28,7 +25,7 @@
 				</div>
 			{/snippet}
 			<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
-				{#each initInventory ? initInventory.paginate()[pageNumber] : (await getInventory())?.paginate()[pageNumber - 1] as item (item.uid)}
+				{#each inventory.paginate()[pageNumber - 1] as item (item.uid)}
 					<ItemRenderer {item} equipFlags={{ equippable: !display }} />
 				{/each}
 			</div>
@@ -39,11 +36,7 @@
 			{#snippet pending()}
 				<Skeleton class="w-full rounded-full" />
 			{/snippet}
-			<Pagination.Root
-				count={(initInventory ? initInventory : await getInventory()).contents.length}
-				perPage={25}
-				bind:page={pageNumber}
-			>
+			<Pagination.Root count={inventory.contents.length} perPage={25} bind:page={pageNumber}>
 				{#snippet children({ pages, currentPage })}
 					<Pagination.Content>
 						<Pagination.Item>

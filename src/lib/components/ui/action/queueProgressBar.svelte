@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getQueue } from '$lib/remote/actions.remote';
+	import { getInventory } from '$lib/remote/inventory.remote';
 	import numeral from 'numeral';
 	import Progress from '../progress/progress.svelte';
 
@@ -47,6 +48,7 @@
 			if (displayProgress >= 100) {
 				if (progressInterval) clearInterval(progressInterval);
 				await getQueue().refresh();
+				await getInventory().refresh();
 			}
 		}, 50);
 	}

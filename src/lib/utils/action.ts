@@ -87,11 +87,12 @@ export function processQueueUntilNow(queue: DBQueueAction[], currentActionStart:
 
 		outputs = { items: [...outputs.items, ...completeAction(action).items] };
 
+		completed.push({
+			...dbAction,
+			outputs
+		});
+
 		if (dbAction.amount <= 0) {
-			completed.push({
-				...dbAction,
-				outputs
-			});
 			outputs.items.length = 0;
 			queue.shift();
 		}

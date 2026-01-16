@@ -5,10 +5,7 @@
 	import ItemRenderer from '../itemRenderer.svelte';
 	import Skeleton from '../skeleton/skeleton.svelte';
 
-	const {
-		equipment: initEquipment,
-		display = false
-	}: { equipment?: Equipment; display?: boolean } = $props();
+	const { equipment, display = false }: { equipment: Equipment; display?: boolean } = $props();
 
 	const slotGridSpots: Record<EquipmentSlot, string> = {
 		Head: 'col-start-3 row-start-1',
@@ -36,7 +33,7 @@
 				</div>
 			{/snippet}
 			<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
-				{#each initEquipment ? initEquipment.export() : (await getEquipment()).export() as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
+				{#each equipment.export() as [slot, item] (`${slot}-${item?.uid ?? 'empty'}`)}
 					{@render equipmentSlot(slot as EquipmentSlot, item)}
 				{/each}
 			</div>

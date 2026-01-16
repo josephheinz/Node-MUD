@@ -6,43 +6,42 @@
 	import { faSkull } from '@fortawesome/free-solid-svg-icons';
 	import ProfileHeader from '$lib/components/ui/profile/profileHeader.svelte';
 	import ProfileBody from '$lib/components/ui/profile/profileBody.svelte';
-	import type { User } from '@supabase/supabase-js';
-	import {
-		getApiSettings,
-		getProfileAndApiSettingsByUsername,
-		getProfileByUsername
-	} from '$lib/remote/auth.remote';
 	import { page } from '$app/state';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
+	import type { Equipment, Inventory } from '$lib/types/item';
 
 	const {
 		data
 	}: {
 		data: {
 			profile: Profile | undefined;
-			api_settings: IApiSettings | undefined;
-			user: User | null;
+			apiSettings: IApiSettings | undefined;
+			equipment: Equipment | undefined;
+			inventory: Inventory | undefined;
+			isUser: boolean;
 		};
 	} = $props();
 
-	let profile = $derived(data.profile);
-	let apiSettings = $derived(data.api_settings);
+	let profile = data.profile;
+	let apiSettings = data.apiSettings;
+	let equipment = data.equipment;
+	let inventory = data.inventory;
+	let user = data.isUser;
 
 	let username: string = $derived(page.params.username ?? '');
 </script>
 
 <svelte:boundary>
 	{#snippet pending()}
-		<title> Loading... </title>
+		<title>Loading...</title>
 		<div class="absolute flex size-full flex-col items-center justify-center gap-8 bg-background">
 			<h1 class="text-4xl font-black">Loading</h1>
 			<Spinner class="size-12" />
 		</div>
 	{/snippet}
-	{@const { profile, apiSettings } = await getProfileAndApiSettingsByUsername(username)}
 	<title>{profile?.display_name ?? `@${profile?.username}`}'s Profile</title>
 
-	{#if profile && apiSettings}
+	{#if profile}
 		<ProfileHeader {profile} />
 		<ProfileBody {data} />
 	{:else}
