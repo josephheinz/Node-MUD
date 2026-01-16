@@ -1,6 +1,9 @@
 import type { IconDefinition } from '@fortawesome/free-brands-svg-icons';
 import { faGem, faTools } from '@fortawesome/free-solid-svg-icons';
 import { parse } from 'yaml';
+import type { Skill, SkillKey } from './skills';
+import { cumulativeXPForLevel } from '$lib/utils/skills';
+import { capitalizeFirstLetter } from '$lib/utils/general';
 
 export type ActionInput = {
 	id: string;
@@ -15,8 +18,8 @@ export type ChanceItem = {
 };
 
 export type ActionOutput = {
-	items: ChanceItem[] /* 
-    xp: Record<SkillKey, number>; */;
+	items: ChanceItem[]
+	xp?: Record<SkillKey, number>;
 };
 
 export type Action = {
@@ -26,7 +29,7 @@ export type Action = {
 	outputs: ActionOutput;
 	time: number;
 	icon: string;
-	// requirement: Skill;
+	requirement?: Skill;
 };
 
 export type DBQueueAction = {
@@ -34,20 +37,39 @@ export type DBQueueAction = {
 	amount: number;
 };
 
+function normalizeXpKeys(xp: Record<string, number>): Record<SkillKey, number> {
+	const out: Record<string, number> = {};
+
+	for (const [key, value] of Object.entries(xp)) {
+		out[capitalizeFirstLetter(key)] = value;
+	}
+
+	return out as Record<SkillKey, number>;
+}
+
 export function parseYamlToAction(yamlString: string): Action {
 	let action = parse(yamlString)[0];
 
 	// xp and requirement going here in the future
+	const xp = action.xp ? normalizeXpKeys(action.xp) : undefined;
+	const requirement = action.req
+		? {
+			name: action.req.skill,
+			xp: cumulativeXPForLevel(action.req.level)
+		}
+		: undefined;
 
 	return {
 		id: action.id,
 		name: action.name,
 		inputs: new Set<ActionInput>(action.inputs ?? []),
 		outputs: {
-			items: action.outputs
+			items: action.outputs,
+			xp
 		},
 		time: action.time,
-		icon: action.icon.image // to chance just to action.icon
+		icon: action.icon.image,
+		requirement
 	};
 }
 

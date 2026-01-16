@@ -7,18 +7,22 @@
 	import { getItem } from '$lib/utils/item';
 	import numeral from 'numeral';
 	import ItemHover from '../chat/itemHover.svelte';
-	import { gameState } from '$lib/store.svelte';
 	import { getInventoryCounts } from '$lib/utils/action';
 	import Label from '../label/label.svelte';
 	import Button from '../button/button.svelte';
 	import { getQueue, queueAction } from '$lib/remote/actions.remote';
 	import { toast } from 'svelte-sonner';
+	import { getInventory } from '$lib/remote/inventory.remote';
+	import { getSkills } from '$lib/remote/skills.remote';
+	import type { Skill, SkillKey } from '$lib/types/skills';
+	import { xpToLevel } from '$lib/utils/skills';
 
 	const { action }: { action: Action } = $props();
 
 	let amount: number = $state(1);
 	let timeAmount: number = $derived(action.time * amount);
-	let inventory: Inventory = $derived(gameState.inventory);
+	let inventory: Inventory = await getInventory();
+	let skills: Record<SkillKey, Skill> = await getSkills();
 
 	let loadedInputs: { item: Item; amount: number }[] = $derived(
 		(Array.from(action.inputs)
@@ -38,16 +42,40 @@
 			})
 			.filter(Boolean) as { item: Item; min: number; max: number; chance?: number }[]
 	);
+
+	let loadedOutputsXp = $derived.by<Array<{ skill: string; xpamount: number }>>(() => {
+		if (!action || !action.outputs.xp) return [];
+
+		return Object.entries(action.outputs.xp).map(([skill, xpamount]) => ({
+			skill,
+			xpamount: xpamount * amount
+		}));
+	});
+
 	let inputsPresent = $derived.by(() => getInventoryCounts(inventory, loadedInputs));
 
+	let actionSkill: Skill = $derived(skills[action.requirement?.name as SkillKey]);
+
 	let canAct = $derived.by(() => {
-		return loadedInputs.every((_, i) => inputsPresent[i].present >= inputsPresent[i].required);
+		return (
+			loadedInputs.every((_, i) => inputsPresent[i].present >= inputsPresent[i].required) &&
+			(action.requirement ? xpToLevel(actionSkill.xp) >= xpToLevel(action.requirement?.xp) : true)
+		);
 	});
 </script>
 
 <Dialog.Content class="w-max min-w-72">
 	<Dialog.Header>
 		<Dialog.Title>{action.name}</Dialog.Title>
+		{#if action.requirement}
+			<span
+				class={xpToLevel(actionSkill.xp) >= xpToLevel(action.requirement.xp)
+					? 'text-muted-foreground'
+					: 'text-rose-400'}
+				>Requires Level {xpToLevel(action.requirement.xp)}
+				{action.requirement.name}</span
+			>
+		{/if}
 	</Dialog.Header>
 	<form
 		class="flex w-full flex-col gap-4"
@@ -88,18 +116,24 @@
 					<li class="my-1 flex items-start justify-start gap-2 pl-4">
 						<span
 							>{min != max
-								? `${formatNumber(min)} - ${formatNumber(max)}`
-								: `${formatNumber(max)}`}</span
+								? `${formatNumber(min, 'short')} - ${formatNumber(max, 'short')}`
+								: `${formatNumber(max, 'short')}`}</span
 						>
 						<ItemHover {item} />
 						<span>{chancePercent == '100%' ? '' : chancePercent}</span>
+					</li>
+				{/each}
+				{#each loadedOutputsXp as { skill, xpamount }}
+					<li class="flex items-center justify-start gap-2 pl-4">
+						<img src="/images/experienceStar.svg" alt="xp star" class="inline-block h-4 w-4" />
+						<span>{formatNumber(xpamount, 'short')} {skill} XP</span>
 					</li>
 				{/each}
 			</ul>
 		</div>
 		<span class="text-md">
 			<b>Duration:</b>
-			{Math.floor(timeAmount / 3600)}h {Math.floor((timeAmount % 3600) / 60)}m {timeAmount %
+			{formatNumber(Math.floor(timeAmount / 3600), 'long')}h {Math.floor((timeAmount % 3600) / 60)}m {timeAmount %
 				60}s</span
 		>
 		<div class="flex gap-2">
