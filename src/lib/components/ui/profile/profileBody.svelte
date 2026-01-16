@@ -2,11 +2,11 @@
 	import type { Profile } from '$lib/store.svelte';
 	import { Equipment as TEquipment, Inventory as TInventory } from '$lib/types/item';
 	import type { IApiSettings } from '../../../../routes/profile/[username]/+layout.server';
-	import Inventory from '../character/inventory.svelte';
-	import Equipment from '../character/equipment.svelte';
 	import Spinner from '../spinner/spinner.svelte';
 	import DisplayInventory from '../character/displayInventory.svelte';
 	import DisplayEquipment from '../character/displayEquipment.svelte';
+	import type { Skill, SkillKey } from '$lib/types/skills';
+	import DisplaySkillMenu from '../skills/displaySkillMenu.svelte';
 
 	const {
 		data
@@ -17,6 +17,7 @@
 			equipment: TEquipment | undefined;
 			inventory: TInventory | undefined;
 			isUser: boolean;
+			skills: Record<SkillKey, Skill> | undefined;
 		};
 	} = $props();
 
@@ -25,6 +26,7 @@
 	let equipment = data.equipment;
 	let api_settings = data.apiSettings;
 	let profile = data.profile;
+	let skills = data.skills;
 </script>
 
 <svelte:boundary>
@@ -43,12 +45,20 @@
 				{#if equipment}
 					<DisplayEquipment {equipment} display={true} />
 				{/if}
+				{#if skills}
+					<DisplaySkillMenu {skills} />
+				{:else}
+					<span>skills undefined</span>
+				{/if}
 			{:else}
 				{#if api_settings.inventory_api && inventory}
 					<DisplayInventory {inventory} display={true} />
 				{/if}
 				{#if api_settings.equipment_api && equipment}
 					<DisplayEquipment {equipment} display={true} />
+				{/if}
+				{#if skills}
+					<DisplaySkillMenu {skills} />
 				{/if}
 			{/if}
 		{/if}

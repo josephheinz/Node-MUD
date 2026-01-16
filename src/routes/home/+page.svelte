@@ -6,6 +6,7 @@
 	import * as Resizable from '$lib/components/ui/resizable';
 	import Chat from '$lib/components/ui/chat/chat.svelte';
 	import Actions from '$lib/components/ui/action/actions.svelte';
+	import SkillMenu from '$lib/components/ui/skills/skillMenu.svelte';
 
 	let currentTab = $derived(tab.tab);
 
@@ -25,6 +26,8 @@
 				<Equipment />
 			{:else if currentTab === 'Actions'}
 				<Actions />
+			{:else if currentTab === 'Skills'}
+				<SkillMenu />
 			{/if}
 		</div>
 	</Resizable.Pane>

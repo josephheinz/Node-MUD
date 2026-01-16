@@ -4,6 +4,8 @@ import type { Equipment, Inventory } from "$lib/types/item";
 import * as z from "zod"
 import { getInventory, getInventoryById } from "./inventory.remote";
 import { getEquipment, getEquipmentById } from "./equipment.remote";
+import type { Skill, SkillKey } from "$lib/types/skills";
+import { getSkills, getSkillsById } from "./skills.remote";
 
 export interface IApiSettings {
     profile_id: string;
@@ -18,6 +20,7 @@ export const getProfilePage = prerender(z.string(), async (username) => {
     let inventory: Inventory | undefined;
     let equipment: Equipment | undefined;
     let profile: Profile | undefined;
+    let skills: Record<SkillKey, Skill> | undefined;
 
     const { data, error } = await supabase
         .from("profiles")
@@ -44,7 +47,8 @@ export const getProfilePage = prerender(z.string(), async (username) => {
     if (user?.id === profile!.id) {
         inventory = await getInventory();
         equipment = await getEquipment();
-        return { profile, apiSettings, inventory, equipment, isUser: true }
+        skills = await getSkills();
+        return { profile, apiSettings, inventory, equipment, isUser: true, skills }
     }
 
     if (apiSettings?.equipment_api) {
@@ -55,5 +59,7 @@ export const getProfilePage = prerender(z.string(), async (username) => {
         inventory = await getInventoryById(profile!.id);
     }
 
-    return { profile, apiSettings, inventory, equipment, isUser: false }
+    skills = await getSkillsById(profile!.id)
+
+    return { profile, apiSettings, inventory, equipment, skills, isUser: false }
 })

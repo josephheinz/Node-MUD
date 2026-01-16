@@ -16,7 +16,7 @@
 	import ActionSelect from '$lib/components/actions/actionSelect.svelte';
 	import ActionModal from '$lib/components/actions/actionModal.svelte';
 	import type { Skill, SkillKey } from '$lib/types/skills';
-	import SkillMenu from '$lib/components/skills/skillMenu.svelte';
+	import SkillMenu from '$lib/components/ui/skills/skillMenu.svelte';
 	import QueueModal from '$lib/components/actions/queueModal.svelte';
 	import Enhancer from '$lib/components/enhancer.svelte';
 

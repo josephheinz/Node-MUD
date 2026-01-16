@@ -7,11 +7,11 @@
 		type SkillKey
 	} from '$lib/types/skills';
 	import numeral from 'numeral';
-	import ProgressBar from '../actions/progressBar.svelte';
-	import Container from '../generic/container.svelte';
-	import Heading from '../generic/heading.svelte';
+	import ProgressBar from '../../actions/progressBar.svelte';
+	import Container from '../../generic/container.svelte';
+	import Heading from '../../generic/heading.svelte';
 	import { formatNumber } from '$lib/utils/general';
-	import FlexColContainer from '../generic/flexContainers/flexColContainer.svelte';
+	import FlexColContainer from '../../generic/flexContainers/flexColContainer.svelte';
 
 	let { skills = $bindable() }: { skills: Record<SkillKey, Skill> } = $props();
 </script>

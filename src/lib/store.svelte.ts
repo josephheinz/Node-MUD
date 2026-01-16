@@ -45,6 +45,6 @@ export const currentChatMessage: { value: string } = $state({ value: '' });
 
 export const sidebar = $state({ open: true });
 
-export const tab = $state<{ tab: 'Home' | 'Inventory' | 'Equipment' | 'Actions' }>({
+export const tab = $state<{ tab: 'Home' | 'Inventory' | 'Equipment' | 'Actions' | "Skills" }>({
 	tab: 'Home'
 });

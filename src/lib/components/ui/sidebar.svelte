@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {
 		faBoxesStacked,
+		faChartSimple,
 		faClipboardList,
 		faHome,
 		faToolbox,
@@ -31,6 +32,10 @@
 		{
 			tab: 'Actions',
 			icon: faClipboardList
+		},
+		{
+			tab: 'Skills',
+			icon: faChartSimple
 		}
 	];
 

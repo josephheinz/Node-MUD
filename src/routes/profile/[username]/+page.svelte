@@ -9,6 +9,7 @@
 	import { page } from '$app/state';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import type { Equipment, Inventory } from '$lib/types/item';
+	import type { Skill, SkillKey } from '$lib/types/skills';
 
 	const {
 		data
@@ -19,6 +20,7 @@
 			equipment: Equipment | undefined;
 			inventory: Inventory | undefined;
 			isUser: boolean;
+			skills: Record<SkillKey, Skill> | undefined;
 		};
 	} = $props();
 
