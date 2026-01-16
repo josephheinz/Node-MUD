@@ -6,6 +6,8 @@ import * as z from 'zod';
 import { getInventory } from './inventory.remote';
 import { Inventory } from '$lib/types/item';
 import { encodeDBItem, tryStackItemInInventory } from '$lib/utils/item';
+import type { SkillKey } from '$lib/types/skills';
+import { getSkills } from './skills.remote';
 
 
 export const getQueue = query(async () => {
@@ -40,16 +42,25 @@ export const getQueue = query(async () => {
 
 	if (result.completed.length > 0) {
 		let updatedInv = await getInventory();
+		let skillData = await getSkills();
 
 		result.completed.forEach((completion) => {
 			completion.outputs.items.forEach(item => {
 				updatedInv = new Inventory(tryStackItemInInventory(item, updatedInv).contents);
+			});
+			Object.entries(completion.outputs.xp).forEach(([skill, value]) => {
+				skillData[skill as SkillKey].xp += value;
 			});
 		});
 
 		await supabase
 			.from("inventories")
 			.update({ inventory_data: updatedInv.serialize() })
+			.eq("player_id", user.id);
+
+		await supabase
+			.from("skills")
+			.update({ skills_data: skillData })
 			.eq("player_id", user.id);
 
 		await supabase

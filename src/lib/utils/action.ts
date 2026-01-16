@@ -1,6 +1,8 @@
 import type { StackableModifier } from '$lib/modifiers/basicModifiers';
 import { getAction, type Action, type ChanceItem, type DBQueueAction } from '$lib/types/action';
 import type { Inventory, Item } from '$lib/types/item';
+import type { SkillKey } from '$lib/types/skills';
+import { cloneDeep } from 'radashi';
 import { loadDbItem, tryStackItemInInventory } from './item';
 
 export type ProcessedQueue = {
@@ -60,16 +62,31 @@ export type QueueCompletedData = {
 	id: string;
 	amount: number;
 	outputs: {
-		items: Item[]
+		items: Item[];
+		xp: Record<SkillKey, number>;
 	}
 };
+
+export const emptyXpOutput: Record<SkillKey, number> = {
+	"Mining": 0,
+	"Crafting": 0
+}
+
+function addXp(
+	target: Record<SkillKey, number>,
+	source: Record<SkillKey, number>
+) {
+	for (const skill in source) {
+		target[skill as SkillKey] += source[skill as SkillKey];
+	}
+}
 
 export function processQueueUntilNow(queue: DBQueueAction[], currentActionStart: Date): { queue: DBQueueAction[]; completed: QueueCompletedData[]; currentActionStart: number } {
 	const now = Date.now();
 	const currentActionTime: number = currentActionStart.getTime();
 	const elapsed = now - currentActionTime;
 
-	let outputs: { items: Item[] } = { items: [] };
+	let outputs: { items: Item[], xp: Record<SkillKey, number> } = { items: [], xp: cloneDeep(emptyXpOutput) };
 	let timeUsed: number = 0;
 	let completed: QueueCompletedData[] = [];
 
@@ -85,7 +102,7 @@ export function processQueueUntilNow(queue: DBQueueAction[], currentActionStart:
 
 		dbAction.amount--;
 
-		outputs = { items: [...outputs.items, ...completeAction(action).items] };
+		outputs = { items: [...outputs.items, ...completeAction(action).items], xp: { ...outputs.xp, ...completeAction(action).xp } };
 
 		completed.push({
 			...dbAction,
@@ -137,8 +154,8 @@ export function getQueueProgress(
 	};
 }
 
-export function completeAction(action: Action): { items: Item[]; time: number } {
-	let outputs: { items: Item[]; time: number } = { items: [], time: action.time * 1000 };
+export function completeAction(action: Action): { items: Item[]; time: number, xp: Record<SkillKey, number> } {
+	let outputs: { items: Item[]; time: number, xp: Record<SkillKey, number> } = { items: [], time: action.time * 1000, xp: cloneDeep(emptyXpOutput) };
 
 	action.outputs.items.forEach((item: ChanceItem) => {
 		if (rollChance(item)) {
@@ -149,6 +166,12 @@ export function completeAction(action: Action): { items: Item[]; time: number } 
 			}
 		}
 	});
+
+	if (action.outputs.xp) {
+		Object.entries(action.outputs.xp).forEach(([skill, value]) => {
+			outputs.xp[skill as SkillKey] += value;
+		});
+	}
 
 	return outputs;
 }

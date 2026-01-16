@@ -5,7 +5,7 @@
     color: "#bdbdbd"
   req:
     skill: "Mining"
-    level: 100
+    level: 10
   outputs:
     - id: titanium_ore
       min: 3
