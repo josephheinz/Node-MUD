@@ -12,6 +12,7 @@
 	import type { IApiSettings } from './+layout.server';
 	import { AccoladeReferences } from '$lib/utils/chat';
 	import Heading from '$lib/components/generic/heading.svelte';
+	import { Cog } from '@lucide/svelte';
 
 	type Profile = {
 		id: string;
@@ -83,7 +84,7 @@
 				<a
 					href="/profile/{profile.username}/settings"
 					class="m-2 mx-auto flex w-4/5 cursor-pointer items-center justify-center gap-2 rounded-md border-2 border-zinc-500 bg-zinc-600 px-4 py-2 hover:border-zinc-300 hover:bg-zinc-400 hover:text-zinc-900"
-					><Fa icon={faGear} />Settings</a
+					><Cog />Settings</a
 				>
 			{/if}
 		</aside>

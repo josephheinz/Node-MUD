@@ -1,13 +1,12 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import Fa from 'svelte-fa';
 	import { buttonVariants } from '../button';
-	import { faArrowRightToBracket } from '@fortawesome/free-solid-svg-icons';
 	import Button from '../button/button.svelte';
 	import Label from '../label/label.svelte';
 	import Input from '../input/input.svelte';
 	import { signup, login } from '$lib/remote/auth.remote';
 	import { toast } from 'svelte-sonner';
+	import { LogIn } from '@lucide/svelte';
 
 	let tab = $state<'login' | 'signup'>('login');
 
@@ -21,9 +20,7 @@
 		<span>Loading</span>
 	{/snippet}
 	<Dialog.Root>
-		<Dialog.Trigger class={buttonVariants({ variant: 'outline' })}
-			><Fa icon={faArrowRightToBracket} />Login</Dialog.Trigger
-		>
+		<Dialog.Trigger class={buttonVariants({ variant: 'outline' })}><LogIn />Login</Dialog.Trigger>
 		<Dialog.Content>
 			<form
 				{...action.enhance(async ({ submit }) => {

@@ -1,23 +1,21 @@
-import { faSquareWebAwesome } from '@fortawesome/free-brands-svg-icons';
-import { faCode, faMedal, type IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { escapeRegExp } from './general';
 import { encodeDBItem, loadDbItem } from './item';
 import { chatItemLinkTable, currentChatMessage } from '$lib/store.svelte';
-import type { DBItem, Item } from '$lib/types/item';
-import { wsManager } from '$lib/websocketManager';
+import type { Item } from '$lib/types/item';
+import { Braces, Crown, Medal, type Icon } from '@lucide/svelte';
 
-export const BadgeReferences: Record<string, { icon: IconDefinition; color: string }> = {
+export const BadgeReferences: Record<string, { icon: typeof Icon; color: string }> = {
 	owner: {
-		icon: faSquareWebAwesome,
+		icon: Crown,
 		color: '#4287f5'
 	},
 	VIP: {
 		color: '#00ff00',
-		icon: faMedal
+		icon: Medal
 	},
 	'Beta-Tester': {
 		color: '#cf3708',
-		icon: faCode
+		icon: Braces
 	}
 };
 

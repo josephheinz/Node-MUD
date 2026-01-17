@@ -2,17 +2,16 @@
 	import type { Action, DBQueueAction } from '$lib/types/action';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Empty from '$lib/components/ui/empty';
-	import Fa from 'svelte-fa';
-	import { faLocust, faTrash } from '@fortawesome/free-solid-svg-icons';
 	import { formatNumber } from '$lib/utils/general';
 	import { loadDbQueue } from '$lib/utils/action';
 	import { deleteFromQueue, getQueue } from '$lib/remote/actions.remote';
+	import { BrushCleaning, Trash2 } from '@lucide/svelte';
 
 	let loadedQueuePromise = $derived(await getQueue());
 	let loadedQueue = $derived(loadDbQueue(loadedQueuePromise.queue));
 
 	async function removeFromQueue(index: number) {
-		if (!loadedQueue.has(index)) return;
+		if (!loadedQueue[index]) return;
 
 		const queue = await getQueue();
 
@@ -27,7 +26,7 @@
 	<Dialog.Header>
 		<Dialog.Title>Your Queue</Dialog.Title>
 	</Dialog.Header>
-	{#if loadedQueue.size > 0}
+	{#if loadedQueue.length > 0}
 		{@render queueNotEmpty()}
 	{:else}
 		{@render queueEmpty()}
@@ -47,7 +46,7 @@
 				>Current action: {formatNumber(queue[currentIndex].amount)} {currentAction.name}</span
 			>
 		</div>
-		{#if loadedQueue.size > 1}
+		{#if loadedQueue.length > 1}
 			<span>Upcoming actions: </span>
 			<div class="flex flex-col items-start justify-start gap-1">
 				{#each loadedQueue.entries() as [index, action]}
@@ -61,7 +60,7 @@
 									removeFromQueue(index);
 								}}
 							>
-								<Fa icon={faTrash} class="text-rose-400" />
+								<Trash2 class="text-rose-400" />
 							</button>
 						</div>
 					{/if}
@@ -75,7 +74,7 @@
 	<Empty.Root class="w-full md:p-0">
 		<Empty.Header class="p-0">
 			<Empty.Media>
-				<Fa icon={faLocust} class="text-2xl" />
+				<BrushCleaning size="24" />
 			</Empty.Media>
 			<Empty.Title>Your queue is empty</Empty.Title>
 			<Empty.Description>Try queueing something</Empty.Description>

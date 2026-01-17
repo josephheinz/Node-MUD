@@ -10,6 +10,7 @@
 	import Fa from 'svelte-fa';
 	import { faShapes } from '@fortawesome/free-solid-svg-icons';
 	import { onMount } from 'svelte';
+	import { Shapes } from '@lucide/svelte';
 
 	const categories: TActionCategory[] = Object.keys(actionCategories);
 	let selectedTab = $state<string | null>(null);
@@ -39,7 +40,7 @@
 			<Empty.Root>
 				<Empty.Header>
 					<Empty.Media>
-						<Fa icon={faShapes} class="text-4xl" />
+						<Shapes size="48" />
 					</Empty.Media>
 					<Empty.Title>No actions available</Empty.Title>
 					<Empty.Description>Click a tab to get started with actions</Empty.Description>

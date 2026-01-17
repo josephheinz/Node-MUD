@@ -3,14 +3,13 @@
 	import * as Card from '../card';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Empty from '$lib/components/ui/empty';
-	import { faLocust } from '@fortawesome/free-solid-svg-icons';
-	import Fa from 'svelte-fa';
 	import { formatNumber } from '$lib/utils/general';
 	import QueueProgressBar from './queueProgressBar.svelte';
 	import { loadDbQueue } from '$lib/utils/action';
 	import { getQueue } from '$lib/remote/actions.remote';
 	import Skeleton from '../skeleton/skeleton.svelte';
 	import type { DBItem } from '$lib/types/item';
+	import { BrushCleaning } from '@lucide/svelte';
 
 	type QueueData = {
 		queue: DBQueueAction[];
@@ -92,7 +91,7 @@
 	<Empty.Root class="w-full md:p-0">
 		<Empty.Header>
 			<Empty.Media>
-				<Fa icon={faLocust} class="text-2xl" />
+				<BrushCleaning size="24" />
 			</Empty.Media>
 			<Empty.Title>Your queue is empty</Empty.Title>
 			<Empty.Description>Try queueing something</Empty.Description>

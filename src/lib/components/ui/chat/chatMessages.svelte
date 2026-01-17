@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import Button from '../button/button.svelte';
-	import Fa from 'svelte-fa';
-	import { faArrowDown, faGhost } from '@fortawesome/free-solid-svg-icons';
 	import type { ChatMessage as TChatMessage } from '$lib/utils/chat';
 	import ChatMessage from './chatMessage.svelte';
 	import * as Empty from '../empty';
+	import { Ghost, MoveDown } from '@lucide/svelte';
 
 	let { messages = $bindable() }: { messages: TChatMessage[] } = $props();
 
@@ -61,7 +60,7 @@
 			<Empty.Root>
 				<Empty.Header>
 					<Empty.Media>
-						<Fa icon={faGhost} class="text-4xl" />
+						<Ghost size="36" />
 					</Empty.Media>
 					<Empty.Title>No Chat Messages Yet</Empty.Title>
 					<Empty.Description>It's quiet in here...</Empty.Description>
@@ -81,7 +80,7 @@
 				size="icon"
 				class="aspect-square cursor-pointer rounded-full"
 			>
-				<Fa icon={faArrowDown} />
+				<MoveDown />
 			</Button>
 		</div>
 	{/if}

@@ -2,14 +2,13 @@
 	import type { Profile } from '$lib/store.svelte';
 	import type { IApiSettings } from './+layout.server';
 	import * as Empty from '$lib/components/ui/empty';
-	import Fa from 'svelte-fa';
-	import { faSkull } from '@fortawesome/free-solid-svg-icons';
 	import ProfileHeader from '$lib/components/ui/profile/profileHeader.svelte';
 	import ProfileBody from '$lib/components/ui/profile/profileBody.svelte';
 	import { page } from '$app/state';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
 	import type { Equipment, Inventory } from '$lib/types/item';
 	import type { Skill, SkillKey } from '$lib/types/skills';
+	import { Skull } from '@lucide/svelte';
 
 	const {
 		data
@@ -50,7 +49,7 @@
 		<Empty.Root>
 			<Empty.Header>
 				<Empty.Media>
-					<Fa icon={faSkull} class="text-4xl" />
+					<Skull size="36" />
 				</Empty.Media>
 				<Empty.Title>This profile does not exist</Empty.Title>
 				<Empty.Description>Are you sure you spelled it right?</Empty.Description>

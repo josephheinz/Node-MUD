@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Profile } from '$lib/store.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import Fa from 'svelte-fa';
 	import UserAvatar from '../userAvatar.svelte';
 	import { BadgeReferences } from '$lib/utils/chat';
 	import { capitalizeFirstLetter } from '$lib/utils/general';
@@ -31,14 +30,10 @@
 				{profile.display_name ?? profile.username}
 				<span class="flex items-center justify-evenly gap-1.5 text-xl">
 					{#each profile.badges as badge}
+						{@const Icon = BadgeReferences[badge].icon}
 						<Tooltip.Provider>
 							<Tooltip.Root>
-								<Tooltip.Trigger
-									><Fa
-										icon={BadgeReferences[badge].icon}
-										color={BadgeReferences[badge].color}
-									/></Tooltip.Trigger
-								>
+								<Tooltip.Trigger><Icon color={BadgeReferences[badge].color} /></Tooltip.Trigger>
 								<Tooltip.Content>
 									<span>{capitalizeFirstLetter(badge)}</span>
 								</Tooltip.Content>

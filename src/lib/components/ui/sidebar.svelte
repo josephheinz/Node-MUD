@@ -1,41 +1,33 @@
 <script lang="ts">
-	import {
-		faBoxesStacked,
-		faChartSimple,
-		faClipboardList,
-		faHome,
-		faToolbox,
-		type IconDefinition
-	} from '@fortawesome/free-solid-svg-icons';
 	import * as Sidebar from './sidebar';
-	import Fa from 'svelte-fa';
 	import NavProfile from './auth/navProfile.svelte';
 	import { sidebar, tab } from '$lib/store.svelte';
 	import ProfileAvatar from './auth/profileAvatar.svelte';
 	import OnlineCounter from './onlineCounter.svelte';
 	import QueueDisplay from './action/queueDisplay.svelte';
+	import { Backpack, Boxes, ChartNoAxesColumn, Clipboard, House, type Icon } from '@lucide/svelte';
 
-	const items: Array<{ tab: typeof tab.tab; icon: IconDefinition; href?: string }> = [
+	const items: Array<{ tab: typeof tab.tab; icon: typeof Icon; href?: string }> = [
 		{
 			tab: 'Home',
-			icon: faHome,
+			icon: House,
 			href: '/home'
 		},
 		{
 			tab: 'Inventory',
-			icon: faBoxesStacked
+			icon: Boxes
 		},
 		{
 			tab: 'Equipment',
-			icon: faToolbox
+			icon: Backpack
 		},
 		{
 			tab: 'Actions',
-			icon: faClipboardList
+			icon: Clipboard
 		},
 		{
 			tab: 'Skills',
-			icon: faChartSimple
+			icon: ChartNoAxesColumn
 		}
 	];
 
@@ -58,6 +50,7 @@
 						<Sidebar.MenuItem>
 							<Sidebar.MenuButton>
 								{#snippet child({ props })}
+									{@const Icon = item.icon}
 									<button
 										onclick={() => {
 											if (item.href) {
@@ -70,7 +63,7 @@
 										}}
 										{...props}
 									>
-										<Fa icon={item.icon} />
+										<Icon size="18" />
 										<span>{item.tab}</span>
 									</button>
 								{/snippet}

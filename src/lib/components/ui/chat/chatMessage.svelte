@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Fa from 'svelte-fa';
 	import { BadgeReferences, type ChatMessage } from '$lib/utils/chat';
 	import ItemHover from './itemHover.svelte';
 	import { type Item } from '$lib/types/item';
@@ -12,7 +11,8 @@
 		<span class="text-sm font-semibold">{message.author.username}</span>
 		<span class="flex items-center justify-evenly gap-1 pr-1">
 			{#each message.author.badges as badge}
-				<Fa icon={BadgeReferences[badge].icon} color={BadgeReferences[badge].color} size="xs" />
+				{@const Icon = BadgeReferences[badge].icon}
+				<Icon color={BadgeReferences[badge].color} size="14" strokeWidth="3"/>
 			{/each}
 		</span>
 		<span class="text-xs text-muted-foreground">

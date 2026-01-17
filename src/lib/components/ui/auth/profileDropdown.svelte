@@ -1,20 +1,13 @@
 <script lang="ts">
 	import * as DropdownMenu from '../dropdown-menu';
-	import Fa from 'svelte-fa';
-	import {
-		faArrowRightFromBracket,
-		faMoon,
-		faSun,
-		faUser
-	} from '@fortawesome/free-solid-svg-icons';
 	import { Button } from '../button/index';
-	import ChevronUpDown from '../chevronUpDown.svelte';
 	import UserAvatar from '../userAvatar.svelte';
 	import { toggleMode, mode } from 'mode-watcher';
 	import { capitalizeFirstLetter } from '$lib/utils/general';
 	import { getProfile, logout } from '$lib/remote/auth.remote';
 	import { toast } from 'svelte-sonner';
 	import Skeleton from '../skeleton/skeleton.svelte';
+	import { ChevronsUpDown, LogOut, Moon, Sun, User } from '@lucide/svelte';
 </script>
 
 <svelte:boundary>
@@ -36,7 +29,7 @@
 				<span class="grow text-left">
 					{profile.display_name ?? `@${profile.username}`}
 				</span>
-				<ChevronUpDown />
+				<ChevronsUpDown />
 			</Button>
 		</DropdownMenu.Trigger>
 		<DropdownMenu.Content align="end">
@@ -44,11 +37,15 @@
 			<DropdownMenu.Group>
 				<DropdownMenu.Item>
 					<a href={`/profile/${profile.username}`} class="flex items-center gap-2">
-						<Fa icon={faUser} />Profile
+						<User />Profile
 					</a>
 				</DropdownMenu.Item>
 				<DropdownMenu.Item onclick={toggleMode}>
-					<Fa icon={mode.current === 'dark' ? faMoon : faSun} />
+					{#if mode.current === 'dark'}
+						<Moon />
+					{:else}
+						<Sun />
+					{/if}
 					{capitalizeFirstLetter(mode.current ?? 'system')}
 				</DropdownMenu.Item>
 				<form
@@ -63,7 +60,7 @@
 				>
 					<button type="submit" class="w-full">
 						<DropdownMenu.Item class="flex items-center gap-2" variant="destructive">
-							<Fa icon={faArrowRightFromBracket} /> Sign Out
+							<LogOut /> Sign Out
 						</DropdownMenu.Item>
 					</button>
 				</form>

@@ -3,14 +3,13 @@
 	import ChatMessages from './chatMessages.svelte';
 	import * as ButtonGroup from '../button-group/index';
 	import Button from '../button/button.svelte';
-	import Fa from 'svelte-fa';
-	import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 	import { sendMessage, type ChatMessage, type messagePart } from '$lib/utils/chat';
 	import { chatMessages, currentChatMessage, type Profile } from '$lib/store.svelte';
 	import { websocketStore } from '$lib/stores/websocket.svelte';
 	import { PressedKeys } from 'runed';
 	import { getProfile } from '$lib/remote/auth.remote';
 	import Skeleton from '../skeleton/skeleton.svelte';
+	import { MoveRight } from '@lucide/svelte';
 
 	let parsedMessages: ChatMessage<Set<messagePart>>[] = $state(chatMessages.parsed);
 	let inputMessage: string = $derived(currentChatMessage.value);
@@ -46,7 +45,7 @@
 				variant="outline"
 				size="icon"
 				onclick={message}
-				disabled={(await getProfile()) === null}><Fa icon={faArrowRight} /></Button
+				disabled={(await getProfile()) === null}><MoveRight /></Button
 			>
 		</ButtonGroup.Root>
 	</div>

@@ -3,6 +3,7 @@
 	import { getInventory } from '$lib/remote/inventory.remote';
 	import numeral from 'numeral';
 	import Progress from '../progress/progress.svelte';
+	import { getSkills } from '$lib/remote/skills.remote';
 
 	const {
 		queueData
@@ -49,6 +50,7 @@
 				if (progressInterval) clearInterval(progressInterval);
 				await getQueue().refresh();
 				await getInventory().refresh();
+				await getSkills().refresh();
 			}
 		}, 50);
 	}
