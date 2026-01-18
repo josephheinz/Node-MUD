@@ -5,7 +5,15 @@
 	import ProfileAvatar from './auth/profileAvatar.svelte';
 	import OnlineCounter from './onlineCounter.svelte';
 	import QueueDisplay from './action/queueDisplay.svelte';
-	import { Backpack, Boxes, ChartNoAxesColumn, Clipboard, House, type Icon } from '@lucide/svelte';
+	import {
+		Anvil,
+		Backpack,
+		Boxes,
+		ChartNoAxesColumn,
+		Clipboard,
+		House,
+		type Icon
+	} from '@lucide/svelte';
 
 	const items: Array<{ tab: typeof tab.tab; icon: typeof Icon; href?: string }> = [
 		{
@@ -28,6 +36,10 @@
 		{
 			tab: 'Skills',
 			icon: ChartNoAxesColumn
+		},
+		{
+			tab: 'Forge',
+			icon: Anvil
 		}
 	];
 

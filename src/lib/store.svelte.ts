@@ -20,7 +20,7 @@ export const gameState = $state<{
 	inventory: Inventory;
 	equipment: Equipment;
 	playerCount: number;
-	queue: { started: Date; queue: DBQueueAction[] }
+	queue: { started: Date; queue: DBQueueAction[] };
 }>({
 	user: null,
 	profile: null,
@@ -45,6 +45,8 @@ export const currentChatMessage: { value: string } = $state({ value: '' });
 
 export const sidebar = $state({ open: true });
 
-export const tab = $state<{ tab: 'Home' | 'Inventory' | 'Equipment' | 'Actions' | "Skills" }>({
+export const tab = $state<{
+	tab: 'Home' | 'Inventory' | 'Equipment' | 'Actions' | 'Skills' | 'Forge';
+}>({
 	tab: 'Home'
 });
