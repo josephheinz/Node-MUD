@@ -216,7 +216,7 @@ export function determineSlot(
 	item.modifiers.forEach((mod: IItemModifier) => {
 		if (mod.type !== 'Equippable' || !(mod as EquippableModifier).slot) return;
 		try {
-			slot = (mod as EquippableModifier).slot as EquipmentSlot;
+			slot = capitalizeFirstLetter((mod as EquippableModifier).slot) as EquipmentSlot;
 			return;
 		} catch (err) {
 			throw new Error(`${err}`);

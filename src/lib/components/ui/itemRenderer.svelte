@@ -2,12 +2,15 @@
 	import { Equipment, Inventory, type EquipmentSlot, type Item } from '$lib/types/item';
 	import * as ContextMenu from './context-menu/index';
 	import { tooltip } from '../tooltip';
-	import { determineSlot, Equip, getDisplayName, getItemData, Unequip } from '$lib/utils/item';
+	import { determineSlot, getDisplayName, getItemData, encodeDBItem } from '$lib/utils/item';
 	import { gameState } from '$lib/store.svelte';
 	import { toast } from 'svelte-sonner';
 	import type { StackableModifier } from '$lib/modifiers/basicModifiers';
 	import { formatNumber } from '$lib/utils/general';
 	import { linkItemToChat } from '$lib/utils/chat';
+	import { equip, getEquipment, unequip } from '$lib/remote/equipment.remote';
+	import { getUser } from '$lib/remote/auth.remote';
+	import { getInventory } from '$lib/remote/inventory.remote';
 
 	type Props = {
 		item: Item;
@@ -20,116 +23,75 @@
 		equippable: boolean;
 	};
 
-	async function tryEquip() {
-		if (equipFlags.equippable && equipFlags.equippedSlot) {
-			const slot = determineSlot(item);
-			if (slot) {
-				// Store originals for rollback
-				const originalEquipment = gameState.equipment;
-				const originalInventory = gameState.inventory;
-
-				// Optimistic update - update UI immediately
-				// Messy
-				const optimisticInventory = new Inventory([
-					...gameState.inventory.contents,
-					...(gameState.equipment[slot] ? [gameState.equipment[slot]] : [])
-				]);
-				const optimisticEquipment = new Equipment({
-					...gameState.equipment,
-					[slot]: null
-				});
-
-				gameState.equipment = optimisticEquipment;
-				gameState.inventory = optimisticInventory;
-
-				try {
-					// Call server
-					const { equipment: newEq, inventory: newInv } = await Unequip(
-						originalEquipment,
-						item,
-						gameState.user?.id
-					);
-
-					// Server confirmed - update with server state
-					if (newEq) gameState.equipment = newEq;
-					if (newInv) gameState.inventory = newInv;
-
-					toast.success(`Successfully unequipped ${item.name}`, {
-						duration: 2500
-					});
-				} catch (error) {
-					gameState.equipment = originalEquipment;
-					gameState.inventory = originalInventory;
-
-					toast.error(`Failed to unequip item: ${item.name}`, {
-						duration: 2500
-					});
-
-					console.error('Failed to unequip item:', error);
-				}
-			} else {
-				console.warn(`Item ${item.id} is not equippable`);
-			}
-		} else {
-			const slot = determineSlot(item);
-			if (slot) {
-				// Store originals for rollback
-				const originalEquipment = gameState.equipment;
-				const originalInventory = gameState.inventory;
-
-				// Optimistic update - update UI immediately
-				// Messy
-				const optimisticInventory = new Inventory([
-					...gameState.inventory.contents.filter((i) => i !== item),
-					...(gameState.equipment[slot] ? [gameState.equipment[slot]] : [])
-				]);
-				const optimisticEquipment = new Equipment({
-					...gameState.equipment,
-					[slot]: item
-				});
-
-				const optimisticReplaceItem: Item | null = originalEquipment[slot];
-
-				gameState.equipment = optimisticEquipment;
-				gameState.inventory = optimisticInventory;
-
-				try {
-					// Call server
-					const { equipment: newEq, inventory: newInv } = await Equip(item, gameState.user?.id);
-
-					// Server confirmed - update with server state
-					if (newEq) gameState.equipment = newEq;
-					if (newInv) gameState.inventory = newInv;
-
-					let description = optimisticReplaceItem
-						? `Replaced ${optimisticReplaceItem.name} in ${slot}`
-						: '';
-
-					toast.success(`Successfully equipped ${item.name}`, {
-						description,
-						duration: 2500
-					});
-				} catch (error) {
-					gameState.equipment = originalEquipment;
-					gameState.inventory = originalInventory;
-
-					toast.error(`Failed to equip item: ${item.name}`, {
-						duration: 2500
-					});
-
-					console.error('Failed to equip item:', error);
-				}
-			} else {
-				console.warn(`Item ${item.id} is not equippable`);
-			}
-		}
-	}
-
 	const { item, class: userClass = '', equipFlags }: Props = $props();
 
 	const stackMod: StackableModifier | undefined = item.modifiers.find(
 		(m) => m.type === 'Stackable'
 	) as StackableModifier;
+
+	async function tryEquip() {
+		const userId = (await getUser()).id;
+		if (!userId) {
+			toast.error('User not authenticated', { duration: 2500 });
+			return;
+		}
+
+		const slot = determineSlot(item);
+		console.log(slot);
+		if (!slot) {
+			console.warn(`Item ${item.id} is not equippable`);
+			return;
+		}
+
+		if (equipFlags.equippable && equipFlags.equippedSlot) {
+			// Unequip logic
+			try {
+				const result = await unequip({
+					id: userId,
+					slot: slot
+				});
+
+				toast.success(`Successfully unequipped ${item.name}`, {
+					duration: 2500
+				});
+
+				await getEquipment().refresh();
+				await getInventory().refresh();
+			} catch (error) {
+				toast.error(`Failed to unequip item: ${item.name}`, {
+					duration: 2500
+				});
+
+				console.error('Failed to unequip item:', error);
+			}
+		} else {
+			// Equip logic
+			const replacedItem = gameState.equipment[slot];
+
+			try {
+				const result = await equip({
+					id: userId,
+					dbItem: encodeDBItem(item)
+				});
+
+				const description = replacedItem ? `Replaced ${replacedItem.name} in ${slot}` : '';
+
+				toast.success(`Successfully equipped ${item.name}`, {
+					description,
+					duration: 2500
+				});
+
+				await getEquipment().refresh();
+				await getInventory().refresh();
+			} catch (error) {
+				toast.error(`Failed to equip item: ${item.name}`, {
+					duration: 2500
+				});
+
+				console.error('Failed to equip item:', error);
+			}
+		}
+	}
 </script>
 
 <ContextMenu.Root>
@@ -144,8 +106,9 @@
 		{#if stackMod}
 			<span
 				class="pointer-events-none absolute right-0.5 bottom-0 text-stroke-2 text-stroke-zinc-800 text-lg font-extrabold text-white shadow-xs"
-				>{formatNumber(stackMod.amount)}</span
 			>
+				{formatNumber(stackMod.amount)}
+			</span>
 		{/if}
 	</ContextMenu.Trigger>
 

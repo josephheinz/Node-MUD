@@ -160,7 +160,7 @@ export const equip = command(equipRequestSchema, async ({ id, dbItem }) => {
 	const { locals } = getRequestEvent();
 	const user = locals.user;
 
-	if (!user || (user && user.id !== id)) return { error: 'Not authenticated' };
+	if (!user || (user && user.id !== id)) return error(401);
 
 	const supabase = locals.supabase;
 
@@ -171,7 +171,7 @@ export const equip = command(equipRequestSchema, async ({ id, dbItem }) => {
 		.single();
 
 	if (fetchError || !data) {
-		return { error: fetchError?.message || 'Not found' };
+		return error(404);
 	}
 
 	const { inventory_data, equipment_data } = data as {
@@ -199,7 +199,7 @@ export const equip = command(equipRequestSchema, async ({ id, dbItem }) => {
 	const item: Item = loadDbItem(dbItem);
 
 	const slot: EquipmentSlot | undefined = determineSlot(item);
-	if (!slot) return { error: 'Item is not equippable' };
+	if (!slot) return error(404, "Item not equippable");
 
 	// Update equipment slot with proper item
 	if (equipment_data[slot]) {
@@ -216,7 +216,7 @@ export const equip = command(equipRequestSchema, async ({ id, dbItem }) => {
 		.update({ inventory_data, equipment_data })
 		.eq('player_id', id);
 
-	if (updateError) return { error: updateError.message };
+	if (updateError) return error(500, updateError.message);
 
 	return { inventory_data, equipment_data };
 });
@@ -240,6 +240,10 @@ export const unequip = command(unequipRequestSchema, async ({ id, slot }) => {
 		equipment_data: DBEquipment;
 	};
 
+	slot = slot.toLowerCase() as EquipmentSlot
+
+	console.log(equipment_data[slot], fetchError)
+
 	const item: DBItem | null = equipment_data[slot];
 	if (!item) return error(400);
 
@@ -254,7 +258,10 @@ export const unequip = command(unequipRequestSchema, async ({ id, slot }) => {
 		})
 		.eq('player_id', id);
 
-	if (updateError) return error(500);
+	if (updateError) {
+		console.log(updateError)
+		return error(500);
+	}
 
 	return { inventory_data, equipment_data };
 });

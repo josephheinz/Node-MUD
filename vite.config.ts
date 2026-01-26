@@ -51,7 +51,7 @@ async function authMessage(
 
 		// Send success back
 		const manager = getWebSocketManager();
-		manager.send(connection.id, { type: 'auth-success', data: {} });
+		manager.send(connection.id, { type: 'auth-success', data: { userId: user.id } });
 
 		// Now you have verified userId
 		wsManager.addConnection(connection.id, { userId: user.id }, supabase);
