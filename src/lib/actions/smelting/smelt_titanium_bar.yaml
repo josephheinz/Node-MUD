@@ -1,16 +1,14 @@
 - id: smelt_titanium_bar
-  name: Smelt Titanium Bar
+  name: Titanium Bar
   icon:
-    image: "/images/actions/foundryBucket.svg"
-    color: "#bdbdbd"
+    image: '/images/actions/foundryBucket.svg'
+    color: '#bdbdbd'
   req:
     skill: 'Crafting'
     level: 10
   inputs:
-    ids:
-      - titanium_ore
-    amounts:
-      - 2
+    - id: titanium_ore
+      amount: 2
   outputs:
     - id: titanium_bar
       min: 1

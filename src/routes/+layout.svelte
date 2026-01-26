@@ -1,36 +1,21 @@
 <script lang="ts">
 	import '../app.css';
-	import "../ui.css"
-	import * as store from '$lib/store';
-	import { hydrateEquipment } from '$lib/types/equipment';
-	import { getModifiedStats, Stats } from '$lib/types/stats';
-	import { get } from 'svelte/store';
-	import { page } from '$app/stores';
-	import { hydrateInventory } from '$lib/utils/item';
+	import '../ui.css';
+	import { ModeWatcher } from 'mode-watcher';
+	import { Toaster } from 'svelte-sonner';
 
-	let { children } = $props();
-
-	import { onMount } from 'svelte';
-	onMount(() => {
-		const inv = hydrateInventory($page.data.inventory);
-		const eq = hydrateEquipment($page.data.equipment);
-
-		store.inventory.set(inv);
-		store.equipment.set(eq);
-		store.user.set($page.data.user ?? null);
-		store.profile.set($page.data.profile);
-		store.baseStats.set($page.data.stats ?? { ...Stats });
-		store.modifiedStats.set(getModifiedStats(get(store.baseStats), get(store.equipment)));
-		store.skills.set($page.data.skills);
-		store.actionQueue.set($page.data.queue);
-		store.queueStart.set(new Date($page.data.started).getTime());
-	});
+	const { children }: { children: any } = $props();
 </script>
 
 <svelte:head>
 	<link rel="icon" href="/images/items/weapons/swords/ironSword.svg" />
 </svelte:head>
 
-<div class="h-full w-full bg-zinc-900 text-white">
+<ModeWatcher />
+<Toaster position="bottom-right" richColors />
+<!-- <DarkModeButton />
+ -->
+
+<div class="m-0 size-full p-0">
 	{@render children?.()}
 </div>

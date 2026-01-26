@@ -1,63 +1,222 @@
-import { EmptyEquipment, type Equipment, type EquipmentSlot } from '$lib/types/equipment';
-import { itemRegistry, type DBItem, type IItemModifier, type Item } from '$lib/types/item';
-import { deepClone } from './general';
-import { get } from 'svelte/store';
-import * as store from '$lib/store';
-import { instantiateModifier } from '$lib/modifiers/modifiersRegistry';
-import type { EnhancerModifier, StackableModifier } from '$lib/modifiers/basicModifiers';
-import ItemHover from '$lib/components/chat/itemHover.svelte';
-import type { StarsModifier } from '$lib/modifiers/stars';
-import type { ReforgeModifier } from '$lib/modifiers/reforges';
+import type { ITooltipData } from '$lib/components/tooltip.old';
+import { StackableModifier, type EquippableModifier } from '$lib/modifiers/basicModifiers';
+import { instantiateModifier, instantiateModifierFromHash } from '$lib/modifiers/modifiersRegistry';
+import {
+	Equipment,
+	Inventory,
+	Rarity,
+	computeItemStats,
+	initializeItemRegistry,
+	itemRegistry,
+	type DBItem,
+	type EquipmentSlot,
+	type IItemModifier,
+	type IRawModifierSpec,
+	type Item
+} from '$lib/types/item';
+import * as _ from 'radashi';
+import { capitalizeFirstLetter, formatNumber } from './general';
+import { isEqual } from 'radashi';
+import { Stats } from '$lib/types/stats';
 
-/**
- * Combine inventory and equipped items into a single list with modifiers reinstantiated.
- *
- * Returns a new array containing all items from `inventory` and all non-null items from `equipment`.
- * Each item in the result has its modifiers revived (instantiated) so modifier methods are available.
- *
- * @param inventory - Array of inventory items to include
- * @param equipment - Equipment object whose non-null slots will be included
- * @returns An array of items from inventory and equipment with revived modifiers
- */
-export function ConglomerateItems(inventory: Item[], equipment: Equipment): Item[] {
-	let inventoryCopy: Item[] = deepClone<Item[]>(inventory) ?? [];
-	let result: Item[] = [];
+export async function Equip(
+	item: Item,
+	userId?: string
+): Promise<{ inventory?: Inventory; equipment?: Equipment }> {
+	if (!userId) throw new Error('No user logged in');
 
-	inventoryCopy.forEach((item: Item) => {
-		item.modifiers = reviveModifiers(item.modifiers);
-		result.push(item as Item);
+	const res = await fetch(`/api/equipment/${userId}/equip`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ dbItem: encodeDBItem(item) })
 	});
 
-	Object.values(deepClone<Equipment>(equipment) ?? EmptyEquipment).forEach((item: Item | null) => {
-		if (item) {
-			// re-instantiate all modifiers so methods exist
-			item.modifiers = reviveModifiers(item.modifiers);
-			result.push(item as Item);
-		}
-	});
+	const data = await res.json();
 
-	return result;
+	if (!res.ok) {
+		console.error('Failed to equip:', data.error);
+		throw new Error(data.error);
+	}
+
+	let newEq = Equipment.load(data.equipment_data);
+	let newInv = Inventory.load(data.inventory_data);
+
+	return {
+		inventory: newInv,
+		equipment: newEq
+	};
 }
 
-/**
- * Determine which equipment slot the item is marked as equippable for.
- *
- * @param item - The item to inspect for an `Equippable` modifier
- * @param equipment - Optional equipment map used for context (defaults to the current store equipment)
- * @returns The `EquipmentSlot` the item is equippable to, or `undefined` if no equippable slot is specified
- * @throws Error if an `Equippable` modifier contains an invalid slot value
- */
+export async function Unequip(
+	equipment: Equipment,
+	item: Item,
+	userId?: string
+): Promise<{ inventory?: Inventory; equipment?: Equipment }> {
+	if (!userId) console.error('No user logged in');
+
+	const slot: EquipmentSlot | undefined = determineSlot(item);
+	if (!slot) throw new Error('Item is not equippable');
+
+	if (equipment[slot] === null) throw new Error('Item is not currently equipped');
+
+	const res = await fetch(`/api/equipment/${userId}/unequip`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ slot })
+	});
+
+	const data = await res.json();
+
+	if (!res.ok) {
+		console.error('Failed to equip:', data.error);
+		throw new Error(data.error);
+	}
+
+	let newEq = Equipment.load(data.equipment_data);
+	let newInv = Inventory.load(data.inventory_data);
+
+	return {
+		inventory: newInv,
+		equipment: newEq
+	};
+}
+
+export function getItemData(item: Item, equippable: boolean = false): ITooltipData {
+	let rarityName: string = getRarity(item.rarity);
+	let descriptor: string = `<b style="color:${item.rarity}">${rarityName} Item</b>`;
+
+	let itemName: string = getDisplayName(item);
+	let itemDesc: string = getDisplayDescription(item);
+
+	let slot: EquipmentSlot | undefined = determineSlot(item);
+	let equipMsg: string = '';
+	if (slot && equippable) equipMsg = `Slot: ${slot}<br/>`;
+
+	let stats = computeItemStats(item);
+	let statsString = '';
+
+	const stackableModifier: StackableModifier | undefined = item.modifiers.find(
+		(m) => m.type == 'Stackable'
+	) as StackableModifier;
+	let stackString = '';
+
+	if (stackableModifier != undefined) {
+		stackString = `Stack: ${formatNumber(stackableModifier.amount)} / ${formatNumber(stackableModifier.stack)}</br>`;
+	}
+
+	for (const key in stats) {
+		const s = stats[key];
+		if (s.base || s.added > 0) {
+			//${Stats[key] ? `<span style="color:${Stats[key].color};">${Stats[key].icon} </span>` : ""}
+			//style="color:oklch(90.5% 0.182 98.111);"
+			statsString += `${capitalizeFirstLetter(key)}: ${s.base + s.added}<span class="text-muted-foreground">${s.added > 0 ? ` (+${s.added})` : ''}</span><br/>`;
+		}
+	}
+
+	return {
+		title: itemName,
+		body: `${stackString}${equipMsg}${statsString}${itemDesc}<br/>${descriptor}`
+	};
+}
+
+export function getRarity(color: string): string {
+	const rarity =
+		Object.keys(Rarity).find((k) => Rarity[k as keyof typeof Rarity] === color) ?? Rarity.Common;
+	return rarity;
+}
+
+export function sortModifiersByPriority(
+	mods: IItemModifier[],
+	mode: 'asc' | 'desc'
+): IItemModifier[] {
+	const dir = mode === 'asc' ? 1 : -1;
+
+	return mods.sort((a, b) => ((a.priority ?? 0) - (b.priority ?? 0)) * dir);
+}
+
+export function encodeDBItem(item: Item): DBItem {
+	const baseItem = itemRegistry[item.id];
+	if (!baseItem) throw new Error(`Unknown item id: ${item.id}`);
+
+	const baseModHashes: string[] = baseItem.modifiers.map((mod) => mod.hash());
+	const encodedMods: string[] = item.modifiers.map((mod) => mod.hash());
+
+	const diffModifiers: string[] = _.diff(encodedMods, baseModHashes);
+
+	return {
+		id: item.id,
+		modifiers: diffModifiers
+	};
+}
+
+export function loadDbItem(item: DBItem): Item {
+	initializeItemRegistry();
+	// check to see if its outdated
+	canonicalizeDbItem(item);
+
+	const base = structuredClone<Item>(itemRegistry[item.id]);
+	base.modifiers = base.modifiers.map(instantiateModifier);
+	/* 	const base = _.cloneDeep(itemRegistry[item.id]) as Item;
+	 */
+	if (!base) throw new Error(`Unknown item id: ${item.id}`);
+
+	const dbMods: IItemModifier[] = item.modifiers?.map(instantiateModifierFromHash) ?? [];
+
+	let merged: IItemModifier[] = [...base.modifiers];
+
+	for (const mod of dbMods) {
+		const i = merged.findIndex((m) => m.type === mod.type);
+		if (i >= 0) merged[i] = mod;
+		else merged.push(mod);
+	}
+
+	return {
+		...base,
+		uid: crypto.randomUUID(),
+		modifiers: merged
+	};
+}
+
+export function canonicalizeDbItem(db: DBItem): DBItem {
+	return {
+		id: db.id,
+		modifiers: (db.modifiers ?? []).map((m: string | IRawModifierSpec) =>
+			// if mod is already a string, keep it
+			// otherwise, if it can be hashed, hash it
+			// otherwise otherwise, try to instantiate then hash it
+			typeof m === 'string' ? m : m?.hash ? m.hash() : instantiateModifier(m).hash()
+		)
+	};
+}
+
+export function getDisplayName(item: Item): string {
+	let name = item.name;
+	for (const mod of sortModifiersByPriority(item.modifiers, 'asc') ?? []) {
+		if (mod.modifyName) name = mod.modifyName(name);
+	}
+	return name;
+}
+
+export function getDisplayDescription(item: Item): string {
+	const base = item.desc ? `<i>${item.desc}</i>` : '';
+	return (
+		sortModifiersByPriority(item.modifiers, 'desc')?.reduce(
+			(desc, mod) => (mod.modifyDescription ? mod.modifyDescription(desc) : desc),
+			base
+		) ?? base
+	);
+}
+
 export function determineSlot(
 	item: Item,
-	equipment: Equipment = get(store.equipment)
+	equipment: Equipment = new Equipment({})
 ): EquipmentSlot | undefined {
 	let slot: EquipmentSlot | undefined = undefined;
 
 	item.modifiers.forEach((mod: IItemModifier) => {
-		if (mod.type !== 'Equippable' || !mod.value || typeof mod.value !== 'string') return;
-		//if (equipment[mod.value as keyof Equipment] != undefined) return;
+		if (mod.type !== 'Equippable' || !(mod as EquippableModifier).slot) return;
 		try {
-			slot = mod.value as EquipmentSlot;
+			slot = capitalizeFirstLetter((mod as EquippableModifier).slot) as EquipmentSlot;
 			return;
 		} catch (err) {
 			throw new Error(`${err}`);
@@ -67,206 +226,78 @@ export function determineSlot(
 	return slot;
 }
 
-/**
- * Fetches an item by its identifier from the backend API.
- *
- * @param id - The identifier of the item to retrieve
- * @returns The fetched `Item`
- * @throws Error if the item cannot be retrieved or does not exist
- */
-export async function getItem(id: string): Promise<Item> {
-	let item: Item | undefined;
-	const res = await fetch(`/api/item/${id}`)
-		.then((response) => {
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-			return response.json();
-		})
-		.then((data) => {
-			item = data.item;
-		})
-		.catch((error) => {
-			console.error(error);
-		});
-	if (item) return item;
-
-	throw new Error(`Item not found: ${id}`);
-}
-
-/**
- * Create a runtime Item from a stored DBItem by merging its modifier overrides with the base item and reviving modifier instances.
- *
- * @param dbItem - Database representation containing the base item `id` and optional `modifiers` to add or replace
- * @returns A new Item cloned from the registry entry with a freshly generated `uid` and revived, merged modifiers
- * @throws Error if `dbItem.id` does not exist in the item registry
- */
-export function loadDbItem(dbItem: DBItem): Item {
-	const base = deepClone(itemRegistry[dbItem.id]);
-	if (!base) throw new Error(`Unknown item id: ${dbItem.id}`);
-
-	const dbMods = dbItem.modifiers ?? [];
-
-	// Keep base modifiers AND db modifiers.
-	let merged = [...base.modifiers];
-
-	for (const mod of dbMods) {
-		const existingIndex = merged.findIndex((m) => m.type === mod.type);
-		if (existingIndex >= 0) {
-			merged[existingIndex] = mod;
-		} else {
-			merged.push(mod);
-		}
-	}
-
-	merged = reviveModifiers(merged);
-
-	return {
-		...base,
-		uid: crypto.randomUUID(),
-		modifiers: merged as IItemModifier[]
+export function compareItems(a: Item, b: Item): boolean {
+	const sa: Item = {
+		...a,
+		modifiers: [...(a.modifiers ?? [])].sort()
 	};
+
+	const sb: Item = {
+		...b,
+		modifiers: [...(b.modifiers ?? [])].sort()
+	};
+
+	return isEqual(sa, sb);
 }
 
-/**
- * Produce a compact DB representation of an Item by including only modifiers that differ from the registry base or are new.
- *
- * @param item - The in-memory Item to encode
- * @returns A DBItem containing the item's `id` and an array of modifiers that are either not present on the base item or have fields that differ from the base
- */
-export function encodeDbItem(item: Item): DBItem {
-	const base = itemRegistry[item.id];
-	const encodedMods: IItemModifier[] = [];
+export function compareDbItems(a: DBItem, b: DBItem): boolean {
+	const sa: DBItem = {
+		...a,
+		modifiers: [...(a.modifiers ?? [])].sort()
+	};
 
-	for (const mod of item.modifiers ?? []) {
-		const baseMod = base.modifiers.find((b) => b.type === mod.type);
+	const sb: DBItem = {
+		...b,
+		modifiers: [...(b.modifiers ?? [])].sort()
+	};
 
-		if (!baseMod) {
-			encodedMods.push(mod);
-			continue;
-		}
-
-		let changed = false;
-		const diff: any = { type: mod.type };
-
-		for (const key of Object.keys(mod) as (keyof IItemModifier)[]) {
-			if (mod[key] !== baseMod[key]) {
-				diff[key] = mod[key];
-				changed = true;
-			}
-		}
-
-		if (changed) encodedMods.push(mod);
-	}
-
-	return { id: item.id, modifiers: encodedMods };
+	return isEqual(sa, sb);
 }
 
-/**
- * Convert an array of database item records into fully hydrated Item instances.
- *
- * @param inventory - Array of `DBItem` records to hydrate into runtime `Item` objects
- * @returns An array of `Item` objects with modifiers revived and other runtime fields populated
- */
-export function hydrateInventory(inventory: DBItem[]): Item[] {
-	let hydratedInventory: Item[] = [];
-
-	inventory.forEach((item: DBItem) => {
-		let loadedItem = loadDbItem(item);
-		hydratedInventory.push(loadedItem);
-	});
-
-	return hydratedInventory;
+export function getItem(id: string): Item | null {
+	if (itemRegistry[id]) return itemRegistry[id];
+	return null;
 }
 
-/**
- * Reinstantiates raw modifier objects into their concrete modifier instances.
- *
- * @param mods - Array of modifier data (possibly plain objects) to revive into instantiated modifiers
- * @returns An array of instantiated `IItemModifier` objects with runtime behavior restored
- */
-export function reviveModifiers(mods: IItemModifier[]): IItemModifier[] {
-	return mods.map((mod) => instantiateModifier(mod));
-}
-
-/**
- * Adds an item to the inventory, merging its Stackable value into an existing stack of the same item when capacity allows.
- *
- * @param item - The item to add or merge into the inventory
- * @param inventory - The inventory array to update; this array is mutated and also returned
- * @returns The updated inventory array with the item merged into an existing stack if possible, otherwise appended as a new entry
- */
-export function tryStackItemInInventory(item: Item, inventory: Item[]): Item[] {
+export function tryStackItemInInventory(item: Item, inventory: Item[] | Inventory): Inventory {
+	const contents: Item[] = inventory instanceof Inventory ? inventory.contents : inventory;
 	const stackableModifier: StackableModifier | undefined = item.modifiers.find(
-		(m) => m.type == 'Stackable'
+		(m) => m.type === 'Stackable'
 	) as StackableModifier;
 
 	if (!stackableModifier) {
-		inventory.push(item);
-		return inventory;
+		contents.push(item);
+		return new Inventory(contents);
 	}
 
-	const inventoryStacks: Item[] = inventory.filter((i) => i.id === item.id);
-
-	if (inventoryStacks.length === 0) {
-		inventory.push(item);
-		return inventory;
+	if (!contents.some((i) => i.id === item.id)) {
+		contents.push(item);
+		return new Inventory(contents);
 	}
 
-	let updatedStackIndex: number = inventory.findIndex(
-		(i) =>
-			i.id === item.id &&
-			(i.modifiers.find((m) => m.type === 'Stackable') as StackableModifier)?.value +
-				stackableModifier.value <
-				stackableModifier.stack
-	);
+	contents.forEach((i: Item) => {
+		if (stackableModifier.amount === 0) return;
+		if (item.id != i.id) return;
 
-	if (updatedStackIndex === -1) {
-		inventory.push(item);
-		return inventory;
-	} else {
-		const stackModifierIndex: number = inventory[updatedStackIndex].modifiers.findIndex(
+		const iStackable: StackableModifier | undefined = i.modifiers.find(
 			(m) => m.type === 'Stackable'
-		);
-		(inventory[updatedStackIndex].modifiers[stackModifierIndex] as StackableModifier).value +=
-			stackableModifier.value;
-		return inventory;
-	}
-}
+		) as StackableModifier;
+		if (!iStackable) return;
 
-export function previewEnhanceItem(item: Item, enhancer: Item): Item {
-	if (!item || !enhancer) throw new Error("Item or enhancer are undefined");
-
-	const enhancements = enhancer.modifiers.find((m) => m.type === 'Enhancer') as
-		| EnhancerModifier
-		| undefined;
-	if (!enhancements) throw new Error('Enhancer item does not actually have any enhancements');
-
-	const instantiated = enhancements.enhancements.map(instantiateModifier);
-
-	const newItem: Item = deepClone(item);
-	newItem.modifiers = reviveModifiers(newItem.modifiers);
-
-	for (const mod of instantiated) {
-		if (mod.type === 'Stars') {
-			const existing: StarsModifier | null = newItem.modifiers.find(
-				(m): m is StarsModifier => m.type === 'Stars'
-			) as StarsModifier;
-
-			if (existing) {
-				existing.stars += (mod as StarsModifier).stars;
-				continue;
-			}
-		} else if (mod.type === 'Reforge') {
-			const existing: number = newItem.modifiers.findIndex(
-				(m): m is ReforgeModifier => m.type === 'Reforge'
-			);
-
-			newItem.modifiers.splice(existing, 1);
+		const stackLeft: number = iStackable.stack - iStackable.amount;
+		if (stackLeft === 0) {
+			return;
 		}
 
-		newItem.modifiers.push(mod);
-	}
+		iStackable.amount = Math.min(iStackable.stack, iStackable.amount + stackableModifier.amount);
+		if (stackableModifier.amount <= stackLeft) {
+			stackableModifier.amount = 0;
+		} else {
+			stackableModifier.amount -= stackLeft;
+		}
+	});
 
-	return newItem;
+	if (stackableModifier.amount > 0) contents.push(item);
+
+	return new Inventory(contents);
 }

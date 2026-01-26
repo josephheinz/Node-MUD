@@ -1,181 +1,113 @@
-import { supabase } from '$lib/auth/supabaseClient.js';
-import { type Item } from '$lib/types/item.js';
-import { Stats } from '$lib/types/stats.js';
-import { EmptyEquipment } from '$lib/types/equipment';
-import type { DBQueueAction } from '$lib/types/action.js';
-import { PlayerSkills } from '$lib/types/skills.js';
+/* import { getQueue } from '$lib/remote/actions.remote.js';
+import { getEquipment } from '$lib/remote/equipment.remote.js';
+import { getInventory } from '$lib/remote/inventory.remote.js';
+import type { Profile } from '$lib/store.svelte';
+import type { DBQueueAction } from '$lib/types/action';
+import {
+	EmptyEquipment,
+	Equipment,
+	initializeItemRegistry,
+	type DBEquipment,
+	type DBItem
+} from '$lib/types/item';
+import type { User } from '@supabase/supabase-js';
 
-/**
- * Load the current authenticated user (if any) and assemble their inventory, equipment, stats, action queue, and queue start time for page initialization.
- *
- * If no session cookie is present, `user` will be `null` and the returned collections will be empty or defaulted.
- *
- * @returns An object with:
- *  - `profile`: the authenticated profile object or `null` when not authenticated,
- *  - `inventory`: an array of items belonging to the user,
- *  - `equipment`: the user's equipment object,
- *  - `stats`: the user's stats object,
- *  - `queue`: an array of queued actions for the user,
- *  - `started`: the timestamp when the queue processing started.
- */
-export async function load({ cookies, fetch }) {
-	// Load supabase session
+export async function load({ cookies, locals }): Promise<{
+	profile: Profile | null;
+	user: User | null;
+	inventory: DBItem[];
+	equipment: DBEquipment;
+	queue: DBQueueAction[];
+	started: Date;
+	/* stats: typeof Stats;
+	skills: typeof PlayerSkills; 
+}> {
+	const supabase = locals.supabase;
+	initializeItemRegistry();
+
 	const sessionCookie = cookies.get('supabase.session');
 	if (!sessionCookie) {
 		return {
+			profile: null,
 			user: null,
 			inventory: [],
-			equipment: EmptyEquipment,
-			stats: Stats,
+			equipment: new Equipment({}).serialize(),
 			queue: [],
-			skills: {}
+			started: new Date(0)
+			/*
+			stats: Stats,
+			skills: PlayerSkills
+			
 		};
 	}
 
-	let sessionParsed = JSON.parse(sessionCookie);
-
+	const sessionParsed = JSON.parse(sessionCookie);
 	const refresh_token = sessionParsed.refresh_token;
+
 	const { data, error } = await supabase.auth.refreshSession({ refresh_token });
 
 	if (error) {
-		console.log(error.message);
+		console.error('Session refresh error:', error.message);
 	}
 
-	const { session, user } = data;
+	const { user } = data;
 
-	if (!user) return { user, inventory: [], equipment: EmptyEquipment };
+	if (!user) {
+		return {
+			profile: null,
+			user: null,
+			inventory: [],
+			equipment: new Equipment({}).serialize(),
+			queue: [],
+			started: new Date(0)
+			/*
+			stats: Stats,
+			skills: PlayerSkills
+			
+		};
+	}
 
-	// Update last time logged in
-	const { data: d, error: e } = await supabase
+	const userId = user.id;
+
+	// Update user's last logged in time
+	const { error: updateError } = await supabase
 		.from('profiles')
 		.update({ last_logged_in: new Date(Date.now()) })
-		.eq('id', user.id);
+		.eq('id', userId);
 
-	if (e) {
-		console.log(e);
+	if (updateError) {
+		console.error('Profile update error:', updateError);
 	}
 
-	// Load inventory
-	const userId = user?.id;
-
-	const { data: profile, error: pError } = await supabase
+	// Load profile
+	const { data: profile, error: profileError } = await supabase
 		.from('profiles')
 		.select('*')
 		.eq('id', userId)
 		.single();
 
-	let queue: DBQueueAction[] = [];
-	let started: Date = new Date(Date.now());
+	if (profileError) {
+		console.error('Profile fetch error:', profileError);
+	}
 
-	const loadQueue = await fetch(`/api/action/${userId}`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	})
-		.then(async (response) => {
-			let responseJson = await response.json();
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-			return responseJson;
-		})
-		.then(async (data) => {
-			queue = data.queue;
-			started = data.started;
-		})
-		.catch((error) => {
-			console.error(error);
-		});
+	// Load all user data in parallel
+	const [queueData, inventoryData, equipmentData /*statsData, skillsData ] = await Promise.all([
+		getQueue(userId),
+		getInventory(userId),
+		getEquipment(userId)
+		//fetchUserData<{ stats: typeof Stats }>('stats', userId),
+		//fetchUserData<{ skills: typeof PlayerSkills }>('skills', userId)
+	]);
 
-	let inventory: Item[] = [];
-
-	const loadInventory = await fetch(`/api/inventory/${userId}`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	})
-		.then(async (response) => {
-			let responseJson = await response.json();
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-			return responseJson;
-		})
-		.then(async (data) => {
-			inventory = data.inventory;
-		})
-		.catch((error) => {
-			console.error(error);
-		});
-
-	// Load equipment
-	let equipment = EmptyEquipment;
-
-	const loadEquipment = await fetch(`/api/equipment/${userId}`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	})
-		.then(async (response) => {
-			let responseJson = await response.json();
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-			return responseJson;
-		})
-		.then(async (data) => {
-			equipment = data.equipment;
-		})
-		.catch((error) => {
-			console.error(error);
-		});
-
-	let stats = { ...Stats };
-
-	const loadStats = await fetch(`/api/stats/${userId}`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	})
-		.then(async (response) => {
-			let responseJson = await response.json();
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-			return responseJson;
-		})
-		.then(async (data) => {
-			stats = data.stats;
-		})
-		.catch((error) => {
-			console.error(error);
-		});
-
-	let skills = { ...PlayerSkills };
-
-	const loadSkills = await fetch(`/api/skills/${userId}`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	})
-		.then(async (response) => {
-			let responseJson = await response.json();
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-			return responseJson;
-		})
-		.then(async (data) => {
-			skills = data.skills;
-		})
-		.catch((error) => {
-			console.error(error);
-		});
-
-	return { profile, inventory, equipment, stats, queue, started, user, skills };
+	return {
+		profile,
+		user,
+		inventory: queueData?.inventory ?? inventoryData?.inventory?.serialize() ?? [],
+		equipment: equipmentData?.equipment?.serialize() ?? new Equipment({}).serialize(),
+		queue: queueData?.queue ?? [],
+		started: queueData?.started ?? new Date(Date.now())
+		//stats: statsData?.stats ?? Stats,
+		//skills: skillsData?.skills ?? PlayerSkills
+	};
 }
+ */

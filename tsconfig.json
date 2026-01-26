@@ -10,10 +10,8 @@
 		"sourceMap": true,
 		"strict": true,
 		"moduleResolution": "bundler",
-		"types": [
-			"svelte",
-			"node"
-		]
+		"allowSyntheticDefaultImports": true,
+		"types": ["svelte", "node"]
 	}
 	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
 	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files

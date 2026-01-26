@@ -1,15 +1,10 @@
-// src/hooks.server.ts
 import type { Handle } from '@sveltejs/kit';
-import { initSocketServer } from '$lib/server/socket';
 import { createClient } from '@supabase/supabase-js';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+import type { Profile } from '$lib/store.svelte';
 
 // @ts-expect-error - server is available in dev mode
 const server = globalThis.__sveltekit_server__;
-
-if (server) {
-	initSocketServer(server);
-}
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
@@ -23,14 +18,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	});
 
-	// READ YOUR COOKIE
 	const raw = event.cookies.get('supabase.session');
 
 	if (raw) {
 		try {
 			const session = JSON.parse(raw);
 
-			// session should contain: { access_token, refresh_token, expires_at, ... }
 			await supabase.auth.setSession(session);
 		} catch (e) {
 			console.error('Invalid supabase.session cookie');
@@ -44,6 +37,19 @@ export const handle: Handle = async ({ event, resolve }) => {
 	} = await supabase.auth.getUser();
 
 	event.locals.user = user;
+
+	const { data, error } = await supabase
+		.from("profiles")
+		.select("*")
+		.eq("id", user?.id)
+		.single();
+
+	if (!data || error) {
+		console.error(error?.message);
+		event.locals.profile = null;
+	} else {
+		event.locals.profile = data as Profile;
+	}
 
 	return resolve(event);
 };

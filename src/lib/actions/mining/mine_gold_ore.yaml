@@ -1,14 +1,11 @@
 - id: mine_gold_ore
-  name: Mine Gold Ore
+  name: Gold Ore
   icon:
     image: "/images/actions/miner.svg"
     color: "#bdbdbd"
   req:
     skill: "Mining"
     level: 5
-  inputs:
-    ids:
-    amounts:
   outputs:
     - id: gold_ore
       min: 3

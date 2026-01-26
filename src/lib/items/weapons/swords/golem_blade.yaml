@@ -1,0 +1,13 @@
+- id: golem_blade
+  name: Golem Blade
+  icon:
+    ascii: '𐕣'
+    image: '/images/items/weapons/swords/golemBlade.png'
+  rarity: Epic
+  stats:
+    damage: 50
+  modifiers:
+    - type: Equippable
+      slot: mainhand
+    - type: Reforgeable
+      group: Sword

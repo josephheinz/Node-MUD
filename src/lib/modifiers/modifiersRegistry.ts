@@ -1,41 +1,45 @@
-import type { IItemModifier } from '$lib/types/item';
-import { ReforgeModifier, ReforgeableModifier } from './reforges';
-import { StarsModifier } from './stars';
+import type { IItemModifier, IItemModifierClass, IRawModifierSpec } from '$lib/types/item';
+import { EquippableModifier, StackableModifier } from './basicModifiers';
+import { EnhancerModifier } from './basicModifiers';
+import { EnchantmentModifier } from './enchantments';
+import { ReforgeableModifier, ReforgeModifier } from './reforges';
 import { CaduceusModifier } from './special';
-import { EnhancerModifier, EquippableModifier, StackableModifier } from './basicModifiers';
+import { StarsModifier } from './stars';
 
-export const modifierRegistry: Record<
-	string,
-	{ new(...args: any[]): IItemModifier; type?: string; fromJSON?: (raw: any) => IItemModifier }
-> = {
+export const modifierRegistry: Record<string, IItemModifierClass> = {/* 
 	Stackable: StackableModifier,
 	Equippable: EquippableModifier,
 	Reforgeable: ReforgeableModifier,
 	Reforge: ReforgeModifier,
 	Stars: StarsModifier,
 	Caduceus: CaduceusModifier,
-	Enhancer: EnhancerModifier
-};
+	Enhancer: EnhancerModifier,
+	Enchantment: EnchantmentModifier
+ */};
 
-/**
- * Create an IItemModifier instance from a raw serialized modifier object.
- *
- * If the registered modifier class exposes a `fromJSON` factory, it will be used; otherwise the raw object's remaining properties (excluding `type`) are passed to the modifier class constructor.
- *
- * @param raw - Serialized modifier object containing a `type` key and any constructor data for that modifier
- * @returns An instantiated `IItemModifier` corresponding to `raw`
- * @throws Error if `raw.type` does not match any registered modifier
- */
-export function instantiateModifier(raw: any): IItemModifier {
+export function initializeModifierRegistry() {
+	if (Object.keys(modifierRegistry).length > 0) return;
+
+	modifierRegistry.Stackable = StackableModifier;
+	modifierRegistry.Equippable = EquippableModifier;
+	modifierRegistry.Reforgeable = ReforgeableModifier;
+	modifierRegistry.Reforge = ReforgeModifier;
+	modifierRegistry.Stars = StarsModifier;
+	modifierRegistry.Caduceus = CaduceusModifier;
+	modifierRegistry.Enhancer = EnhancerModifier;
+	modifierRegistry.Enchantment = EnchantmentModifier;
+}
+
+export function instantiateModifier(raw: IRawModifierSpec): IItemModifier {
 	const ModClass = modifierRegistry[raw.type];
 	if (!ModClass) throw new Error(`Unknown modifier: ${raw.type}`);
 
-	if (typeof ModClass.fromJSON === 'function') {
-		return ModClass.fromJSON(raw);
-	}
+	return ModClass.fromJSON(raw);
+}
 
-	const args = { ...raw };
-	delete args.type;
-
-	return new ModClass(...Object.values(args));
+export function instantiateModifierFromHash(hash: string): IItemModifier {
+	const type = hash.split(':')[0];
+	const ModClass = modifierRegistry[type];
+	if (!ModClass) throw new Error(`Unknown modifier: ${type}`);
+	return ModClass.fromHash(hash);
 }

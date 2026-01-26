@@ -2,7 +2,7 @@
   name: Hardened Titanium Bar
   icon:
     ascii: '='
-    image: '/images/items/materials/crafting/bars/hardenedTitaniumBar.svg'
+    image: '/images/items/materials/crafting/bars/hardenedTitaniumBar.png'
   rarity: Rare
   modifiers:
     - type: Stackable

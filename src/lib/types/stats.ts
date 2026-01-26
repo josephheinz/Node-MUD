@@ -1,37 +1,48 @@
-import { deepClone } from "$lib/utils/general";
-import type { Equipment, EquipmentSlot } from "./equipment";
-import { computeItemStats, type Item } from "./item";
+import { cloneDeep } from "radashi";
+import { computeItemStats, type Equipment, type EquipmentSlot, type Item } from "./item";
+
+export type StatList = Record<string, Stat>;
 
 export type Stat = {
-    name: string;
-    icon: string;
     amount: number;
-};
+    operation: "additive" | "multiplicative";
+}
 
-export type StatList = Record<string, number>;
+export const Stats: Record<string, { icon: string; color: string }> = {
+    health: {
+        icon: "♥",
+        color: "#6cf23f"
+    },
+    strength: {
+        icon: "δ",
+        color: "#eb4034"
+    },
+    defense: {
+        icon: "℧",
+        color: "#73c2fa"
+    },
 
-export const Stats: StatList = {
-    health: 100,
-    strength: 0,
-    defense: 0,
-    "crit chance": 1,
-    "crit damage": 50,
-    speed: 100
-};
-
-export const StatIcons: Record<string, string> = {
-    health: "♡",
-    strength: "δ",
-    defense: "℧",
-    "crit chance": "✧",
-    "crit damage": "🕱",
-    speed: "λ"
-};
-
+    "crit chance": {
+        icon: "✧",
+        color: "#2a67b8"
+    },
+    "crit damage": {
+        icon: "🕱",
+        color: "#2a67b8"
+    },
+    speed: {
+        icon: "λ",
+        color: "white"
+    },
+    damage: {
+        icon: "֎",
+        color: "#eb4034"
+    }
+}
 
 export function getModifiedStats(stats: StatList, equipment: Equipment): StatList {
-    const result: StatList = deepClone<StatList>(stats); // copy so references to an original Stats store doesn't get changed
-    let itemStats: Record<string, Record<string, { base: number; modifiers: number; reforges: number; }>> = {};
+    const result: StatList = cloneDeep<StatList>(stats); // copy so references to an original Stats store doesn't get changed
+    let itemStats: Record<string, Record<string, { base: number; added: number; }>> = {};
 
     for (const key in equipment) {
         const slot = key as EquipmentSlot;
@@ -42,11 +53,11 @@ export function getModifiedStats(stats: StatList, equipment: Equipment): StatLis
         itemStats[slot] = equipmentItemStats;
     }
 
-    Object.values(itemStats).forEach((itemStats: Record<string, { base: number; modifiers: number; reforges: number; }>) => {
+    Object.values(itemStats).forEach((itemStats: Record<string, { base: number; added: number; }>) => {
         Object.entries(itemStats).forEach(([stat, amounts]) => {
             Object.values(amounts).forEach((val) => {
                 if (result[stat] != undefined) {
-                    result[stat] += Number(val);
+                    result[stat].amount += Number(val);
                 }
             });
         });

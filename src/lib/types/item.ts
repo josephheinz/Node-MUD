@@ -1,12 +1,9 @@
+import * as _ from 'radashi';
+import type { Stat, StatList } from './stats';
+import { encodeDBItem, loadDbItem } from '$lib/utils/item';
+import { initializeModifierRegistry, instantiateModifier } from '$lib/modifiers/modifiersRegistry';
 import { parse } from 'yaml';
-import { type ITooltipData } from '../components/tooltip';
-import { instantiateModifier } from '../modifiers/modifiersRegistry';
-import type { StatList } from './stats';
-import { type EquipmentSlot } from './equipment';
-import { determineSlot } from '$lib/utils/item';
-import { capitalizeFirstLetter, formatNumber } from '$lib/utils/general';
-import type { ReforgeableModifier } from '$lib/modifiers/reforges';
-import type { StackableModifier } from '$lib/modifiers/basicModifiers';
+import { capitalizeFirstLetter } from '$lib/utils/general';
 
 export type RarityKey = keyof typeof Rarity;
 
@@ -15,7 +12,7 @@ export enum Rarity {
 	Uncommon = '#32a852',
 	Rare = '#5b8dfa',
 	Epic = '#d335f3',
-	Legendary = '#dbd82b',
+	Legendary = '#EFBF04',
 	Mythic = '#fd89e8',
 	Divine = '#3fe9ff',
 	Special = '#ff5252'
@@ -23,18 +20,31 @@ export enum Rarity {
 
 export interface IItemModifier {
 	type: string;
-	value?: number | string | boolean;
 	displayName?: string;
+	priority: number;
+	statChanges?: StatList;
+
 	modifyName?(baseName: string): string;
 	modifyDescription?(baseDesc: string): string;
-	statChanges?: StatList;
-	toJSON?: () => object;
-	fromJSON?: (json: any) => IItemModifier;
+
+	toJSON(): IRawModifierSpec;
+	hash(): string;
 }
 
-export interface DBItem {
-	id: string;
-	modifiers?: IItemModifier[];
+export interface IRawModifierSpec {
+	type: string;
+	[key: string]: any;
+}
+
+export interface IItemModifierClass<T extends IItemModifier = IItemModifier> {
+	// For building from objects
+	//toJSON(): object;
+	fromJSON(raw: IRawModifierSpec): T;
+	// For building from hashes
+	//hash(): string;
+	fromHash(hash: string): T;
+
+	new(...args: any[]): T;
 }
 
 export type Item = {
@@ -43,164 +53,362 @@ export type Item = {
 	name: string;
 	rarity: Rarity;
 	desc?: string;
-	icon: {
-		ascii: string;
-		image?: string;
-	};
+	icon: string;
+	baseStats?: StatList;
 	modifiers: IItemModifier[];
-	baseStats: StatList;
 };
 
+export type DBItem = {
+	id: string;
+	modifiers?: string[];
+};
+
+export type DBInventory = DBItem[];
+
+export class Inventory {
+	private _contents: Array<Item>;
+
+	constructor(initalContents: Item[]) {
+		this._contents = initalContents;
+	}
+
+	public get contents(): Item[] {
+		return this._contents;
+	}
+
+	public add(item: Item, index?: number): Item[] {
+		if (index && (index < 0 || index > this._contents.length - 1))
+			throw new Error(`Index ${index} is out of bounds: 0-${this._contents.length - 1}`);
+
+		if (!index) this._contents.push(item);
+		else {
+			const firstPart: Item[] = this._contents.splice(0, index + 1);
+			const lastPart: Item[] = this._contents.splice(index, this._contents.length - index);
+			this._contents = [...firstPart, item, ...lastPart];
+		}
+		return this._contents;
+	}
+
+	public getItem(index: number): Item {
+		return this._contents[index];
+	}
+
+	public paginate(): Array<Item[]> {
+		return _.cluster(this._contents, 25);
+	}
+
+	public serialize(): DBInventory {
+		return this._contents.map(encodeDBItem);
+	}
+
+	public static load(dbInv: DBInventory): Inventory {
+		return new Inventory(dbInv.map(loadDbItem));
+	}
+}
+
+export type EquipmentSlot =
+	| 'Head'
+	| 'Body'
+	| 'Legs'
+	| 'Offhand'
+	| 'Mainhand'
+	| 'Necklace'
+	| 'Ring'
+	| 'Hands';
+
+export class Equipment {
+	private _head: Item | null = null;
+	private _body: Item | null = null;
+	private _legs: Item | null = null;
+	private _offhand: Item | null = null;
+	private _mainhand: Item | null = null;
+	private _necklace: Item | null = null;
+	private _ring: Item | null = null;
+	private _hands: Item | null = null;
+
+	constructor(initValues: {
+		Head?: Item;
+		Body?: Item;
+		Legs?: Item;
+		Offhand?: Item;
+		Mainhand?: Item;
+		Necklace?: Item;
+		Ring?: Item;
+		Hands?: Item;
+	}) {
+		// Holy vomit
+		// maybe ill figure out a better way to do this in the future
+		this._head = initValues.Head ? initValues.Head : null;
+		this._body = initValues.Body ? initValues.Body : null;
+		this._legs = initValues.Legs ? initValues.Legs : null;
+		this._offhand = initValues.Offhand ? initValues.Offhand : null;
+		this._mainhand = initValues.Mainhand ? initValues.Mainhand : null;
+		this._necklace = initValues.Necklace ? initValues.Necklace : null;
+		this._ring = initValues.Ring ? initValues.Ring : null;
+		this._hands = initValues.Hands ? initValues.Hands : null;
+	}
+
+	get Head() {
+		return this._head;
+	}
+	private set Head(v: Item | null) {
+		this._head = v;
+	}
+
+	get Body() {
+		return this._body;
+	}
+	private set Body(v: Item | null) {
+		this._body = v;
+	}
+
+	get Legs() {
+		return this._legs;
+	}
+	private set Legs(v: Item | null) {
+		this._legs = v;
+	}
+
+	get Offhand() {
+		return this._offhand;
+	}
+	private set Offhand(v: Item | null) {
+		this._offhand = v;
+	}
+
+	get Mainhand() {
+		return this._mainhand;
+	}
+	private set Mainhand(v: Item | null) {
+		this._mainhand = v;
+	}
+
+	get Necklace() {
+		return this._necklace;
+	}
+	private set Necklace(v: Item | null) {
+		this._necklace = v;
+	}
+
+	get Ring() {
+		return this._ring;
+	}
+	private set Ring(v: Item | null) {
+		this._ring = v;
+	}
+
+	get Hands() {
+		return this._hands;
+	}
+	private set Hands(v: Item | null) {
+		this._hands = v;
+	}
+
+	public Equip(item: Item, slot: EquipmentSlot): Item | null {
+		const prev = this[slot];
+		this[slot] = item;
+		return prev;
+	}
+
+	public Unequip(slot: EquipmentSlot): Item | null {
+		const prev = this[slot];
+		if (prev) {
+			this[slot] = null;
+			return prev;
+		} else return null;
+	}
+
+	public serialize(): DBEquipment {
+		return {
+			Head: this._head ? encodeDBItem(this._head) : null,
+			Body: this._body ? encodeDBItem(this._body) : null,
+			Legs: this._legs ? encodeDBItem(this._legs) : null,
+			Offhand: this._offhand ? encodeDBItem(this._offhand) : null,
+			Mainhand: this._mainhand ? encodeDBItem(this._mainhand) : null,
+			Necklace: this._necklace ? encodeDBItem(this._necklace) : null,
+			Ring: this._ring ? encodeDBItem(this._ring) : null,
+			Hands: this._hands ? encodeDBItem(this._hands) : null
+		};
+	}
+
+	public static load(dbEquip: DBEquipment): Equipment {
+		let equipment: Record<string, Item | null> = {};
+		Object.entries(dbEquip).forEach(([slot, item]) => {
+			if (item === null) {
+				equipment[slot] = null;
+				return;
+			}
+
+			equipment[capitalizeFirstLetter(slot)] = loadDbItem(item);
+		});
+
+		return new Equipment({
+			...equipment
+		});
+	}
+
+	public export(): Array<[EquipmentSlot, Item | null]> {
+		return [
+			['Head', this._head],
+			['Body', this._body],
+			['Legs', this._legs],
+			['Offhand', this._offhand],
+			['Mainhand', this._mainhand],
+			['Necklace', this._necklace],
+			['Ring', this._ring],
+			['Hands', this._hands]
+		];
+	}
+}
+
+export type DBEquipment = {
+	Head: DBItem | null;
+	Body: DBItem | null;
+	Legs: DBItem | null;
+	Offhand: DBItem | null;
+	Mainhand: DBItem | null;
+	Necklace: DBItem | null;
+	Ring: DBItem | null;
+	Hands: DBItem | null;
+};
+
+export const EmptyEquipment: DBEquipment = {
+	Head: null,
+	Body: null,
+	Legs: null,
+	Offhand: null,
+	Mainhand: null,
+	Necklace: null,
+	Ring: null,
+	Hands: null
+};
+
+// i know functions should be in here but it makes things cyclical if its in utils/item
 export function parseYAMLToItem(yamlString: string): Item {
 	let item = parse(yamlString)[0];
 	const modifiers: IItemModifier[] = (item.modifiers || []).map(instantiateModifier);
+
+	let baseStats: StatList = {};
+	if (item.stats) {
+		Object.entries(item.stats).forEach(([stat, amount]) => {
+			baseStats[stat] = { amount: Number(amount), operation: "additive" }
+		})
+	}
 
 	return {
 		uid: crypto.randomUUID(),
 		id: item.id,
 		name: item.name,
 		rarity: Rarity[item.rarity as RarityKey],
-		icon: {
-			ascii: item.icon.ascii,
-			image: item.icon.image
-		},
+		icon: item.icon.image,
 		modifiers,
-		baseStats: item.stats,
+		baseStats,
 		desc: item.description
 	};
 }
 
-export function computeItemStats(
-	item: Item
-): Record<string, { base: number; modifiers: number; reforges: number }> {
-	const stats: Record<string, { base: number; modifiers: number; reforges: number }> = {};
-
+export function computeItemStats(item: Item): Record<string, { base: number; added: number }> {
+	const stats: Record<string, { base: number; added: number }> = {};
 	const baseStats = item.baseStats ?? {};
 	const modifiers = item.modifiers ?? [];
 
-	// collect all stat keys from baseStats and all modifiers/reforges
-	const statKeys = new Set<string>([
-		...Object.keys(baseStats),
-		...modifiers.flatMap((mod) => (mod.statChanges ? Object.keys(mod.statChanges) : []))
-	]);
+	// Single pass: collect additive and multiplicative modifiers per stat
+	const statData: Record<string, {
+		base: number;
+		modAdditive: number;
+		modMultiplicative: number;
+		reforgeAdditive: number;
+		reforgeMultiplicative: number;
+	}> = {};
 
-	for (const key of statKeys) {
-		const base = baseStats[key] ?? 0;
+	// Initialize with base stats
+	for (const key in baseStats) {
+		statData[key] = {
+			base: baseStats[key]?.amount ?? 0,
+			modAdditive: 0,
+			modMultiplicative: 1,
+			reforgeAdditive: 0,
+			reforgeMultiplicative: 1
+		};
+	}
 
-		let modTotal = 0;
-		let reforgeTotal = 0;
+	// Single pass through modifiers
+	for (const mod of modifiers) {
+		if (!mod.statChanges) continue;
 
-		for (const mod of modifiers) {
-			if (!mod.statChanges) continue;
-			const val = mod.statChanges[key] ?? 0;
-			if (mod.type === 'Reforge') reforgeTotal += val;
-			else modTotal += val;
+		for (const key in mod.statChanges) {
+			const value = mod.statChanges[key];
+			if (!value || value.amount === 0) continue;
+
+			// Initialize stat if not seen before
+			if (!statData[key]) {
+				statData[key] = {
+					base: baseStats[key]?.amount ?? 0,
+					modAdditive: 0,
+					modMultiplicative: 1,
+					reforgeAdditive: 0,
+					reforgeMultiplicative: 1
+				};
+			}
+
+			const isReforge = mod.type === "Reforge";
+			const isMultiplicative = value.operation === "multiplicative";
+
+			if (isReforge) {
+				if (isMultiplicative) {
+					statData[key].reforgeMultiplicative *= value.amount;
+				} else {
+					statData[key].reforgeAdditive += value.amount;
+				}
+			} else {
+				if (isMultiplicative) {
+					statData[key].modMultiplicative *= value.amount;
+				} else {
+					statData[key].modAdditive += value.amount;
+				}
+			}
 		}
+	}
 
-		stats[key] = { base, modifiers: modTotal, reforges: reforgeTotal };
+	// Helper function to round to avoid floating point errors
+	const round = (num: number, decimals: number = 2): number => {
+		return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
+	};
+
+	// Compute final stats: (base + additive) * multiplicative
+	for (const key in statData) {
+		const data = statData[key];
+
+		// Calculate final value: (base + additive) * multiplicative
+		const totalAdditive = data.modAdditive + data.reforgeAdditive;
+		const totalMultiplicative = data.modMultiplicative * data.reforgeMultiplicative;
+
+		const baseWithAdditive = data.base + totalAdditive;
+		const finalValue = baseWithAdditive * totalMultiplicative;
+
+		stats[key] = {
+			base: round(data.base),
+			added: round(finalValue - data.base)
+		};
 	}
 
 	return stats;
 }
 
-/**
- * Builds tooltip data for an item including title and a formatted body with stats, description, rarity, and optional slot/stack info.
- *
- * @param item - The item to render into tooltip data
- * @param equippable - If true, includes the equipment slot line when the item is equippable
- * @returns An ITooltipData object whose `title` is the item's display name and whose `body` contains (in order) stack information if present, an optional slot line, formatted stat lines showing base/modifier/reforge values, the item description, and a colored rarity descriptor
- */
-export function getItemData(item: Item, equippable: boolean = true): ITooltipData {
-	let rarityName: string = getRarity(item.rarity);
-	let reforgeGroup: ReforgeableModifier | undefined = item.modifiers.find(
-		(m) => m.type === 'Reforgeable'
-	) as ReforgeableModifier;
-	let descriptor: string = `<b style="color:${item.rarity}">${rarityName} ${reforgeGroup ? reforgeGroup.group : 'Item'}</b>`;
-
-	let itemName: string = getDisplayName(item);
-	let itemDesc: string = getDisplayDescription(item);
-
-	let slot: EquipmentSlot | undefined = determineSlot(item);
-	let equipMsg: string = '';
-	if (slot && equippable) equipMsg = `Slot: ${slot}<br/>`;
-
-	let stats = computeItemStats(item);
-	let statsString = '';
-
-	const stackableModifier: StackableModifier | undefined = item.modifiers.find(
-		(m) => m.type == 'Stackable'
-	) as StackableModifier;
-	let stackString = '';
-
-	if (stackableModifier != undefined) {
-		stackString = `Stack: ${formatNumber(stackableModifier.value)} / ${formatNumber(stackableModifier.stack)}</br>`;
-	}
-
-	for (const key in stats) {
-		const s = stats[key];
-		if (s.base || s.modifiers > 0 || s.reforges > 0) {
-			statsString += `${capitalizeFirstLetter(key)}: ${s.base}<span style="color:oklch(74.6% 0.16 232.661);">${s.modifiers > 0 ? ` (+${s.modifiers})` : ''}</span><span style="color:oklch(90.5% 0.182 98.111);">${s.reforges > 0 ? ` (+${s.reforges})` : ''}</span><br/>`;
-		}
-	}
-
-	return {
-		title: itemName,
-		body: `${stackString}${equipMsg}${statsString}${itemDesc}<br/>${descriptor}`
-	};
-}
-
-export function getRarity(color: string): string {
-	const rarity =
-		Object.keys(Rarity).find((k) => Rarity[k as keyof typeof Rarity] === color) ?? Rarity.Common;
-	return rarity;
-}
-
-export function getDisplayName(item: Item): string {
-	let name = item.name;
-	for (const mod of item.modifiers ?? []) {
-		if (mod.modifyName) name = mod.modifyName(name);
-	}
-	return name;
-}
-
-/**
- * Produce the item's final description after applying each modifier's description hook in order.
- *
- * @param item - The item whose description will be produced
- * @returns The final description string with each modifier's `modifyDescription` applied sequentially
- */
-export function getDisplayDescription(item: Item): string {
-	const base = item.desc ? `<i>${item.desc}</i>` : '';
-	return (
-		item.modifiers?.reduce(
-			(desc, mod) => (mod.modifyDescription ? mod.modifyDescription(desc) : desc),
-			base
-		) ?? base
-	);
-}
-
-/**
- * Retrieve an item by its registry id.
- *
- * @param id - The item's identifier in the registry
- * @returns The matching Item if found, `null` otherwise
- */
-export function getItem(id: string): Item | null {
-	if (itemRegistry[id]) return itemRegistry[id];
-	return null;
-}
-
-// Load all the items for api
-
 export const itemRegistry: Record<string, Item> = {};
 
-const items = import.meta.glob('$lib/items/**/*', { eager: true, as: 'raw' });
+export function initializeItemRegistry() {
+	if (Object.keys(itemRegistry).length > 0) return; // Already initialized
+	initializeModifierRegistry(); // Initialize modifiers first
 
-for (const item in items) {
-	const id = item
-		.split('/')
-		.pop()!
-		.replace(/\.[^/.]+$/, '');
-	let _item = (items[item] as any).default ?? items[item];
-	itemRegistry[id] = parseYAMLToItem(_item);
+	const items = import.meta.glob('$lib/items/**/*', { eager: true, as: 'raw' });
+
+	for (const item in items) {
+		const id = item
+			.split('/')
+			.pop()!
+			.replace(/\.[^/.]+$/, '');
+		let _item = (items[item] as any).default ?? items[item];
+		itemRegistry[id] = parseYAMLToItem(_item);
+	}
 }

@@ -1,16 +1,14 @@
 - id: craft_iron_sword
-  name: Craft Iron Sword
+  name: Iron Sword
   icon:
-    image: "/images/actions/swordMold.svg"
-    color: "#bdbdbd"
+    image: '/images/actions/swordMold.svg'
+    color: '#bdbdbd'
   req:
     skill: 'Crafting'
     level: 1
   inputs:
-    ids:
-      - iron_bar
-    amounts:
-      - 5
+    - id: iron_bar
+      amount: 5
   outputs:
     - id: iron_sword
       min: 1

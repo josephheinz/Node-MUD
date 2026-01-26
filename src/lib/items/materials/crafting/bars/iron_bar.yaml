@@ -2,7 +2,7 @@
   name: Iron Bar
   icon:
     ascii: '='
-    image: '/images/items/materials/crafting/bars/ironBar.svg'
+    image: '/images/items/materials/crafting/bars/ironBar.png'
   rarity: Common
   modifiers:
     - type: Stackable
