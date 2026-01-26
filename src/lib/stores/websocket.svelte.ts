@@ -1,4 +1,3 @@
-// src/lib/stores/websocket.svelte.ts
 class WebSocketStore {
 	ws = $state<WebSocket | null>(null);
 	connected = $state(false);

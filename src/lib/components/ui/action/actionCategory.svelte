@@ -3,7 +3,7 @@
 	import { getSkills } from '$lib/remote/skills.remote';
 	import { actionCategories, getAction, type Action, type ActionCategory } from '$lib/types/action';
 	import type { Skill, SkillKey } from '$lib/types/skills';
-	import { xpToLevel } from '$lib/types/skills.old';
+	import { xpToLevel } from '$lib/utils/skills';
 	import ActionButton from './actionButton.svelte';
 	import ActionDialog from './actionDialog.svelte';
 	const { category: categoryName }: { category: ActionCategory } = $props();
