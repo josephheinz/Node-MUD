@@ -209,7 +209,7 @@ export const equip = command(equipRequestSchema, async ({ id, dbItem }) => {
 		inventory_data.push(equippedItem);
 	}
 
-	equipment_data[slot] = dbItem;
+	equipment_data[slot.toLowerCase() as EquipmentSlot] = dbItem;
 
 	const { error: updateError } = await supabase
 		.from('inventories')
@@ -241,8 +241,6 @@ export const unequip = command(unequipRequestSchema, async ({ id, slot }) => {
 	};
 
 	slot = slot.toLowerCase() as EquipmentSlot
-
-	console.log(equipment_data[slot], fetchError)
 
 	const item: DBItem | null = equipment_data[slot];
 	if (!item) return error(400);

@@ -5,6 +5,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { websocketStore } from '$lib/stores/websocket.svelte';
 	import { extractItemsFromMessage, type ChatMessage, type messagePart } from '$lib/utils/chat';
+	import { getSession } from '$lib/remote/auth.remote';
 
 	const { user }: { user: User } = $props();
 
@@ -18,9 +19,7 @@
 	}
 
 	async function authWebsocket(ws: WebSocket) {
-		const { session, _ }: { session: Session; _: User } = await fetch('/api/auth/session').then(
-			(r) => r.json()
-		);
+		const session = (await getSession()).session;
 
 		ws.send(
 			JSON.stringify({
