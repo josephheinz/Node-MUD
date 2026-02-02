@@ -28,7 +28,7 @@
 				</div>
 			{/snippet}
 			<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
-				{#each initInventory ? initInventory.paginate()[pageNumber] : (await getInventory())?.paginate()[pageNumber - 1] as item (item.uid)}
+				{#each initInventory ? initInventory.paginate()[pageNumber] : (await getInventory()).paginate()[pageNumber - 1] as item (item.uid)}
 					<ItemRenderer {item} equipFlags={{ equippable: !display }} />
 				{/each}
 			</div>

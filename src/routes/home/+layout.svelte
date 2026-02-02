@@ -31,7 +31,7 @@
 		</div>
 	{/snippet}
 	<Sidebar.Provider
-		class="relative size-full bg-background text-foreground"
+		class="relative size-full overflow-hidden bg-background text-foreground"
 		bind:open={sidebar.open}
 	>
 		<AppSidebar />

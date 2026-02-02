@@ -55,7 +55,7 @@ export function intToBlackCircledNumber(n: number): string {
 }
 
 export function formatNumber(num: number, mode: "long" | "short" = "long"): string {
-	return numeral(num).format(`0,0[.][00]${mode === "long" ? 'A' : 'a'}`);
+	return numeral(num).format(`0,0[.][0]${mode === "long" ? 'A' : 'a'}`);
 }
 
 export async function fetchUserData<T>(

@@ -96,7 +96,7 @@
 
 <ContextMenu.Root>
 	<ContextMenu.Trigger
-		class="relative flex h-16 w-16 items-center justify-center rounded-lg bg-card select-none {userClass}"
+		class="max-h-16 max-w-16 relative flex aspect-square size-full items-center justify-center rounded-lg bg-card select-none {userClass}"
 		style="border:2px solid {item?.rarity ?? 'transparent'}"
 		title=""
 	>
@@ -105,9 +105,9 @@
 		</div>
 		{#if stackMod}
 			<span
-				class="pointer-events-none absolute right-0.5 bottom-0 text-stroke-2 text-stroke-zinc-800 text-lg font-extrabold text-white shadow-xs"
+				class="text-md pointer-events-none absolute right-0.5 bottom-0 text-stroke-2 text-stroke-zinc-800 font-extrabold text-white shadow-xs"
 			>
-				{formatNumber(stackMod.amount)}
+				{formatNumber(stackMod.amount, 'short')}
 			</span>
 		{/if}
 	</ContextMenu.Trigger>

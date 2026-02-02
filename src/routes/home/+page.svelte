@@ -8,6 +8,7 @@
 	import Actions from '$lib/components/ui/action/actions.svelte';
 	import SkillMenu from '$lib/components/ui/skills/skillMenu.svelte';
 	import Forge from '$lib/components/ui/forge/forge.svelte';
+	import Combat from '$lib/components/ui/combat/combat.svelte';
 
 	let currentTab = $derived(tab.tab);
 
@@ -18,7 +19,7 @@
 
 <Resizable.PaneGroup direction="horizontal" class="size-full" autoSaveId="mainContentPaneGroup">
 	<Resizable.Pane defaultSize={75} minSize={60}>
-		<div class="flex h-full items-start justify-start p-4">
+		<div class="flex h-full items-start justify-start p-4 relative">
 			{#if currentTab === 'Home'}
 				<HomeScreen />
 			{:else if currentTab === 'Inventory'}
@@ -31,6 +32,8 @@
 				<SkillMenu />
 			{:else if currentTab === 'Forge'}
 				<Forge />
+			{:else if currentTab === 'Combat'}
+				<Combat />
 			{/if}
 		</div>
 	</Resizable.Pane>

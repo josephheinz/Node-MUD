@@ -12,6 +12,7 @@
 		ChartNoAxesColumn,
 		Clipboard,
 		House,
+		Swords,
 		type Icon
 	} from '@lucide/svelte';
 
@@ -40,6 +41,10 @@
 		{
 			tab: 'Forge',
 			icon: Anvil
+		},
+		{
+			tab: 'Combat',
+			icon: Swords
 		}
 	];
 
