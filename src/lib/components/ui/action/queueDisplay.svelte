@@ -75,7 +75,7 @@
 		/>
 	</Card.Content>
 	{#if nextAction}
-		<Card.Footer class=" flex flex-col items-start justify-start text-xs text-muted-foreground">
+		<Card.Footer class="flex flex-col items-start justify-start text-xs text-muted-foreground">
 			<span>Upcoming actions:</span>
 			<span>
 				{nextAction.name} x{formatNumber(queue.queue[1].amount)}

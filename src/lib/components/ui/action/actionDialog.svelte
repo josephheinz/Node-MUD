@@ -80,14 +80,10 @@
 	<form
 		class="flex w-full flex-col gap-4"
 		{...queueAction.enhance(async ({ submit }) => {
-			try {
-				await submit();
-				toast.success(`Successfully queued ${amount} ${action.name}`);
-				await getQueue().refresh();
-				amount = 1;
-			} catch (e) {
-				toast.error('Something went wrong queueing an item');
-			}
+			await submit();
+			toast.success(`Successfully queued ${amount} ${action.name}`);
+			await getQueue().refresh();
+			amount = 1;
 		})}
 	>
 		<div>
