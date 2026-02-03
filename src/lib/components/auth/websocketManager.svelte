@@ -52,7 +52,7 @@
 			console.log('Disconnected');
 		};
 
-		ws.onmessage = (event) => {
+		ws.addEventListener('message', (event) => {
 			const message: WSMessage<any> = JSON.parse(event.data);
 			switch (message.type) {
 				case 'auth-success':
@@ -74,7 +74,7 @@
 					break;
 			}
 			console.log('Message received:', event.data);
-		};
+		});
 
 		if (browser) {
 			window.addEventListener('beforeunload', closeConnection);

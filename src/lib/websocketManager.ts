@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Require } from './utils/general';
 import { getWebSocketManager } from 'sveltekit-ws';
+import type { UUID } from 'node:crypto';
 
 export type UserData = {
 	userId: string;
@@ -23,8 +24,9 @@ class WebsocketManager {
 	private userMap = new Map<UserId, UserData>();
 	private connectionMap = new Map<ConnectionId, UserId>();
 	private loadingUsers = new Map<UserId, Promise<UserData>>();
+	private combatInstances = new Map<UUID, Array<UserId>>();
 
-	private constructor() {}
+	private constructor() { }
 
 	public static getInstance(): WebsocketManager {
 		if (!WebsocketManager.instance) {
@@ -133,6 +135,30 @@ class WebsocketManager {
 		});
 	}
 
+	private createCombatInstance(): UUID {
+		let uuid = crypto.randomUUID();
+		while (this.combatInstances.has(uuid)) {
+			uuid = crypto.randomUUID();
+		}
+
+		this.combatInstances.set(uuid, new Array<UserId>());
+
+		return uuid;
+	}
+
+	addPlayerToCombatInstance(instanceId: UUID, userId: UserId): UUID {
+		if (this.combatInstances.has(instanceId)) {
+			const combatInstance = this.combatInstances.get(instanceId)!;
+			if (combatInstance.includes(userId)) return instanceId;
+
+			combatInstance.push(userId);
+			return instanceId;
+		} else {
+			let newUUID = this.createCombatInstance();
+			return this.addPlayerToCombatInstance(newUUID, userId);
+		}
+	}
+
 	getUser(userId: UserId): UserData | null {
 		return this.userMap.get(userId) ?? null;
 	}
@@ -152,6 +178,15 @@ class WebsocketManager {
 
 	getPlayerCount(): number {
 		return this.userMap.size;
+	}
+
+	getCombatInstanceByUser(userId: UserId): UUID | undefined {
+		let instanceId: UUID | undefined;
+		this.combatInstances.forEach((users, id) => {
+			if (users.includes(userId)) instanceId = id;
+		});
+
+		return instanceId;
 	}
 }
 

@@ -5,7 +5,8 @@ import { webSocketServer } from 'sveltekit-ws/vite';
 import { getWebSocketManager, type WSConnection } from 'sveltekit-ws';
 import { createClient } from '@supabase/supabase-js';
 import type { Session } from '@supabase/supabase-js';
-import { wsManager } from './src/lib/websocketManager';
+import { wsManager, type UserData } from './src/lib/websocketManager';
+
 
 function parseCookies(cookieHeader: string | undefined): Record<string, string> {
 	if (!cookieHeader) return {};
@@ -79,6 +80,24 @@ function handleChatMessage(msg: string) {
 	});
 }
 
+function handleCombatMessage(connnection: WSConnection, message: {
+	type: string;
+	data: any;
+	timestamp?: number | undefined;
+}, user: UserData): void {
+	const manager = getWebSocketManager();
+
+	switch (message.type) {
+		case "combat-join-instance":
+			const inInstance = wsManager.getCombatInstanceByUser(user.userId);
+			const instanceId = wsManager.addPlayerToCombatInstance(inInstance ?? crypto.randomUUID(), user.userId);
+
+			manager.send(connnection.id, { type: "combat-join-instance", data: { instanceId } });
+
+			break;
+	}
+}
+
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
 
@@ -129,6 +148,10 @@ export default defineConfig(({ mode }) => {
 							return;
 						}
 
+						if (message.type.includes("combat-")) {
+							handleCombatMessage(connection, message, user!); // can safely override because if not user and auth message combat message wont run
+						}
+
 						switch (message.type) {
 							case 'auth':
 								console.log('authenticating');
@@ -139,7 +162,6 @@ export default defineConfig(({ mode }) => {
 								break;
 						}
 
-						//console.log('Received', message, 'from', connection.id);
 					},
 					onDisconnect: (connection) => {
 						wsManager.removeConnection(connection.id);
