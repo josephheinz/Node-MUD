@@ -6,6 +6,8 @@ import { getWebSocketManager, type WSConnection } from 'sveltekit-ws';
 import { createClient } from '@supabase/supabase-js';
 import type { Session } from '@supabase/supabase-js';
 import { wsManager, type UserData } from './src/lib/websocketManager';
+import type { UUID } from 'node:crypto';
+import { getOrCreateCombatInstance } from './src/lib/server/combat';
 
 
 function parseCookies(cookieHeader: string | undefined): Record<string, string> {
@@ -55,7 +57,7 @@ async function authMessage(
 		manager.send(connection.id, { type: 'auth-success', data: { userId: user.id } });
 
 		// Now you have verified userId
-		wsManager.addConnection(connection.id, { userId: user.id }, supabase);
+		wsManager.addConnection(connection.id as UUID, { userId: user.id as UUID }, supabase);
 	} catch (e) {
 		console.error('Auth failed:', e);
 		connection.ws.close();
@@ -70,8 +72,8 @@ function handleChatMessage(msg: string) {
 		type: 'chat-message',
 		data: {
 			author: {
-				username: wsManager.getUser(message.author)?.username,
-				badges: wsManager.getBadges(message.author) ?? []
+				username: wsManager.getUser(message.author as UUID)?.username,
+				badges: wsManager.getBadges(message.author as UUID) ?? []
 			},
 			content: message.content,
 			timestamp: message.timestamp
@@ -80,17 +82,17 @@ function handleChatMessage(msg: string) {
 	});
 }
 
-function handleCombatMessage(connnection: WSConnection, message: {
+async function handleCombatMessage(connnection: WSConnection, message: {
 	type: string;
 	data: any;
 	timestamp?: number | undefined;
-}, user: UserData): void {
+}, user: UserData): Promise<void> {
 	const manager = getWebSocketManager();
 
 	switch (message.type) {
 		case "combat-join-instance":
-			const inInstance = wsManager.getCombatInstanceByUser(user.userId);
-			const instanceId = wsManager.addPlayerToCombatInstance(inInstance ?? crypto.randomUUID(), user.userId);
+			const instance = await getOrCreateCombatInstance(user.userId);
+			const instanceId = wsManager.addPlayerToCombatInstance(instance, user.userId);
 
 			manager.send(connnection.id, { type: "combat-join-instance", data: { instanceId } });
 
@@ -141,7 +143,7 @@ export default defineConfig(({ mode }) => {
 						console.log('Client connected:', connection.id);
 					},
 					onMessage: async (connection, message) => {
-						const user = wsManager.getUserByConnection(connection.id);
+						const user = wsManager.getUserByConnection(connection.id as UUID);
 
 						if (!user && message.type !== 'auth') {
 							connection.ws.close();
@@ -149,7 +151,7 @@ export default defineConfig(({ mode }) => {
 						}
 
 						if (message.type.includes("combat-")) {
-							handleCombatMessage(connection, message, user!); // can safely override because if not user and auth message combat message wont run
+							await handleCombatMessage(connection, message, user!); // can safely override because if not user and auth message combat message wont run
 						}
 
 						switch (message.type) {
@@ -164,7 +166,7 @@ export default defineConfig(({ mode }) => {
 
 					},
 					onDisconnect: (connection) => {
-						wsManager.removeConnection(connection.id);
+						wsManager.removeConnection(connection.id as UUID);
 						console.log('Client disconnected:', connection.id);
 					}
 				}

@@ -2,22 +2,23 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Require } from './utils/general';
 import { getWebSocketManager } from 'sveltekit-ws';
 import type { UUID } from 'node:crypto';
+import { playerInCombat, getOrCreateCombatInstance } from './server/combat';
 
 export type UserData = {
-	userId: string;
+	userId: UUID;
 	username: string;
 	badges: string[];
 	connectionIds: Set<string>;
 };
 
 export type PartialUserData = {
-	userId: string;
+	userId: UUID;
 	username: string;
 	badges: string[];
 };
 
-type ConnectionId = string;
-type UserId = string;
+type ConnectionId = UUID;
+type UserId = UUID;
 
 class WebsocketManager {
 	private static instance: WebsocketManager;
@@ -54,19 +55,12 @@ class WebsocketManager {
 			this.loadingUsers.delete(userId);
 
 			const manager = getWebSocketManager();
-			manager.send(connectionId, {
-				type: 'player-count-update',
-				data: {
-					amount: this.userMap.size
-				}
-			});
 
 			manager.broadcast(
 				{
 					type: 'player-count-update',
 					data: { amount: this.userMap.size }
-				},
-				[connectionId]
+				}
 			);
 
 			return filledData;
@@ -77,7 +71,7 @@ class WebsocketManager {
 	}
 
 	addConnection(
-		connectionId: string,
+		connectionId: UUID,
 		userData: Require<Partial<UserData>, 'userId'>,
 		supabase: SupabaseClient
 	) {
@@ -93,25 +87,18 @@ class WebsocketManager {
 		userInstance.connectionIds.add(connectionId);
 
 		const manager = getWebSocketManager();
-		manager.send(connectionId, {
-			type: 'player-count-update',
-			data: {
-				amount: this.userMap.size
-			}
-		});
 
 		manager.broadcast(
 			{
 				type: 'player-count-update',
 				data: { amount: this.userMap.size }
-			},
-			[connectionId]
+			}
 		);
 
 		return;
 	}
 
-	removeConnection(connectionId: string) {
+	removeConnection(connectionId: UUID) {
 		const user: UserData | undefined = this.getUserByConnection(connectionId);
 		const userId: UserId | undefined = user?.userId;
 
@@ -154,8 +141,11 @@ class WebsocketManager {
 			combatInstance.push(userId);
 			return instanceId;
 		} else {
-			let newUUID = this.createCombatInstance();
-			return this.addPlayerToCombatInstance(newUUID, userId);
+			this.combatInstances.set(instanceId, new Array<UserId>())
+			const combatInstance = this.combatInstances.get(instanceId)!;
+			combatInstance.push(userId);
+
+			return instanceId;
 		}
 	}
 
@@ -163,7 +153,7 @@ class WebsocketManager {
 		return this.userMap.get(userId) ?? null;
 	}
 
-	getUserByConnection(connectionId: string): UserData | undefined {
+	getUserByConnection(connectionId: UUID): UserData | undefined {
 		const userId: UserId | undefined = this.connectionMap.get(connectionId);
 		if (userId && this.userMap.has(userId)) {
 			return this.userMap.get(userId);
@@ -172,7 +162,7 @@ class WebsocketManager {
 		return;
 	}
 
-	getBadges(userId: string): string[] {
+	getBadges(userId: UUID): string[] {
 		return this.userMap.get(userId)?.badges ?? [];
 	}
 
@@ -192,7 +182,7 @@ class WebsocketManager {
 
 export const wsManager = WebsocketManager.getInstance();
 
-async function getUserData(userId: string, supabase: SupabaseClient): Promise<PartialUserData> {
+async function getUserData(userId: UUID, supabase: SupabaseClient): Promise<PartialUserData> {
 	const { data, error } = await supabase
 		.from('profiles')
 		.select('username, badges')

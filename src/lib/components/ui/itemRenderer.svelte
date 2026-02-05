@@ -37,7 +37,6 @@
 		}
 
 		const slot = determineSlot(item);
-		console.log(slot);
 		if (!slot) {
 			console.warn(`Item ${item.id} is not equippable`);
 			return;
