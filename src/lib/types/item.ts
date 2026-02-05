@@ -110,7 +110,7 @@ const getStackSize = (item: Item): number => {
 	const stack = item.modifiers.find(
 		(m): m is StackableModifier => m.type === 'Stackable'
 	);
-	return stack?.stack ?? 1;
+	return stack?.amount ?? 1;
 };
 
 export const sortByStackSize = (
