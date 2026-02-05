@@ -5,6 +5,7 @@
 	import ItemRenderer from '../itemRenderer.svelte';
 	import { getInventory } from '$lib/remote/inventory.remote';
 	import Skeleton from '../skeleton/skeleton.svelte';
+	import InventorySorter from './inventorySorter.svelte';
 
 	const {
 		inventory: initInventory,
@@ -12,11 +13,32 @@
 	}: { display?: boolean; inventory?: Inventory } = $props();
 
 	let pageNumber: number = $state(1);
+	let sortAlgo: 'Chronological' | 'Rarity' | 'Stack Size' | 'Alphabetical' =
+		$state('Chronological');
+	let sortMode: 'asc' | 'desc' = $state('asc');
+
+	let inventory = $state<Inventory | null>(null);
+
+	$effect(() => {
+		if (initInventory) inventory = initInventory;
+		else getInventory().then((val) => (inventory = val));
+	});
+
+	const sortedInventory = $derived.by(() => {
+		if (!inventory) return null;
+		return inventory.sort(sortAlgo, sortMode);
+	});
+
+	const pagedItems = $derived.by(() => {
+		if (!sortedInventory) return [];
+		return sortedInventory.paginate()[pageNumber - 1] ?? [];
+	});
 </script>
 
 <Card.Root class="aspect-square p-2 select-none">
-	<Card.Header>
+	<Card.Header class="flex w-full items-center justify-between">
 		<Card.Title>{!display ? 'Your ' : ''}Inventory</Card.Title>
+		<InventorySorter bind:algorithm={sortAlgo} bind:direction={sortMode} />
 	</Card.Header>
 	<Card.Content>
 		<svelte:boundary>
@@ -28,7 +50,7 @@
 				</div>
 			{/snippet}
 			<div class="grid size-full grid-cols-5 grid-rows-5 gap-2">
-				{#each initInventory ? initInventory.paginate()[pageNumber] : (await getInventory()).paginate()[pageNumber - 1] as item (item.uid)}
+				{#each pagedItems as item (item.uid)}
 					<ItemRenderer {item} equipFlags={{ equippable: !display }} />
 				{/each}
 			</div>
@@ -39,11 +61,7 @@
 			{#snippet pending()}
 				<Skeleton class="w-full rounded-full" />
 			{/snippet}
-			<Pagination.Root
-				count={(initInventory ? initInventory : await getInventory()).contents.length}
-				perPage={25}
-				bind:page={pageNumber}
-			>
+			<Pagination.Root count={inventory?.contents.length ?? 0} perPage={25} bind:page={pageNumber}>
 				{#snippet children({ pages, currentPage })}
 					<Pagination.Content>
 						<Pagination.Item>
