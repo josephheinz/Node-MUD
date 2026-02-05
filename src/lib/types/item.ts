@@ -4,6 +4,7 @@ import { encodeDBItem, loadDbItem } from '$lib/utils/item';
 import { initializeModifierRegistry, instantiateModifier } from '$lib/modifiers/modifiersRegistry';
 import { parse } from 'yaml';
 import { capitalizeFirstLetter } from '$lib/utils/general';
+import type { StackableModifier } from '$lib/modifiers/basicModifiers';
 
 export type RarityKey = keyof typeof Rarity;
 
@@ -65,6 +66,73 @@ export type DBItem = {
 
 export type DBInventory = DBItem[];
 
+export type SortType =
+	| 'Chronological'
+	| 'Rarity'
+	| 'Stack Size'
+	| 'Alphabetical';
+
+export type SortDirection = 'asc' | 'desc';
+
+const rarityOrder: Record<Rarity, number> = {
+	[Rarity.Common]: 0,
+	[Rarity.Uncommon]: 1,
+	[Rarity.Rare]: 2,
+	[Rarity.Epic]: 3,
+	[Rarity.Legendary]: 4,
+	[Rarity.Mythic]: 5,
+	[Rarity.Divine]: 6,
+	[Rarity.Special]: 7
+};
+
+const dir = (direction: SortDirection) => (direction === 'asc' ? 1 : -1);
+
+export const sortChronological = (
+	items: Item[],
+	direction: SortDirection
+) => {
+	return direction === 'asc'
+		? [...items]
+		: [...items].reverse();
+};
+
+export const sortByRarity = (
+	items: Item[],
+	direction: SortDirection
+) => {
+	return [...items].sort(
+		(a, b) =>
+			(rarityOrder[a.rarity] - rarityOrder[b.rarity]) * dir(direction)
+	);
+};
+
+const getStackSize = (item: Item): number => {
+	const stack = item.modifiers.find(
+		(m): m is StackableModifier => m.type === 'Stackable'
+	);
+	return stack?.amount ?? 1;
+};
+
+export const sortByStackSize = (
+	items: Item[],
+	direction: SortDirection
+) => {
+	return [...items].sort(
+		(a, b) =>
+			(getStackSize(a) - getStackSize(b)) * dir(direction)
+	);
+};
+
+export const sortAlphabetical = (
+	items: Item[],
+	direction: SortDirection
+) => {
+	return [...items].sort(
+		(a, b) =>
+			a.name.localeCompare(b.name) * dir(direction)
+	);
+};
+
 export class Inventory {
 	private _contents: Array<Item>;
 
@@ -77,17 +145,18 @@ export class Inventory {
 	}
 
 	public add(item: Item, index?: number): Item[] {
-		if (index && (index < 0 || index > this._contents.length - 1))
-			throw new Error(`Index ${index} is out of bounds: 0-${this._contents.length - 1}`);
+		if (index !== undefined && (index < 0 || index > this._contents.length))
+			throw new Error(`Index ${index} is out of bounds`);
 
-		if (!index) this._contents.push(item);
-		else {
-			const firstPart: Item[] = this._contents.splice(0, index + 1);
-			const lastPart: Item[] = this._contents.splice(index, this._contents.length - index);
-			this._contents = [...firstPart, item, ...lastPart];
+		if (index === undefined) {
+			this._contents.push(item);
+		} else {
+			this._contents.splice(index, 0, item);
 		}
+
 		return this._contents;
 	}
+
 
 	public getItem(index: number): Item {
 		return this._contents[index];
@@ -101,9 +170,25 @@ export class Inventory {
 		return this._contents.map(encodeDBItem);
 	}
 
+	public sort(type: SortType, mode: SortDirection): Inventory {
+		switch (type) {
+			case 'Chronological':
+				return new Inventory(sortChronological(this._contents, mode));
+			case 'Rarity':
+				return new Inventory(sortByRarity(this._contents, mode));
+			case 'Stack Size':
+				return new Inventory(sortByStackSize(this._contents, mode));
+			case 'Alphabetical':
+				return new Inventory(sortAlphabetical(this._contents, mode));
+			default:
+				return new Inventory(this._contents);
+		}
+	}
+
 	public static load(dbInv: DBInventory): Inventory {
 		return new Inventory(dbInv.map(loadDbItem));
 	}
+
 }
 
 export type EquipmentSlot =
