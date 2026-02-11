@@ -1,5 +1,3 @@
-import type { IconDefinition } from '@fortawesome/free-brands-svg-icons';
-import { faGem, faTools } from '@fortawesome/free-solid-svg-icons';
 import { parse } from 'yaml';
 import type { Skill, SkillKey } from './skills';
 import { cumulativeXPForLevel } from '$lib/utils/skills';
@@ -14,7 +12,7 @@ export type ChanceItem = {
 	id: string;
 	min: number;
 	max: number;
-	chance?: number; // Denominator, e.g. 1/1000 <- 100 is chance
+	chance?: number; // Denominator, e.g. 1/1000 <- 1000 is chance
 };
 
 export type ActionOutput = {
