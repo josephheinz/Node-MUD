@@ -13,7 +13,8 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check .",
 		"start": "cross-env HOST=localhost PORT=3000 ORIGIN=http://localhost:3000 tsx server.ts",
-		"loc": "git ls-files | grep -Ev \"package-lock\\.json|\\.png$|\\.jpg$|\\.jpeg$|\\.gif$|\\.svg$|\\.ico$|\\.webp$|\\.pdf$|\\.ttf$|\\.woff2?$|\\.mp4$|\\.mov$|\\.exe$|\\.bin$\" | xargs wc -l"
+		"loc": "git ls-files | grep -Ev '^src/lib/components/ui/(avatar|button|button-group|card-|collapsible|context-menu|dialog|dropdown-menu|empty|input|label|pagination|popover|progress|resizable|separator|sheet|sidebar|skeleton|sonner|spinner|tabs|tooltip)/' | grep -Ev \"package-lock\\.json|\\.png$|\\.jpg$|\\.jpeg$|\\.gif$|\\.svg$|\\.ico$|\\.webp$|\\.pdf$|\\.ttf$|\\.woff2?$|\\.mp4$|\\.mov$|\\.exe$|\\.bin$\" | xargs wc -l",
+		"loc-w": "git ls-files | Where-Object { $_ -notmatch '^src/lib/components/ui/(avatar|button|button-group|card-|collapsible|context-menu|dialog|dropdown-menu|empty|input|label|pagination|popover|progress|resizable|separator|sheet|sidebar|skeleton|sonner|spinner|tabs|tooltip)/' } | Where-Object { $_ -notmatch 'package-lock\\.json$|\\.png$|\\.jpg$|\\.jpeg$|\\.gif$|\\.svg$|\\.ico$|\\.webp$|\\.pdf$|\\.ttf$|\\.woff2?$|\\.mp4$|\\.mov$|\\.exe$|\\.bin$' } | ForEach-Object { (Get-Content $_ | Measure-Object -Line).Lines } | Measure-Object -Sum"
 	},
 	"devDependencies": {
 		"@fortawesome/free-brands-svg-icons": "^7.1.0",
