@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getProfile } from '$lib/remote/auth.remote';
 	import { getEquipment } from '$lib/remote/equipment.remote';
 	import { enemyRegistry } from '$lib/types/enemy';
 	import Equipment from '../character/equipment.svelte';
@@ -19,7 +20,7 @@
 			<CombatWebsocketManager bind:instance={instanceId} />
 			Instance: {instanceId}
 			<EnemyRenderer enemy={enemyRegistry['slime']} />
-			<PlayerRenderer equipment={await getEquipment()} />
+			<PlayerRenderer equipment={await getEquipment()} name={(await getProfile()).username} />
 		</main>
 		<aside class="flex flex-col justify-evenly gap-4 p-2">
 			<Equipment />

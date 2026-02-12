@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { Equipment, EquipmentSlot } from '$lib/types/item';
+	import Progress from '../progress/progress.svelte';
 
-	const { equipment }: { equipment: Equipment } = $props();
+	const { equipment, name }: { equipment: Equipment; name: string } = $props();
 
 	/* 	let equipment = $state(InitEquipment);
 	 */
@@ -17,13 +18,17 @@
 	};
 </script>
 
-<div class="pointer-none relative aspect-square w-max">
-	<img src="/images/player.png" alt="Player icon" class="absolute inset-0 min-h-24 min-w-24" />
-	{#each equipment.export() as [slot, item]}
-		{#if item}
-			<div class={item.position ?? slotPositions[slot]}>
-				<img src={item.icon} alt={item.name} />
-			</div>
-		{/if}
-	{/each}
+<div class="relative flex size-max flex-col items-center justify-evenly gap-1 p-4">
+	<h1 class="text-md font-medium">{name}</h1>
+	<Progress value={100} max={100} class="w-full [&>*]:bg-rose-500" />
+	<div class="relative aspect-square w-24">
+		<img src="/images/player.png" alt="Player icon" class="absolute inset-0 min-h-24 min-w-24" />
+		{#each equipment.export() as [slot, item]}
+			{#if item}
+				<div class={item.position ?? slotPositions[slot]}>
+					<img src={item.icon} alt={item.name} />
+				</div>
+			{/if}
+		{/each}
+	</div>
 </div>
