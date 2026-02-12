@@ -1,9 +1,10 @@
 - id: cool_hat
   name: Cool Hat
   icon:
-    ascii: "⌓"
-    image: "/images/items/armor/un-craftable/coolHat.svg"
+    ascii: '⌓'
+    image: '/images/items/armor/un-craftable/coolHat.svg'
   rarity: Divine
+  position: 'absolute size-8 top-2 left-8'
   modifiers:
     - type: Equippable
       slot: head

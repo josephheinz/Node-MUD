@@ -57,6 +57,7 @@ export type Item = {
 	icon: string;
 	baseStats?: StatList;
 	modifiers: IItemModifier[];
+	position?: string;
 };
 
 export type DBItem = {
@@ -388,7 +389,8 @@ export function parseYAMLToItem(yamlString: string): Item {
 		icon: item.icon.image,
 		modifiers,
 		baseStats,
-		desc: item.description
+		desc: item.description,
+		position: item.position
 	};
 }
 

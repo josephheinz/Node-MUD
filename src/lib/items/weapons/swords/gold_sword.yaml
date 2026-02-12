@@ -1,9 +1,10 @@
 - id: gold_sword
   name: Gold Sword
   icon:
-    ascii: "𐕣"
-    image: "/images/items/weapons/swords/goldSword.png"
+    ascii: '𐕣'
+    image: '/images/items/weapons/swords/goldSword.png'
   rarity: Uncommon
+  position: 'absolute size-8 top-14 left-6 rotate-60 z-4'
   stats:
     damage: 10
   modifiers:

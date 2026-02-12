@@ -2,13 +2,15 @@
 	import type { Enemy, EnemySize } from '$lib/types/enemy';
 	import Progress from '../progress/progress.svelte';
 
-	const { enemy }: { enemy: Enemy } = $props();
+	const { enemy: InitEnemy }: { enemy: Enemy } = $props();
 	const sizeClasses: Record<EnemySize, string> = {
 		Small: 'size-16',
 		Medium: 'size-24',
 		Large: 'size-32',
 		Huge: 'size-48'
 	};
+
+	let enemy = $state(InitEnemy);
 </script>
 
 <div class="flex aspect-square size-max flex-col items-center justify-evenly gap-1 p-4">

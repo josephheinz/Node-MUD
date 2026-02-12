@@ -1,9 +1,10 @@
 - id: titanium_sword
   name: Titanium Sword
   icon:
-    ascii: "𐕣"
-    image: "/images/items/weapons/swords/titaniumSword.png"
+    ascii: '𐕣'
+    image: '/images/items/weapons/swords/titaniumSword.png'
   rarity: Rare
+  position: 'absolute size-8 top-14 left-6 rotate-60 z-4'
   stats:
     damage: 25
   modifiers:

@@ -4,6 +4,7 @@
     ascii: '𐕣'
     image: '/images/items/weapons/swords/ancientSword.png'
   rarity: Legendary
+  position: 'absolute size-8 top-14 left-6 rotate-60 z-4'
   stats:
     damage: 100
   modifiers:

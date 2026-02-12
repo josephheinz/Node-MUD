@@ -4,6 +4,7 @@
     ascii: '𓂻'
     image: '/images/items/armor/un-craftable/discoPants.svg'
   rarity: Mythic
+  position: 'absolute size-10 top-16 left-7 z-1'
   modifiers:
     - type: Equippable
       slot: legs

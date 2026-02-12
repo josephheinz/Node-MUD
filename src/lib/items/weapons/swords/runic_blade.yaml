@@ -4,6 +4,7 @@
     ascii: '𐕣'
     image: '/images/items/weapons/swords/runicBlade.png'
   rarity: Rare
+  position: 'absolute size-12 top-14 left-6 rotate-60 z-4'
   stats:
     damage: 25
   modifiers:

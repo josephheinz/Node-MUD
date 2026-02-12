@@ -1,9 +1,10 @@
 - id: iron_sword
   name: Iron Sword
   icon:
-    ascii: "𐕣"
-    image: "/images/items/weapons/swords/ironSword.png"
+    ascii: '𐕣'
+    image: '/images/items/weapons/swords/ironSword.png'
   rarity: Common
+  position: 'absolute size-8 top-14 left-6 rotate-60 z-4'
   stats:
     damage: 5
   modifiers:

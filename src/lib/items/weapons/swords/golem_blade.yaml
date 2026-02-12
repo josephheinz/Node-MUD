@@ -4,6 +4,7 @@
     ascii: '𐕣'
     image: '/images/items/weapons/swords/golemBlade.png'
   rarity: Epic
+  position: 'absolute size-10 top-14 left-6 rotate-60 z-4'
   stats:
     damage: 50
   modifiers:
