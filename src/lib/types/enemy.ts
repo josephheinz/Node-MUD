@@ -33,13 +33,13 @@ export function parseYamlToEnemy(yamlString: string): Enemy {
     let enemy = parse(yamlString)[0];
 
     const stats: EnemyStats = {
-        health: enemy.health,
-        maxHealth: enemy.health,
-        strength: enemy.strength,
-        damage: enemy.damage,
-        defense: enemy.defense,
-        critChance: enemy.critChance,
-        critDamage: enemy.critDamage
+        health: enemy.stats.health,
+        maxHealth: enemy.stats.health,
+        strength: enemy.stats.strength,
+        damage: enemy.stats.damage,
+        defense: enemy.stats.defense,
+        critChance: enemy.stats.critChance,
+        critDamage: enemy.stats.critDamage
     };
 
     return {

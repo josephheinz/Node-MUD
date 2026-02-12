@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { enemyRegistry } from '$lib/types/enemy';
 	import Equipment from '../character/equipment.svelte';
 	import Inventory from '../character/inventory.svelte';
 	import CombatWebsocketManager from './combatWebsocketManager.svelte';
+	import EnemyRenderer from './enemyRenderer.svelte';
 
 	let instanceId: string = $state('');
 </script>
@@ -10,6 +12,7 @@
 	<main class="p-6">
 		<CombatWebsocketManager bind:instance={instanceId} />
 		Instance: {instanceId}
+		<EnemyRenderer enemy={enemyRegistry['slime']} />
 	</main>
 	<aside class="flex flex-col justify-evenly gap-4 p-2">
 		<Equipment />
