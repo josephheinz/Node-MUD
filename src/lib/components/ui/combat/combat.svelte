@@ -19,7 +19,7 @@
 		<main class="p-6">
 			<CombatWebsocketManager bind:instance={instanceId} />
 			Instance: {instanceId}
-			<EnemyRenderer enemy={enemyRegistry['slime']} />
+			<EnemyRenderer enemy={enemyRegistry['king_slime']} />
 			<PlayerRenderer equipment={await getEquipment()} name={(await getProfile()).username} />
 		</main>
 		<aside class="flex flex-col justify-evenly gap-4 p-2">
