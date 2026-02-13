@@ -35,7 +35,7 @@
 						<h2 class="text-lg font-medium">
 							{skill.name}
 						</h2>
-						<h1 class="text-center font-black" title={`Total XP: ${formatNumber(skill.xp)}`}>
+						<h1 class="text-center font-black text-3xl" title={`Total XP: ${formatNumber(skill.xp)}`}>
 							{xpToLevel(skill.xp)}
 						</h1>
 						<Progress max={xpReqForLevel} value={Math.min(xpOutOfCurrentLevel, xpReqForLevel)} />
