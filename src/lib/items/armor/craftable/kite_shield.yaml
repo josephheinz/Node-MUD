@@ -2,7 +2,7 @@
   name: Kite Shield
   icon:
     ascii: '⛨'
-    image: '/images/items/armor/craftable/kiteShield.svg'
+    image: '/images/items/armor/craftable/kiteShield.png'
   rarity: Common
   position: 'absolute size-6 top-14 left-14 rotate-60 z-3'
   stats:

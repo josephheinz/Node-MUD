@@ -2,7 +2,7 @@
   name: Disco Pants
   icon:
     ascii: '𓂻'
-    image: '/images/items/armor/un-craftable/discoPants.svg'
+    image: '/images/items/armor/un-craftable/discoPants.png'
   rarity: Mythic
   position: 'absolute size-10 top-16 left-7 z-1'
   modifiers:

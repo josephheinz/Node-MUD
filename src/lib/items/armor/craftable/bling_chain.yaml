@@ -2,7 +2,7 @@
   name: Bling Chain
   icon:
     ascii: '𓋩'
-    image: '/images/items/armor/craftable/blingChain.svg'
+    image: '/images/items/armor/craftable/blingChain.png'
   rarity: Legendary
   position: 'absolute size-4 top-9.5 left-10 z-2'
   modifiers:

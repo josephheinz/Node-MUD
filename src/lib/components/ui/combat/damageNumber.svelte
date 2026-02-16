@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { formatNumber } from '$lib/utils/general';
+	import { Sparkle } from '@lucide/svelte';
 
 	let {
 		value,
@@ -70,17 +71,25 @@
 >
 	<span
 		class="text-xl font-bold drop-shadow-lg select-none {crit
-			? 'text-gradient'
+			? 'text-gradient text-white'
 			: 'text-red-500'} text-stroke-2 text-stroke-zinc-800"
 		style="-webkit-user-select: none; user-select: none;"
 	>
-		{formatNumber(value, 'long')}
+		{#if crit}
+			<div class="flex items-center justify-center gap-1">
+				<Sparkle size="14" />
+				{formatNumber(value, 'long')}
+				<Sparkle size="14" />
+			</div>
+		{:else}
+			{formatNumber(value, 'long')}
+		{/if}
 	</span>
 </div>
 
 <style>
 	.text-gradient {
-		color: #f22c2c;
+		color: white;
 		background-image: linear-gradient(45deg, #f22c2c 0%, #f79131 25%, #ecd74b 50%, #89c6f0 73%);
 		background-clip: text;
 		-webkit-background-clip: text;

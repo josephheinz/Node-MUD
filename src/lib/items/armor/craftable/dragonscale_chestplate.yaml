@@ -2,9 +2,9 @@
   name: Dragonscale Chestplate
   icon:
     ascii: '⬓'
-    image: '/images/items/armor/craftable/dragonscaleChestplate.svg'
+    image: '/images/items/armor/craftable/dragonscaleChestplate.png'
   rarity: Epic
-  position: 'absolute size-10 top-8 left-7 z-2'
+  position: 'absolute size-9 top-9 left-7.5 z-2'
   stats:
     defense: 50
   modifiers:
