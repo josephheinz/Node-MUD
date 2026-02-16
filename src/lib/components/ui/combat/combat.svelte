@@ -5,6 +5,7 @@
 	import Equipment from '../character/equipment.svelte';
 	import Inventory from '../character/inventory.svelte';
 	import CombatWebsocketManager from './combatWebsocketManager.svelte';
+	import DamageSpawner from './damageSpawner.svelte';
 	import EnemyRenderer from './enemyRenderer.svelte';
 	import PlayerRenderer from './playerRenderer.svelte';
 
@@ -21,6 +22,7 @@
 			Instance: {instanceId}
 			<EnemyRenderer enemy={enemyRegistry['king_slime']} />
 			<PlayerRenderer equipment={await getEquipment()} name={(await getProfile()).username} />
+			<DamageSpawner />
 		</main>
 		<aside class="flex flex-col justify-evenly gap-4 p-2">
 			<Equipment />

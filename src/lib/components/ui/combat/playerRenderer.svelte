@@ -22,11 +22,21 @@
 	<h1 class="text-md font-medium">{name}</h1>
 	<Progress value={100} max={100} class="w-full [&>*]:bg-rose-500" />
 	<div class="relative aspect-square w-24">
-		<img src="/images/player.png" alt="Player icon" class="absolute inset-0 min-h-24 min-w-24" />
+		<img
+			src="/images/player.png"
+			alt="Player icon"
+			class="pointer-events-none absolute inset-0 min-h-24 min-w-24 select-none"
+			draggable="false"
+		/>
 		{#each equipment.export() as [slot, item]}
 			{#if item}
 				<div class={item.position ?? slotPositions[slot]}>
-					<img src={item.icon} alt={item.name} />
+					<img
+						src={item.icon}
+						alt={item.name}
+						class="pointer-events-none select-none"
+						draggable="false"
+					/>
 				</div>
 			{/if}
 		{/each}
