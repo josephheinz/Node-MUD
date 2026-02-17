@@ -1,0 +1,10 @@
+- id: combat_fight_slime
+  name: Fight Slime
+  icon: '/images/enemies/slime.png'
+  req:
+    skill: 'Combat'
+    level: 1
+  enemies:
+    - id: slime
+      amount: 1
+    

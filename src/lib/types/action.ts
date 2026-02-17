@@ -2,6 +2,7 @@ import { parse } from 'yaml';
 import type { Skill, SkillKey } from './skills';
 import { cumulativeXPForLevel } from '$lib/utils/skills';
 import { capitalizeFirstLetter } from '$lib/utils/general';
+import { parseYamlToCombatAction, type CombatAction } from './combatAction';
 
 export type ActionInput = {
 	id: string;
@@ -85,6 +86,7 @@ export function getAction(id: string): Action | null {
 }
 
 export const actionRegistry: Record<string, Action> = {};
+export const combatActionRegistry: Record<string, CombatAction> = {};
 
 export function initializeActionRegistry() {
 	if (Object.keys(actionRegistry).length > 0) return;
@@ -97,6 +99,10 @@ export function initializeActionRegistry() {
 			.pop()!
 			.replace(/\.[^/.]+$/, '');
 		let _action = (actions[action] as any).default ?? actions[action];
-		actionRegistry[id] = parseYamlToAction(_action);
+		if (id.includes("combat_")) {
+			combatActionRegistry[id] = parseYamlToCombatAction(_action);
+		} else {
+			actionRegistry[id] = parseYamlToAction(_action);
+		}
 	}
 }
