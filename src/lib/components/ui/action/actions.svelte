@@ -11,6 +11,7 @@
 	import { faShapes } from '@fortawesome/free-solid-svg-icons';
 	import { onMount } from 'svelte';
 	import { Shapes } from '@lucide/svelte';
+	import CombatActions from './combatActions.svelte';
 
 	const categories: TActionCategory[] = Object.keys(actionCategories);
 	let selectedTab = $state<string | null>(null);
@@ -58,6 +59,10 @@
 
 {#snippet ActionCat(category: string)}
 	<Tabs.Content value={category} class="h-full grow">
-		<ActionCategory {category} />
+		{#if category === 'Combat'}
+			<CombatActions />
+		{:else}
+			<ActionCategory {category} />
+		{/if}
 	</Tabs.Content>
 {/snippet}

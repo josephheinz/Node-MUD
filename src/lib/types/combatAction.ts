@@ -1,8 +1,7 @@
 import { parse } from "yaml";
 import type { Skill } from "./skills";
-import { enemyRegistry, initializeEnemyRegistry, type Enemy } from "./enemy";
-import { cloneDeep } from "radashi";
 import { cumulativeXPForLevel } from "$lib/utils/skills";
+import { combatActionRegistry } from "./action";
 
 export type CombatEnemy = {
     id: string;
@@ -13,17 +12,22 @@ export type CombatEnemy = {
 export type CombatAction = {
     id: string;
     name: string;
-    enemies: Set<CombatEnemy>;
+    enemies: CombatEnemy[];
     icon: string;
     requirement?: Skill;
 };
 
+export function getCombatAction(id: string): CombatAction | null {
+    if (combatActionRegistry[id]) return combatActionRegistry[id];
+    return null;
+}
+
 export function parseYamlToCombatAction(yamlString: string): CombatAction {
     let action = parse(yamlString)[0];
 
-    const enemies: Set<CombatEnemy> = new Set();
-    action.enemies.forEach((id: string, amount: number, chance: number | undefined) => {
-        enemies.add({ id, amount, chance });
+    const enemies: CombatEnemy[] = [];
+    action.enemies.forEach((e: { id: string; amount: number; chance?: number }) => {
+        enemies.push({ id: e.id, amount: e.amount, chance: e.chance });
     });
 
     const requirement = action.req

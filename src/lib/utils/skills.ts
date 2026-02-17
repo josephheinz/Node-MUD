@@ -1,3 +1,4 @@
+import { Skills, type Skill } from "$lib/types/skills";
 
 export function xpForLevel(level: number): number {
     // Tunable constants:
@@ -44,5 +45,21 @@ function buildXPTable(maxLevel = 120): Array<number> {
 export function cumulativeXPForLevel(level: number): number {
     return XP_TABLE[Math.max(0, level - 1)];
 }
+
+export function fillMissingSkills(
+    input: Partial<Record<Skills, Skill>>
+): Record<Skills, Skill> {
+    const result = {} as Record<Skills, Skill>;
+
+    for (const skill of Object.values(Skills)) {
+        result[skill] = input[skill] ?? {
+            name: skill,
+            xp: 0
+        };
+    }
+
+    return result;
+}
+
 
 export const XP_TABLE = buildXPTable(120);

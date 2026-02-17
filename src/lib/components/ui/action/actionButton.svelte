@@ -1,7 +1,9 @@
 <script lang="ts">
 	import type { Action } from '$lib/types/action';
+	import type { CombatAction } from '$lib/types/combatAction';
 
-	const { action, disabled = false }: { action: Action; disabled?: boolean } = $props();
+	const { action, disabled = false }: { action: Action | CombatAction; disabled?: boolean } =
+		$props();
 </script>
 
 <div

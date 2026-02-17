@@ -1,5 +1,6 @@
 import { getRequestEvent, query } from "$app/server";
-import type { Skill, SkillKey } from "$lib/types/skills";
+import { Skills, type Skill, type SkillKey } from "$lib/types/skills";
+import { fillMissingSkills } from "$lib/utils/skills";
 import { redirect } from "@sveltejs/kit";
 import * as z from "zod"
 
@@ -19,7 +20,7 @@ export const getSkills = query(async () => {
     if (!data) throw new Error("Skills data not found on the database")
 
 
-    const skills: Record<SkillKey, Skill> = JSON.parse(JSON.stringify(data.skills_data));
+    const skills: Record<Skills, Skill> = fillMissingSkills(JSON.parse(JSON.stringify(data.skills_data)));
 
     return skills;
 })
@@ -38,7 +39,7 @@ export const getSkillsById = query(z.uuidv4(), async (id) => {
     if (!data) throw new Error("Skills data not found on the database")
 
 
-    const skills: Record<SkillKey, Skill> = JSON.parse(JSON.stringify(data.skills_data));
+    const skills: Record<SkillKey, Skill> = fillMissingSkills(JSON.parse(JSON.stringify(data.skills_data)));
 
     return skills;
 })

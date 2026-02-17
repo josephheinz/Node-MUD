@@ -1,4 +1,3 @@
-import type { ITooltipData } from '$lib/components/tooltip.old';
 import { StackableModifier, type EquippableModifier } from '$lib/modifiers/basicModifiers';
 import { instantiateModifier, instantiateModifierFromHash } from '$lib/modifiers/modifiersRegistry';
 import {
@@ -18,6 +17,7 @@ import * as _ from 'radashi';
 import { capitalizeFirstLetter, formatNumber } from './general';
 import { isEqual } from 'radashi';
 import { Stats } from '$lib/types/stats';
+import type { ITooltipData } from '$lib/components/tooltip';
 
 export async function Equip(
 	item: Item,
