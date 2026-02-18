@@ -1,6 +1,6 @@
 import type { ITooltipData } from "$lib/components/tooltip";
 import { enemyRegistry, type Enemy } from "$lib/types/enemy";
-import { normalizeXpKeys } from "$lib/types/action";
+import { Stats } from "$lib/types/stats";
 
 export function getEnemy(id: string): Enemy | null {
     console.log(enemyRegistry)
@@ -15,8 +15,11 @@ export function getEnemyData(enemy: Enemy): ITooltipData {
         let recordized: Record<string, number> = {};
         recordized[name] = val;
 
-        let normalized = normalizeXpKeys(recordized)
-        statString += `${normalized[name]}: ${val}</br>`
+        if (name === "maxHealth") return;
+        let statThing = Stats[name];
+        console.log(statThing, name);
+
+        statString += `<span class="color:${Stats[name].color};">${Stats[name].icon} ${Stats[name].name}: ${val}</span></br>`
     })
     return {
         title: `Lv.${enemy.level} ${enemy.name}`,

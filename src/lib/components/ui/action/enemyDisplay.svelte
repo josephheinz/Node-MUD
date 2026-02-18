@@ -10,9 +10,10 @@
 	class="relative flex aspect-square min-w-16 flex-col items-center justify-start gap-1"
 	use:tooltip={getEnemyData(enemy)}
 >
-	<img src={enemy.icon} alt={enemy.name} />
+	<img src={enemy.icon} alt={enemy.name} class="pixelated" />
 	{#if amount > 1}
-		<span class="absolute right-1 bottom-1 font-black text-lg text-stroke-2 text-stroke-zinc-800 text-white"
+		<span
+			class="absolute right-1 bottom-1 text-stroke-2 text-stroke-zinc-800 text-lg font-black text-white"
 			>x{amount}</span
 		>
 	{/if}

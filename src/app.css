@@ -153,3 +153,7 @@ html {
 		@apply bg-background text-foreground;
 	}
 }
+
+.pixelated {
+	image-rendering: pixelated;
+}

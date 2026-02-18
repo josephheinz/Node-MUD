@@ -57,7 +57,7 @@
 				<ul>
 					{#each loadedEnemies as { enemy, amount: eAmount, chance }, index}
 						<li class="my-1 flex items-center justify-start gap-2 pl-4">
-							<EnemyDisplay {enemy} amount={eAmount * amount} />
+							<EnemyDisplay {enemy} amount={eAmount} />
 						</li>
 					{/each}
 				</ul>
