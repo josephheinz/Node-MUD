@@ -1,4 +1,4 @@
-import { StackableModifier, type EquippableModifier } from '$lib/modifiers/basicModifiers';
+import { EnhancerModifier, StackableModifier, type EquippableModifier } from '$lib/modifiers/basicModifiers';
 import { instantiateModifier, instantiateModifierFromHash } from '$lib/modifiers/modifiersRegistry';
 import {
 	Equipment,
@@ -18,6 +18,9 @@ import { capitalizeFirstLetter, formatNumber } from './general';
 import { isEqual } from 'radashi';
 import { Stats } from '$lib/types/stats';
 import type { ITooltipData } from '$lib/components/tooltip';
+import type { ReforgeableModifier, ReforgeGroup, ReforgeModifier } from '$lib/modifiers/reforges';
+import type { StarsModifier } from '$lib/modifiers/stars';
+import { EnchantmentModifier, type Enchantment } from '$lib/modifiers/enchantments';
 
 export async function Equip(
 	item: Item,
@@ -300,4 +303,147 @@ export function tryStackItemInInventory(item: Item, inventory: Item[] | Inventor
 	if (stackableModifier.amount > 0) contents.push(item);
 
 	return new Inventory(contents);
+}
+
+
+export function previewEnhanceItem(item: Item, enhancer: Item): Item {
+	if (!item || !enhancer) throw new Error('Item or enhancer are undefined');
+
+	const enhancements = enhancer.modifiers.find((m) => m.type === 'Enhancer') as
+		| EnhancerModifier
+		| undefined;
+	if (!enhancements) throw new Error('Enhancer item does not actually have any enhancements');
+
+	const instantiated = enhancements.enhancements.map(instantiateModifier);
+
+	const newItem: Item = _.cloneDeep(item);
+
+	for (const mod of instantiated) {
+		if (mod.type === 'Stars') {
+			const existing: StarsModifier | null = newItem.modifiers.find(
+				(m): m is StarsModifier => m.type === 'Stars'
+			) as StarsModifier;
+
+			const addStars: number = (mod as StarsModifier).stars;
+
+			if (existing) {
+				existing.stars = Math.min(35, existing.stars + addStars);
+				continue;
+			}
+		} else if (mod.type === 'Reforge') {
+			const existing: number = newItem.modifiers.findIndex(
+				(m): m is ReforgeModifier => m.type === 'Reforge'
+			);
+
+			newItem.modifiers.splice(existing, 1);
+		} else if (mod.type === 'Enchantment') {
+			addEnchantments(newItem, (mod as EnchantmentModifier).enchantments);
+			continue;
+		}
+
+		newItem.modifiers.push(mod);
+	}
+
+	return newItem;
+}
+
+// dont ask me, im confused writing this
+export function addEnchantments(item: Item, enchants: Enchantment[]): Item {
+	const reforgeGroup: ReforgeGroup | undefined = (
+		item.modifiers.find((m) => m.type === 'Reforgeable') as ReforgeableModifier
+	).group as ReforgeGroup;
+
+	const enchantMod: EnchantmentModifier | undefined = item.modifiers.find(
+		(m) => m.type === 'Enchantment'
+	) as EnchantmentModifier;
+
+	const itemEnchants: Enchantment[] = enchantMod?.enchantments ?? [];
+
+	if (!reforgeGroup) return item;
+
+	if (!enchantMod) {
+		const enhanceMod: EnhancerModifier | undefined = item.modifiers.find(
+			(m) => m.type === 'Enhancer'
+		) as EnhancerModifier;
+
+		const enchantEnhancement: EnchantmentModifier | undefined = enhanceMod?.enhancements.find(
+			(e) => e.type === 'Enchantment'
+		) as EnchantmentModifier;
+
+		if (enhanceMod) {
+			enhanceMod.enhancements = enhanceMod.enhancements.map((e) => instantiateModifier(e));
+		}
+
+		if (enhanceMod && enchantEnhancement) {
+			let updatedEnchants: Enchantment[] = combineEnchantments(
+				enchantEnhancement.enchantments,
+				enchants,
+				reforgeGroup
+			);
+
+			enchantEnhancement.enchantments = updatedEnchants;
+
+			return item;
+		} else {
+			let newEnchantMod: EnchantmentModifier = new EnchantmentModifier([]);
+
+			enchants.forEach((e) => {
+				if (e.applies.includes(reforgeGroup) || reforgeGroup === 'Enchanted Book') {
+					newEnchantMod.enchantments.push(e);
+				}
+			});
+
+			item.modifiers.push(newEnchantMod);
+
+			return item;
+		}
+	}
+
+	let updatedEnchants: Enchantment[] = combineEnchantments(itemEnchants, enchants, reforgeGroup);
+
+	let itemEnchantMod: EnchantmentModifier | undefined = item.modifiers.find(
+		(m) => m.type === 'Enchantment'
+	) as EnchantmentModifier;
+
+	if (itemEnchantMod) itemEnchantMod.enchantments = updatedEnchants;
+
+	return item;
+}
+
+export function combineEnchantments(
+	enchants: Enchantment[],
+	add: Enchantment[],
+	reforgeGroup: ReforgeGroup
+): Enchantment[] {
+	let updatedEnchants: Enchantment[] = [];
+
+	add.forEach((enchant) => {
+		const name: string = enchant.name;
+		const applies: ReforgeGroup[] = enchant.applies;
+
+		let existing: Enchantment | undefined = enchants.find((e) => e.name === name);
+
+		if (!existing) {
+			if (applies.includes(reforgeGroup) || reforgeGroup === 'Enchanted Book')
+				updatedEnchants.push(enchant);
+		} else {
+			let existingLevel: number = existing.level;
+			let exisitingMax: number = existing.maxLevel;
+
+			if (existingLevel >= exisitingMax) return;
+
+			if (enchant.level < existingLevel) {
+				return;
+			} else if (enchant.level === existingLevel) {
+				existing.level++;
+			} else if (enchant.level > existingLevel) {
+				existing.level = enchant.level;
+			}
+
+			updatedEnchants.push(existing);
+			return;
+		}
+	});
+
+	return updatedEnchants;
 }

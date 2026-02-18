@@ -15,7 +15,7 @@
 	type Props = {
 		item: Item;
 		class?: string;
-		equipFlags: EquippedFlags;
+		equipFlags?: EquippedFlags;
 	};
 
 	type EquippedFlags = {
@@ -23,7 +23,7 @@
 		equippable: boolean;
 	};
 
-	const { item, class: userClass = '', equipFlags }: Props = $props();
+	const { item, class: userClass = '', equipFlags = { equippable: false } }: Props = $props();
 
 	const stackMod: StackableModifier | undefined = item.modifiers.find(
 		(m) => m.type === 'Stackable'
@@ -95,7 +95,7 @@
 
 <ContextMenu.Root>
 	<ContextMenu.Trigger
-		class="max-h-16 max-w-16 relative flex aspect-square size-full items-center justify-center rounded-lg bg-card select-none {userClass}"
+		class="relative flex aspect-square size-full max-h-16 max-w-16 items-center justify-center rounded-lg bg-card select-none {userClass}"
 		style="border:2px solid {item?.rarity ?? 'transparent'}"
 		title=""
 	>
