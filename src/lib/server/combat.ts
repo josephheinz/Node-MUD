@@ -1,6 +1,41 @@
 import type { UUID } from "node:crypto";
 import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
+import type { StatList } from "$lib/types/stats";
+
+export type ActionType = "attack" | "heal" | "special";
+
+export type Effect = {
+    name: string;
+    duration: number;
+    value?: number;
+}
+
+export interface IActionResult {
+    type: ActionType;
+    target: UUID;
+    value?: number;
+}
+
+export type EntityUpdates = {
+    id: UUID;
+    stats?: StatList;
+    effects?: string[];
+    action?: IActionResult;
+}
+
+export type CombatEntity = {
+    id: UUID;
+    stats: StatList;
+    effects?: string[];
+    aiModel?: string;
+}
+
+export interface ICombatState {
+    tick: number;
+    updates?: EntityUpdates[];
+    entities: CombatEntity[];
+};
 
 const supabaseUrl = process.env.PUBLIC_SUPABASE_URL!;
 const supabaseSecretKey = process.env.PRIVATE_SUPABASE_SECRET_KEY!;
@@ -65,4 +100,9 @@ export async function getOrCreateCombatInstance(playerId: UUID): Promise<UUID> {
     if (error) throw new Error(error.message);
 
     return createdInstance;
+}
+
+export async function combatTick(state: ICombatState): Promise<ICombatState> {
+
+    return { tick: state.tick, entities: state.entities };
 }
