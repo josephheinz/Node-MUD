@@ -53,7 +53,7 @@
 		/>
 	{:else}
 		<div
-			class="bg-card-background flex h-16 w-16 items-center justify-center rounded-lg border-2 border-ring text-card-foreground select-none {slotGridSpots[
+			class="bg-card-background max-size-16 relative flex aspect-square size-full items-center justify-center rounded-lg border-2 border-ring text-card-foreground select-none {slotGridSpots[
 				slot
 			]}"
 		>

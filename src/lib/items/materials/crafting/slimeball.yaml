@@ -1,0 +1,10 @@
+- id: slimeball
+  name: Slimeball
+  icon:
+    ascii: 'o'
+    image: '/images/items/materials/crafting/slimeball.png'
+  rarity: Uncommon
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 50000
