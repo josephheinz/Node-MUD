@@ -1,0 +1,16 @@
+- id: slime
+  name: Slime
+  level: 1
+  icon: '/images/enemies/slime.png'
+  size: 'Small'
+  drops:
+    - id: slimeball
+      min: 2
+      max: 7
+  stats:
+    health: 10
+    strength: 1
+    damage: 2
+    defense: 1
+    critChance: 5
+    critDamage: 20

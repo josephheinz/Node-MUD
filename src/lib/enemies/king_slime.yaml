@@ -1,0 +1,16 @@
+- id: king_slime
+  name: King Slime
+  level: 10
+  icon: '/images/enemies/kingSlime.png'
+  size: 'Large'
+  drops:
+    - id: slimeball
+      min: 10
+      max: 23
+  stats:
+    health: 50
+    strength: 5
+    damage: 5
+    defense: 10
+    critChance: 5
+    critDamage: 40

@@ -9,6 +9,9 @@
 	import PlayerRenderer from './playerRenderer.svelte';
 	import * as Empty from '$lib/components/ui/empty';
 	import { Skull } from '@lucide/svelte';
+	import { getInstance, getPlayerInstance } from '$lib/remote/combat.remote';
+	import { getCombatEnemy } from '$lib/utils/enemy';
+	import Spinner from '../spinner/spinner.svelte';
 
 	type CombatData = {
 		entities: Enemy[];
@@ -23,19 +26,30 @@
 		'col-start-1 row-start-1'
 	];
 
-	let instanceId: string = $state('a');
+	let instanceId: string = $state('');
 	let entities: Enemy[] = $state([]);
+	let loading: boolean = $state(true);
 	$effect(() => {
 		console.log(entities);
+		getPlayerInstance().then((response) => {
+			if (response != null) instanceId = response;
+			else return;
+
+			getInstance(instanceId).then((instanceResponse) => {
+				if (instanceResponse != null) {
+					console.log(instanceResponse.entities);
+					entities = instanceResponse.entities.map(getCombatEnemy);
+				}
+			});
+			loading = false;
+		});
 	});
 </script>
 
 <svelte:boundary>
-	{#snippet pending()}
-		Loading...
-	{/snippet}
-
-	{#if instanceId == ''}
+	{#if loading}
+		{@render loadingScreen()}
+	{:else if instanceId == ''}
 		{@render emptyInstance()}
 	{:else}
 		{@render inInstance()}
@@ -82,5 +96,12 @@
 				<Empty.Description>Go to the actions tab and queue some combat actions</Empty.Description>
 			</Empty.Header>
 		</Empty.Root>
+	</div>
+{/snippet}
+
+{#snippet loadingScreen()}
+	<div class="flex size-full flex-col items-center justify-center gap-4">
+		<h1 class="text-4xl font-black">Loading...</h1>
+		<Spinner class="size-8" />
 	</div>
 {/snippet}
