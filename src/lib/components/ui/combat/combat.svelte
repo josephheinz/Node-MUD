@@ -1,21 +1,18 @@
 <script lang="ts">
 	import { getProfile } from '$lib/remote/auth.remote';
 	import { getEquipment } from '$lib/remote/equipment.remote';
-	import { enemyRegistry, type Enemy } from '$lib/types/enemy';
+	import { type Enemy } from '$lib/types/enemy';
 	import Equipment from '../character/equipment.svelte';
 	import Inventory from '../character/inventory.svelte';
-	import DamageSpawner from './damageSpawner.svelte';
 	import EnemyRenderer from './enemyRenderer.svelte';
 	import PlayerRenderer from './playerRenderer.svelte';
 	import * as Empty from '$lib/components/ui/empty';
 	import { Skull } from '@lucide/svelte';
-	import { getInstance, getPlayerInstance } from '$lib/remote/combat.remote';
+	import { getInstance, getPlayerInstance, tickCombatInstance } from '$lib/remote/combat.remote';
 	import { getCombatEnemy } from '$lib/utils/enemy';
 	import Spinner from '../spinner/spinner.svelte';
-
-	type CombatData = {
-		entities: Enemy[];
-	};
+	import { useInterval } from 'runed';
+	import { onDestroy, onMount } from 'svelte';
 
 	let enemyLayouts: string[] = [
 		'col-start-2 row-start-2',
@@ -29,7 +26,21 @@
 	let instanceId: string = $state('');
 	let entities: Enemy[] = $state([]);
 	let loading: boolean = $state(true);
-	$effect(() => {
+	let timeUntilNextTick: number = $state(10_000);
+
+	const tickInterval = useInterval(() => timeUntilNextTick, {
+		immediate: true,
+		immediateCallback: false,
+		callback: (_) => {
+			if (instanceId.trim() === '') return;
+			tickCombatInstance(instanceId).then((response) => {
+				console.log('combat ticking');
+				console.log(response);
+			});
+		}
+	});
+
+	onMount(() => {
 		console.log(entities);
 		getPlayerInstance().then((response) => {
 			if (response != null) instanceId = response;
@@ -43,6 +54,15 @@
 			});
 			loading = false;
 		});
+	});
+
+	$effect(() => {
+		console.log(entities);
+	});
+
+	onDestroy(() => {
+		timeUntilNextTick = Infinity;
+		tickInterval.pause();
 	});
 </script>
 
