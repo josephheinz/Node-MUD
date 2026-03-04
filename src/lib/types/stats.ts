@@ -5,7 +5,7 @@ export type StatList = Record<string, Stat>;
 
 export type Stat = {
     amount: number;
-    operation: "additive" | "multiplicative";
+    operation?: "additive" | "multiplicative";
 }
 
 export const Stats: Record<string, { icon: string; color: string; name: string; }> = {

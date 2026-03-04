@@ -3,7 +3,14 @@
 	import Progress from '../progress/progress.svelte';
 	import DamageSpawner from './damageSpawner.svelte';
 
-	const { enemy: InitEnemy }: { enemy: Enemy } = $props();
+	const {
+		enemy: InitEnemy,
+		ref
+	}: {
+		enemy: Enemy;
+		ref?: (api: { spawnDamage: (amount: number, crit?: boolean) => void }) => void;
+	} = $props();
+
 	const sizeClasses: Record<EnemySize, string> = {
 		Small: 'size-16',
 		Medium: 'size-24',
@@ -14,6 +21,10 @@
 	let enemy = $state(InitEnemy);
 
 	let spawner: DamageSpawner | undefined;
+
+	$effect(() => {
+		if (spawner) ref?.({ spawnDamage: (amount, crit) => spawner!.damage(amount, crit) });
+	});
 </script>
 
 <div class="relative flex aspect-square size-max flex-col items-center justify-evenly gap-1 p-4">

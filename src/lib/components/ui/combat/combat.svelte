@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { getProfile } from '$lib/remote/auth.remote';
-	import { getEquipment } from '$lib/remote/equipment.remote';
-	import { type Enemy } from '$lib/types/enemy';
+	import { getProfileById } from '$lib/remote/auth.remote';
+	import { getEquipmentById } from '$lib/remote/equipment.remote';
 	import Equipment from '../character/equipment.svelte';
 	import Inventory from '../character/inventory.svelte';
 	import EnemyRenderer from './enemyRenderer.svelte';
@@ -13,6 +12,10 @@
 	import Spinner from '../spinner/spinner.svelte';
 	import { useInterval } from 'runed';
 	import { onDestroy, onMount } from 'svelte';
+	import type { CombatEntity, EntityUpdates, ICombatState } from '$lib/types/combat';
+	import type { UUID } from 'node:crypto';
+
+	type RendererAPI = { spawnDamage: (amount: number, crit?: boolean) => void };
 
 	let enemyLayouts: string[] = [
 		'col-start-2 row-start-2',
@@ -23,10 +26,30 @@
 		'col-start-1 row-start-1'
 	];
 
+	let combatState = $state<ICombatState | null>(null);
+
 	let instanceId: string = $state('');
-	let entities: Enemy[] = $state([]);
+	let entities: CombatEntity[] = $derived(combatState?.entities ?? []);
+	let players: CombatEntity[] = $derived(combatState?.players ?? []);
 	let loading: boolean = $state(true);
 	let timeUntilNextTick: number = $state(10_000);
+	let currentTick = $state(0);
+
+	let entityMap = new Map<UUID, RendererAPI>();
+
+	function runUpdates(updates: EntityUpdates[]) {
+		updates.forEach((update: EntityUpdates) => {
+			if (!update.action) return;
+
+			const targetId = update.action.target;
+			const targetComponent = entityMap.get(targetId);
+			if (update.action.type === 'attack') {
+				const attack = update.action;
+
+				if (attack.value) targetComponent?.spawnDamage(attack.value, attack.crit);
+			}
+		});
+	}
 
 	const tickInterval = useInterval(() => timeUntilNextTick, {
 		immediate: true,
@@ -34,8 +57,18 @@
 		callback: (_) => {
 			if (instanceId.trim() === '') return;
 			tickCombatInstance(instanceId).then((response) => {
+				if (response.nextTick) {
+					timeUntilNextTick = response.nextTick;
+				}
 				console.log('combat ticking');
-				console.log(response);
+				if (response.state) {
+					if (response.state.updates && currentTick != response.state.tick) {
+						runUpdates(response.state.updates);
+					}
+					currentTick = response.state.tick;
+
+					combatState = response.state;
+				}
 			});
 		}
 	});
@@ -47,17 +80,10 @@
 			else return;
 
 			getInstance(instanceId).then((instanceResponse) => {
-				if (instanceResponse != null) {
-					console.log(instanceResponse.entities);
-					entities = instanceResponse.entities.map(getCombatEnemy);
-				}
+				if (instanceResponse != null) combatState = instanceResponse;
 			});
 			loading = false;
 		});
-	});
-
-	$effect(() => {
-		console.log(entities);
 	});
 
 	onDestroy(() => {
@@ -81,13 +107,20 @@
 		<main class="p-6">
 			Instance: {instanceId}
 			<div class="flex h-full justify-stretch">
-				<section id="left" class="flex h-full items-center justify-center py-12">
-					<PlayerRenderer equipment={await getEquipment()} name={(await getProfile()).username} />
+				<section id="left" class="flex h-full flex-col items-center justify-center py-12">
+					{#each players as player (player.id)}
+						<PlayerRenderer
+							equipment={await getEquipmentById(player.id)}
+							name={(await getProfileById(player.id))?.username ?? player.id}
+							ref={(api) => entityMap.set(player.id, api)}
+						/>
+					{/each}
 				</section>
 				<section id="right" class="grid h-full grow grid-cols-2 grid-rows-3 py-12">
-					{#each entities as enemy, index}
+					{#each entities as enemy, index (enemy.id)}
+						{@const loadedEnemy = getCombatEnemy(enemy)}
 						<div class={enemyLayouts[index]}>
-							<EnemyRenderer {enemy} />
+							<EnemyRenderer enemy={loadedEnemy} ref={(api) => entityMap.set(enemy.id, api)} />
 						</div>
 					{/each}
 				</section>

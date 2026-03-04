@@ -4,11 +4,11 @@
 
 	let {
 		value,
-		duration = 1200, // total animation duration
+		duration = 1500, // total animation duration
 		xOrigin = 0,
 		yOrigin = 0,
 		crit = false,
-		lingerDuration = 200, // new: milliseconds to stay fully opaque
+		lingerDuration = 750, // new: milliseconds to stay fully opaque
 		onComplete
 	}: {
 		value: number;
@@ -27,7 +27,7 @@
 
 	let start: number | undefined;
 
-	const horizontalDrift = (Math.random() - 0.5) * 60;
+	const horizontalDrift = (Math.random() - 0.5) * 40;
 	const initialVelocity = -(80 + Math.random() * 40);
 	const gravity = 220 + Math.random() * 60;
 

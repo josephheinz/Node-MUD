@@ -1,15 +1,7 @@
-/*
-    FUNCTIONS NEEDED
-
-    query getPlayerInstance(id: UUID) => returns the instance id a player is in or null
-    query getInstance(id: UUID) => returns the data from the instance with the requested id or throws an error
-    command tickCombatInstance(id: UUID) => returns updated combat data if enough time has elapsed or returns a timeout object
-*/
-
 import { command, getRequestEvent, query } from "$app/server";
+import { combatTick } from "$lib/server/combat";
 import type { ICombatState } from "$lib/types/combat";
 import { redirect } from "@sveltejs/kit";
-import type { UUID } from "node:crypto";
 import * as z from "zod";
 
 export const getPlayerInstance = query(async () => {
@@ -67,9 +59,21 @@ export const tickCombatInstance = command(z.uuidv4(), async (id) => {
     if (previousTick > Date.now() - 10_000) {
         return {
             "nextTick": (previousTick + 10_000) - Date.now(),
-            "message": "Combat has progressed to next tick"
+            "message": "Combat has not progressed to next tick"
         };
-    } else {
-        return true;
     }
+
+    const state = await combatTick(instance);
+
+    const { error } = await locals.supabase
+        .from("combat_instances")
+        .update({
+            combat_data: state
+        })
+        .eq("id", id);
+
+    if (error) throw new Error(error.message);
+
+    return { state, nextTick: 10_000 };
+
 });

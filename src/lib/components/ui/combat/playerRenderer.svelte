@@ -3,7 +3,15 @@
 	import Progress from '../progress/progress.svelte';
 	import DamageSpawner from './damageSpawner.svelte';
 
-	const { equipment, name }: { equipment: Equipment; name: string } = $props();
+	const {
+		equipment,
+		name,
+		ref
+	}: {
+		equipment: Equipment;
+		name: string;
+		ref?: (api: { spawnDamage: (amount: number, crit?: boolean) => void }) => void;
+	} = $props();
 
 	/* 	let equipment = $state(InitEquipment);
 	 */
@@ -19,6 +27,10 @@
 	};
 
 	let spawner: DamageSpawner | undefined;
+
+	$effect(() => {
+		if (spawner) ref?.({ spawnDamage: (amount, crit) => spawner!.damage(amount, crit) });
+	});
 </script>
 
 <div class="relative flex size-max flex-col items-center justify-evenly gap-1 p-4">
