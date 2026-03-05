@@ -54,7 +54,7 @@
 <Sidebar.Root collapsible="icon">
 	<Sidebar.Header>
 		{#if open}
-			<h1 class="text-2xl font-bold">Web based Runescape-like</h1>
+			<h1 class="text-2xl font-bold">Multiplayer Incremental Game Simulator</h1>
 		{/if}
 		<OnlineCounter short={!open} />
 	</Sidebar.Header>

@@ -66,7 +66,7 @@
 						runUpdates(response.state.updates);
 					}
 					currentTick = response.state.tick;
-
+					console.log(response.state);
 					combatState = response.state;
 				}
 			});
@@ -84,6 +84,10 @@
 			});
 			loading = false;
 		});
+	});
+
+	$effect(() => {
+		console.log(entities);
 	});
 
 	onDestroy(() => {

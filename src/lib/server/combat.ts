@@ -1,4 +1,3 @@
-import type { UUID } from "node:crypto";
 import 'dotenv/config';
 import { getModifiedStats, type Stat } from "$lib/types/stats";
 import { getEquipmentById } from "$lib/remote/equipment.remote";
@@ -6,11 +5,40 @@ import type { Equipment } from "$lib/types/item";
 import { damageCalculation, defenseCalculation } from "$lib/utils/combat";
 import type { CombatEntity, EntityUpdates, ICombatState } from "$lib/types/combat";
 
+export async function resolveCombatUpdates(state: ICombatState): Promise<ICombatState> {
+    if (!state.updates) return state;
+    let updates = state.updates;
+
+    updates.forEach((update: EntityUpdates) => {
+        if (!update.action) return;
+
+        let target = update.action.target;
+        if (!target) return;
+
+        let targetEntity = state.entities.find(e => e.id === target) ?? state.players.find(p => p.id === target);
+        if (!targetEntity) return;
+
+        if (update.action.type === "attack") {
+            let damage = update.action.value ?? 0;
+            targetEntity.stats.health -= damage;
+        } else if (update.action.type === "heal") {
+            let heal = update.action.value ?? 0;
+            targetEntity.stats.health = Math.min(targetEntity.stats.maxHealth, targetEntity.stats.health + heal);
+        } else {
+            /////////////////////////////////////////
+            /// special will go here eventually  ///
+            ///////////////////////////////////////
+        }
+    });
+
+    return state;
+}
 
 export async function combatTick(state: ICombatState): Promise<ICombatState> {
     let updates: EntityUpdates[] = [];
 
-    state.players.forEach(async (player: CombatEntity) => {
+    for (let i = 0; i < state.players.length; i++) {
+        const player = state.players[i];
         const playerEquipment: Equipment = await getEquipmentById(player.id);
         const baseStats: Record<string, Stat> = {
             "damage": { amount: player.stats.damage },
@@ -21,7 +49,8 @@ export async function combatTick(state: ICombatState): Promise<ICombatState> {
         };
         const attackStats = getModifiedStats(baseStats, playerEquipment);
 
-        state.entities.forEach((entity: CombatEntity) => {
+        for (let j = 0; j < state.entities.length; j++) {
+            const entity = state.entities[j];
             const playerDamage = damageCalculation(attackStats);
             const entityDefensePercent = defenseCalculation({ defense: entity.stats.defense });
 
@@ -59,8 +88,10 @@ export async function combatTick(state: ICombatState): Promise<ICombatState> {
                 }
             };
             updates.push(entUpdate);
-        });
-    });
+        }
+    }
 
-    return { tick: state.tick + 1, previousTick: Date.now(), entities: state.entities, players: state.players, updates };
+    const resolvedState = await resolveCombatUpdates({ tick: state.tick + 1, previousTick: Date.now(), entities: state.entities, players: state.players, updates })
+
+    return resolvedState;
 }

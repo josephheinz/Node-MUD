@@ -5,7 +5,7 @@ import type { UUID } from "node:crypto";
 import { cloneDeep } from "radashi";
 
 export function getEnemy(id: string): Enemy | null {
-    
+
     console.log(enemyRegistry)
     if (enemyRegistry[id]) return enemyRegistry[id];
     return null;
@@ -37,10 +37,10 @@ export function getCombatEnemy(enemy: {
     effects?: string[];
     aiModel?: string;
 }): Enemy {
-    console.log(enemy)
-    let cloned = getEnemy(enemy.enemyId)!
+    let regEnemy = getEnemy(enemy.enemyId)!
+    let cloned = cloneDeep(regEnemy)
 
-    cloned.stats = enemy.stats;
+    cloned.stats = { ...enemy.stats, maxHealth: regEnemy.stats.maxHealth };
 
     return cloned;
 }
