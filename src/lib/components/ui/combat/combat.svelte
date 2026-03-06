@@ -14,6 +14,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import type { CombatEntity, EntityUpdates, ICombatState } from '$lib/types/combat';
 	import type { UUID } from 'node:crypto';
+	import { enemyStatsToStatList, getModifiedStats } from '$lib/types/stats';
 
 	type RendererAPI = { spawnDamage: (amount: number, crit?: boolean) => void };
 
@@ -112,13 +113,22 @@
 			Instance: {instanceId}
 			<div class="flex h-full justify-stretch">
 				<section id="left" class="flex h-full flex-col items-center justify-center py-12">
-					{#each players as player (player.id)}
-						<PlayerRenderer
-							equipment={await getEquipmentById(player.id)}
-							name={(await getProfileById(player.id))?.username ?? player.id}
-							ref={(api) => entityMap.set(player.id, api)}
-						/>
-					{/each}
+					<svelte:boundary>
+						{#snippet pending()}
+							<span>loading</span>
+						{/snippet}
+						{#each players as player (player.id)}
+							{@const equipment = await getEquipmentById(player.id)}
+							{@const stats = getModifiedStats(enemyStatsToStatList(player.stats), equipment)}
+							<PlayerRenderer
+								equipment={await getEquipmentById(player.id)}
+								name={(await getProfileById(player.id))?.username ?? player.id}
+								ref={(api) => entityMap.set(player.id, api)}
+								health={stats.health.amount}
+								maxHealth={stats.maxHealth.amount}
+							/>
+						{/each}
+					</svelte:boundary>
 				</section>
 				<section id="right" class="grid h-full grow grid-cols-2 grid-rows-3 py-12">
 					{#each entities as enemy, index (enemy.id)}

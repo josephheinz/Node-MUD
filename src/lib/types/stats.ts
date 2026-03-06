@@ -1,5 +1,6 @@
 import { cloneDeep } from "radashi";
 import { computeItemStats, type Equipment, type EquipmentSlot, type Item } from "./item";
+import type { EnemyStats } from "./enemy";
 
 export type StatList = Record<string, Stat>;
 
@@ -44,6 +45,18 @@ export const Stats: Record<string, { icon: string; color: string; name: string; 
         icon: "֎",
         color: "#eb4034",
         name: "Damage"
+    }
+}
+
+export function enemyStatsToStatList(enemy: EnemyStats): StatList {
+    return {
+        health: { amount: enemy.health },
+        maxHealth: { amount: enemy.maxHealth },
+        strength: { amount: enemy.strength },
+        defense: { amount: enemy.defense },
+        critChance: { amount: enemy.critChance },
+        critDamage: { amount: enemy.critDamage },
+        damage: { amount: enemy.damage }
     }
 }
 

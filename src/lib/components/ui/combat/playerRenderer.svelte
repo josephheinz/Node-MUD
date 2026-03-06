@@ -1,16 +1,21 @@
 <script lang="ts">
 	import type { Equipment, EquipmentSlot } from '$lib/types/item';
+	import { formatNumber } from '$lib/utils/general';
 	import Progress from '../progress/progress.svelte';
 	import DamageSpawner from './damageSpawner.svelte';
 
 	const {
 		equipment,
 		name,
-		ref
+		ref,
+		health,
+		maxHealth
 	}: {
 		equipment: Equipment;
 		name: string;
 		ref?: (api: { spawnDamage: (amount: number, crit?: boolean) => void }) => void;
+		health: number;
+		maxHealth: number;
 	} = $props();
 
 	/* 	let equipment = $state(InitEquipment);
@@ -35,7 +40,13 @@
 
 <div class="relative flex size-max flex-col items-center justify-evenly gap-1 p-4">
 	<h1 class="text-md font-medium">{name}</h1>
-	<Progress value={100} max={100} class="w-full [&>*]:bg-rose-500" />
+	<div class="flex-col items-center justify-evenly gap-1">
+		<Progress value={health} max={maxHealth} class="min-w-32 grow-2 [&>*]:bg-rose-500" />
+		<div class="flex items-center justify-between">
+			<span class="shrink-1">{formatNumber(health, 'short')}</span>
+			<span>{formatNumber(maxHealth, 'short')}</span>
+		</div>
+	</div>
 	<div class="relative aspect-square w-24">
 		<img
 			src="/images/player.png"
