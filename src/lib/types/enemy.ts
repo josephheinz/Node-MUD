@@ -1,5 +1,5 @@
 import { parse } from "yaml";
-import type { ChanceItem } from "./action";
+import { normalizeXpKeys, type ChanceItem } from "./action";
 import type { SkillKey } from "./skills";
 
 export type EnemySize = "Small" | "Medium" | "Large" | "Huge";
@@ -31,6 +31,8 @@ export type Enemy = {
 
 export function parseYamlToEnemy(yamlString: string): Enemy {
     let enemy = parse(yamlString)[0];
+    const xp = enemy.xp ? normalizeXpKeys(enemy.xp) : undefined;
+
 
     const stats: EnemyStats = {
         health: enemy.stats.health,
@@ -48,7 +50,7 @@ export function parseYamlToEnemy(yamlString: string): Enemy {
         level: enemy.level,
         icon: enemy.icon,
         size: enemy.size,
-        drops: new Array<EnemyDrops>(enemy.drops ?? []),
+        drops: new Array<EnemyDrops>({ items: enemy.drops ?? [], xp }),
         stats
     }
 }

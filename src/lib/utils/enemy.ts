@@ -5,8 +5,6 @@ import type { UUID } from "node:crypto";
 import { cloneDeep } from "radashi";
 
 export function getEnemy(id: string): Enemy | null {
-
-    console.log(enemyRegistry)
     if (enemyRegistry[id]) return enemyRegistry[id];
     return null;
 }

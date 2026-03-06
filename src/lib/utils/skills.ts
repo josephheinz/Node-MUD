@@ -1,3 +1,4 @@
+import { PlayerSkills, type Skill, type SkillKey } from "$lib/types/skills";
 
 export function xpForLevel(level: number): number {
     // Tunable constants:
@@ -43,6 +44,13 @@ function buildXPTable(maxLevel = 120): Array<number> {
 
 export function cumulativeXPForLevel(level: number): number {
     return XP_TABLE[Math.max(0, level - 1)];
+}
+
+export function canonicalizeSkills(skills: Record<SkillKey, Skill>): Record<SkillKey, Skill> {
+    return {
+        ...PlayerSkills,
+        ...skills
+    };
 }
 
 export const XP_TABLE = buildXPTable(120);

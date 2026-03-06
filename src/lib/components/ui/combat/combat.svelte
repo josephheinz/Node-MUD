@@ -12,9 +12,16 @@
 	import Spinner from '../spinner/spinner.svelte';
 	import { useInterval } from 'runed';
 	import { onDestroy, onMount } from 'svelte';
-	import type { CombatEntity, EntityUpdates, ICombatState } from '$lib/types/combat';
+	import type {
+		CombatEntity,
+		EntityUpdates,
+		ICombatEndState,
+		ICombatState
+	} from '$lib/types/combat';
 	import type { UUID } from 'node:crypto';
 	import { enemyStatsToStatList, getModifiedStats } from '$lib/types/stats';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import CombatEndedDialog from './combatEndedDialog.svelte';
 
 	type RendererAPI = { spawnDamage: (amount: number, crit?: boolean) => void };
 
@@ -38,6 +45,9 @@
 
 	let entityMap = new Map<UUID, RendererAPI>();
 
+	let endedDialogOpen: boolean = $state(false);
+	let endedState: ICombatEndState | null = $state(null);
+
 	function runUpdates(updates: EntityUpdates[]) {
 		updates.forEach((update: EntityUpdates) => {
 			if (!update.action) return;
@@ -54,7 +64,7 @@
 
 	const tickInterval = useInterval(() => timeUntilNextTick, {
 		immediate: true,
-		immediateCallback: false,
+		immediateCallback: true,
 		callback: (_) => {
 			if (instanceId.trim() === '') return;
 			tickCombatInstance(instanceId).then((response) => {
@@ -63,12 +73,21 @@
 				}
 				console.log('combat ticking');
 				if (response.state) {
-					if (response.state.updates && currentTick != response.state.tick) {
+					if (
+						response.state.updates &&
+						currentTick != response.state.tick &&
+						response.state.ticking
+					) {
 						runUpdates(response.state.updates);
 					}
+
 					currentTick = response.state.tick;
 					console.log(response.state);
-					combatState = response.state;
+					combatState = response.state as ICombatState;
+
+					if (response.state.ended) {
+						endedDialogOpen = true;
+					}
 				}
 			});
 		}
@@ -85,10 +104,6 @@
 			});
 			loading = false;
 		});
-	});
-
-	$effect(() => {
-		console.log(entities);
 	});
 
 	onDestroy(() => {
@@ -108,48 +123,51 @@
 </svelte:boundary>
 
 {#snippet inInstance()}
-	<div class="absolute -m-4 grid size-full grid-cols-[3fr_1fr] grid-rows-[9fr_1fr]">
-		<main class="p-6">
-			Instance: {instanceId}
-			<div class="flex h-full justify-stretch">
-				<section id="left" class="flex h-full flex-col items-center justify-center py-12">
-					<svelte:boundary>
-						{#snippet pending()}
-							<span>loading</span>
-						{/snippet}
-						{#each players as player (player.id)}
-							{@const equipment = await getEquipmentById(player.id)}
-							{@const stats = getModifiedStats(enemyStatsToStatList(player.stats), equipment)}
-							<PlayerRenderer
-								equipment={await getEquipmentById(player.id)}
-								name={(await getProfileById(player.id))?.username ?? player.id}
-								ref={(api) => entityMap.set(player.id, api)}
-								health={stats.health.amount}
-								maxHealth={stats.maxHealth.amount}
-							/>
+	<Dialog.Root bind:open={endedDialogOpen}>
+		<div class="absolute -m-4 grid size-full grid-cols-[3fr_1fr] grid-rows-[9fr_1fr]">
+			<main class="p-6">
+				Instance: {instanceId}
+				<div class="flex h-full justify-stretch">
+					<section id="left" class="flex h-full flex-col items-center justify-center py-12">
+						<svelte:boundary>
+							{#snippet pending()}
+								<span>loading</span>
+							{/snippet}
+							{#each players as player (player.id)}
+								{@const equipment = await getEquipmentById(player.id)}
+								{@const stats = getModifiedStats(enemyStatsToStatList(player.stats), equipment)}
+								<PlayerRenderer
+									equipment={await getEquipmentById(player.id)}
+									name={(await getProfileById(player.id))?.username ?? player.id}
+									ref={(api) => entityMap.set(player.id, api)}
+									health={stats.health.amount}
+									maxHealth={stats.maxHealth.amount}
+								/>
+							{/each}
+						</svelte:boundary>
+					</section>
+					<section id="right" class="grid h-full grow grid-cols-2 grid-rows-3 py-12">
+						{#each entities as enemy, index}
+							{@const loadedEnemy = getCombatEnemy(enemy)}
+							<div class={enemyLayouts[index]}>
+								<EnemyRenderer enemy={loadedEnemy} ref={(api) => entityMap.set(enemy.id, api)} />
+							</div>
 						{/each}
-					</svelte:boundary>
-				</section>
-				<section id="right" class="grid h-full grow grid-cols-2 grid-rows-3 py-12">
-					{#each entities as enemy, index}
-						{@const loadedEnemy = getCombatEnemy(enemy)}
-						<div class={enemyLayouts[index]}>
-							<EnemyRenderer enemy={loadedEnemy} ref={(api) => entityMap.set(enemy.id, api)} />
-						</div>
-					{/each}
-				</section>
-			</div>
-		</main>
-		<aside class="flex flex-col justify-evenly gap-4 p-2">
-			<Equipment />
-			<Inventory />
-		</aside>
-		<footer
-			class="col-span-2 flex items-center justify-start gap-4 border-t-1 border-ring bg-card p-4"
-		>
-			a
-		</footer>
-	</div>
+					</section>
+				</div>
+			</main>
+			<aside class="flex flex-col justify-evenly gap-4 p-2">
+				<Equipment />
+				<Inventory />
+			</aside>
+			<footer
+				class="col-span-2 flex items-center justify-start gap-4 border-t-1 border-ring bg-card p-4"
+			>
+				a
+			</footer>
+		</div>
+		<CombatEndedDialog ended={endedState} />
+	</Dialog.Root>
 {/snippet}
 
 {#snippet emptyInstance()}

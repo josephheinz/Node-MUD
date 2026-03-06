@@ -7,6 +7,8 @@
     - id: slimeball
       min: 2
       max: 7
+  xp:
+    combat: 50
   stats:
     health: 10
     strength: 1

@@ -1,6 +1,8 @@
 import type { UUID } from "node:crypto";
 import type { StatList } from "./stats";
 import type { EnemyStats } from "./enemy";
+import type { Item } from "./item";
+import type { Skill, SkillKey } from "./skills";
 
 export type ActionType = "attack" | "heal" | "special";
 
@@ -37,5 +39,13 @@ export interface ICombatState {
     previousTick: number;
     entities: CombatEntity[];
     players: CombatEntity[];
+    ticking: boolean;
     updates?: EntityUpdates[];
+    ended?: ICombatEndState;
 };
+
+export interface ICombatEndState {
+    message: string;
+    drops?: Item[];
+    xp?: Record<SkillKey, Skill>;
+}

@@ -37,7 +37,7 @@ export type DBQueueAction = {
 	amount: number;
 };
 
-function normalizeXpKeys(xp: Record<string, number>): Record<SkillKey, number> {
+export function normalizeXpKeys(xp: Record<string, number>): Record<SkillKey, number> {
 	const out: Record<string, number> = {};
 
 	for (const [key, value] of Object.entries(xp)) {

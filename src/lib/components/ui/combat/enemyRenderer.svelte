@@ -29,7 +29,7 @@
 	});
 </script>
 
-<div class="relative flex aspect-square size-max flex-col items-center justify-evenly gap-1 p-4">
+<div class="relative flex aspect-square size-max flex-col items-center justify-evenly gap-1 p-4 m-auto">
 	{#if enemy.stats.health <= 0}
 		<div class="absolute z-10 flex size-full items-center justify-center opacity-100">
 			<Skull color="oklch(25.8% 0.092 26.042)" fill="oklch(57.7% 0.245 27.325)" size="64" />

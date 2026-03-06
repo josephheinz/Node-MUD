@@ -3,9 +3,43 @@ import { getModifiedStats, type Stat } from "$lib/types/stats";
 import { getEquipmentById } from "$lib/remote/equipment.remote";
 import type { Equipment } from "$lib/types/item";
 import { damageCalculation, defenseCalculation } from "$lib/utils/combat";
-import type { EntityUpdates, ICombatState } from "$lib/types/combat";
+import type { CombatEntity, EntityUpdates, ICombatEndState, ICombatState } from "$lib/types/combat";
+import { SECRET_supabase } from '$lib/auth/supabaseClient';
 
 export async function handleResolvedCombat(state: ICombatState): Promise<ICombatState> {
+    let deadEnemies: CombatEntity[] = [];
+    let deadPlayers: CombatEntity[] = [];
+
+    state.entities.forEach((entity) => {
+        if (entity.stats.health > 0) return;
+
+        deadEnemies.push(entity);
+    });
+
+    state.players.forEach((player) => {
+        if (player.stats.health > 0) return;
+
+        deadPlayers.push(player);
+    })
+
+    if (deadPlayers.length === state.players.length) {
+        state.ticking = false;
+        return {
+            ...state, ended: {
+                message: "Combat ended: all players dead"
+            }
+        };
+    }
+
+    if (deadEnemies.length === state.entities.length) {
+        state.ticking = false;
+        return {
+            ...state, ended: {
+                message: "Combat ended: all enemies dead"
+            }
+        };
+    }
+
     return state;
 }
 
@@ -26,7 +60,10 @@ export async function resolveCombatUpdates(state: ICombatState): Promise<ICombat
             let damage = update.action.value ?? 0;
             targetEntity.stats.health -= damage;
             if (targetEntity.stats.health <= 0) {
-                console.log("dead");
+                handleResolvedCombat(state).then((s) => {
+                    state = s;
+                    console.log(s)
+                });
             }
         } else if (update.action.type === "heal") {
             let heal = update.action.value ?? 0;
@@ -42,6 +79,8 @@ export async function resolveCombatUpdates(state: ICombatState): Promise<ICombat
 }
 
 export async function combatTick(state: ICombatState): Promise<ICombatState> {
+    if (state.ticking === false) return handleResolvedCombat(state);
+
     let updates: EntityUpdates[] = [];
 
     for (let i = 0; i < state.players.length; i++) {
@@ -98,7 +137,7 @@ export async function combatTick(state: ICombatState): Promise<ICombatState> {
         }
     }
 
-    const resolvedState = await resolveCombatUpdates({ tick: state.tick + 1, previousTick: Date.now(), entities: state.entities, players: state.players, updates })
+    const resolvedState = await resolveCombatUpdates({ tick: state.tick + 1, previousTick: Date.now(), entities: state.entities, players: state.players, updates, ticking: state.ticking })
 
     return resolvedState;
 }
