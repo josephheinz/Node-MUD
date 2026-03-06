@@ -3,7 +3,11 @@ import { getModifiedStats, type Stat } from "$lib/types/stats";
 import { getEquipmentById } from "$lib/remote/equipment.remote";
 import type { Equipment } from "$lib/types/item";
 import { damageCalculation, defenseCalculation } from "$lib/utils/combat";
-import type { CombatEntity, EntityUpdates, ICombatState } from "$lib/types/combat";
+import type { EntityUpdates, ICombatState } from "$lib/types/combat";
+
+export async function handleResolvedCombat(state: ICombatState): Promise<ICombatState> {
+    return state;
+}
 
 export async function resolveCombatUpdates(state: ICombatState): Promise<ICombatState> {
     if (!state.updates) return state;
@@ -21,6 +25,9 @@ export async function resolveCombatUpdates(state: ICombatState): Promise<ICombat
         if (update.action.type === "attack") {
             let damage = update.action.value ?? 0;
             targetEntity.stats.health -= damage;
+            if (targetEntity.stats.health <= 0) {
+                console.log("dead");
+            }
         } else if (update.action.type === "heal") {
             let heal = update.action.value ?? 0;
             targetEntity.stats.health = Math.min(targetEntity.stats.maxHealth, targetEntity.stats.health + heal);

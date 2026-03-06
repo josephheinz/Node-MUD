@@ -30,7 +30,7 @@
 	let combatState = $state<ICombatState | null>(null);
 
 	let instanceId: string = $state('');
-	let entities: CombatEntity[] = $derived(combatState?.entities ?? []);
+	let entities: CombatEntity[] = $derived.by(() => combatState?.entities ?? []);
 	let players: CombatEntity[] = $derived(combatState?.players ?? []);
 	let loading: boolean = $state(true);
 	let timeUntilNextTick: number = $state(10_000);
@@ -131,7 +131,7 @@
 					</svelte:boundary>
 				</section>
 				<section id="right" class="grid h-full grow grid-cols-2 grid-rows-3 py-12">
-					{#each entities as enemy, index (enemy.id)}
+					{#each entities as enemy, index}
 						{@const loadedEnemy = getCombatEnemy(enemy)}
 						<div class={enemyLayouts[index]}>
 							<EnemyRenderer enemy={loadedEnemy} ref={(api) => entityMap.set(enemy.id, api)} />
