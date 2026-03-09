@@ -86,7 +86,9 @@
 					combatState = response.state as ICombatState;
 
 					if (response.state.ended) {
+						endedState = response.state.ended;
 						endedDialogOpen = true;
+						timeUntilNextTick = 100_000_000_000;
 					}
 				}
 			});
@@ -101,6 +103,11 @@
 
 			getInstance(instanceId).then((instanceResponse) => {
 				if (instanceResponse != null) combatState = instanceResponse;
+				if (instanceResponse?.ended) {
+					endedState = instanceResponse.ended;
+					endedDialogOpen = true;
+					timeUntilNextTick = 100_000_000;
+				}
 			});
 			loading = false;
 		});

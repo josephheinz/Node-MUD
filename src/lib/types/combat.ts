@@ -47,5 +47,5 @@ export interface ICombatState {
 export interface ICombatEndState {
     message: string;
     drops?: Item[];
-    xp?: Record<SkillKey, Skill>;
+    xp?: Record<SkillKey, number>;
 }

@@ -92,54 +92,21 @@ export function capitalizeFirstLetter(str: string): string {
 	return String(str).charAt(0).toUpperCase() + String(str).slice(1);
 }
 
-export async function getInventory(id: string): Promise<Inventory> {
-	let inventory: DBItem[] = [];
 
-	const loadInventory = await fetch(`/api/inventory/${id}`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	})
-		.then(async (response) => {
-			let responseJson = await response.json();
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-			return responseJson;
-		})
-		.then(async (data) => {
-			inventory = data.inventory;
-		})
-		.catch((error) => {
-			console.error(error);
-		});
-	return Inventory.load(inventory);
-}
+export function safeCloneDeep<T>(obj: T, seen = new WeakMap()): T {
+	if (obj === null || typeof obj !== 'object') return obj;
+	if (seen.has(obj as object)) return seen.get(obj as object);
 
-export async function getEquipment(id: string): Promise<Equipment> {
-	// Load equipment
-	let equipment: DBEquipment = EmptyEquipment;
+	if ((obj as object).constructor !== Object && (obj as object).constructor !== Array) {
+		const instance = Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
+		seen.set(obj as object, instance);
+		return instance;
+	}
 
-	const loadEquipment = await fetch(`/api/equipment/${id}`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	})
-		.then(async (response) => {
-			let responseJson = await response.json();
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-			return responseJson;
-		})
-		.then(async (data) => {
-			equipment = data.equipment;
-		})
-		.catch((error) => {
-			console.error(error);
-		});
-
-	return Equipment.load(equipment);
+	const result: any = Array.isArray(obj) ? [] : {};
+	seen.set(obj as object, result);
+	for (const key of Object.keys(obj)) {
+		result[key] = safeCloneDeep((obj as any)[key], seen);
+	}
+	return result;
 }

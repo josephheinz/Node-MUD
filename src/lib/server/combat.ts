@@ -5,6 +5,11 @@ import type { Equipment } from "$lib/types/item";
 import { damageCalculation, defenseCalculation } from "$lib/utils/combat";
 import type { CombatEntity, EntityUpdates, ICombatEndState, ICombatState } from "$lib/types/combat";
 import { SECRET_supabase } from '$lib/auth/supabaseClient';
+import { getCombatEnemy, rollEnemyDrops } from '$lib/utils/enemy';
+import type { Skill, SkillKey } from '$lib/types/skills';
+import { emptyXpOutput } from '$lib/utils/action';
+import { clone } from 'radashi';
+import { tryStackItemInInventory } from '$lib/utils/item';
 
 export async function handleResolvedCombat(state: ICombatState): Promise<ICombatState> {
     let deadEnemies: CombatEntity[] = [];
@@ -33,9 +38,30 @@ export async function handleResolvedCombat(state: ICombatState): Promise<ICombat
 
     if (deadEnemies.length === state.entities.length) {
         state.ticking = false;
+        const dropsRaw = state.entities.map(e => rollEnemyDrops(getCombatEnemy(e)));
+        let drops = dropsRaw.flatMap(d => d.items);
+        const xpArray = dropsRaw.flatMap(d => d.xp);
+        let xp: Record<SkillKey, number> = clone(emptyXpOutput);
+        xpArray.forEach((val) => {
+            if (typeof val === 'object' && val !== null) {
+                Object.entries(val).forEach(([str, value]) => {
+                    const key = str as SkillKey;
+                    if (!xp[key]) xp[key] = 0;
+                    xp[key] += value;
+                });
+            }
+        });
+
+        let stackedDrops: typeof drops = [];
+        drops.forEach(item => {
+            const inv = tryStackItemInInventory(item, stackedDrops);
+            stackedDrops = inv.contents;
+        });
         return {
             ...state, ended: {
-                message: "Combat ended: all enemies dead"
+                message: "Combat ended: all enemies dead",
+                drops: stackedDrops,
+                xp
             }
         };
     }
