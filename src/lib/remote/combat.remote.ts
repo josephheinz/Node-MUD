@@ -65,10 +65,6 @@ export const tickCombatInstance = command(z.uuidv4(), async (id) => {
 
     const state = await combatTick(instance);
 
-    if (state) {
-
-    }
-
     const { error } = await locals.supabase
         .from("combat_instances")
         .update({

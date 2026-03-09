@@ -2,6 +2,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { StackableModifier } from '$lib/modifiers/basicModifiers';
 	import type { ICombatEndState } from '$lib/types/combat';
+	import { Inventory } from '$lib/types/item';
 	import ItemHover from '../chat/itemHover.svelte';
 
 	const { ended }: { ended: ICombatEndState | null } = $props();
@@ -14,7 +15,7 @@
 	<section>
 		<h2 class="text-lg font-semibold">Drops:</h2>
 		<div class="flex w-3/5 flex-col pl-4">
-			{#each ended?.drops as item}
+			{#each Inventory.load(ended?.drops ?? []).contents as item}
 				{@const stack: StackableModifier | null = item.modifiers.find(m => m.type === "Stackable") as StackableModifier}
 				<div class="flex items-center justify-start gap-2">
 					<span>{stack?.amount ?? 1}x</span>

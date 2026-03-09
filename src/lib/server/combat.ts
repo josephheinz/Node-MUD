@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { getModifiedStats, type Stat } from "$lib/types/stats";
 import { getEquipmentById } from "$lib/remote/equipment.remote";
-import type { Equipment } from "$lib/types/item";
+import type { DBItem, Equipment } from "$lib/types/item";
 import { damageCalculation, defenseCalculation } from "$lib/utils/combat";
 import type { CombatEntity, EntityUpdates, ICombatEndState, ICombatState } from "$lib/types/combat";
 import { SECRET_supabase } from '$lib/auth/supabaseClient';
@@ -53,14 +53,15 @@ export async function handleResolvedCombat(state: ICombatState): Promise<ICombat
         });
 
         let stackedDrops: typeof drops = [];
+        let serialStackedDrops: DBItem[] = [];
         drops.forEach(item => {
             const inv = tryStackItemInInventory(item, stackedDrops);
-            stackedDrops = inv.contents;
+            serialStackedDrops = inv.serialize();
         });
         return {
             ...state, ended: {
                 message: "Combat ended: all enemies dead",
-                drops: stackedDrops,
+                drops: serialStackedDrops,
                 xp
             }
         };

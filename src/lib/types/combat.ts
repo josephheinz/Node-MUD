@@ -1,7 +1,7 @@
 import type { UUID } from "node:crypto";
 import type { StatList } from "./stats";
 import type { EnemyStats } from "./enemy";
-import type { Item } from "./item";
+import type { DBItem, Item } from "./item";
 import type { Skill, SkillKey } from "./skills";
 
 export type ActionType = "attack" | "heal" | "special";
@@ -46,6 +46,6 @@ export interface ICombatState {
 
 export interface ICombatEndState {
     message: string;
-    drops?: Item[];
+    drops?: DBItem[];
     xp?: Record<SkillKey, number>;
 }
