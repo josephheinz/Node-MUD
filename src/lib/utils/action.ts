@@ -69,7 +69,8 @@ export type QueueCompletedData = {
 
 export const emptyXpOutput: Record<SkillKey, number> = {
 	"Mining": 0,
-	"Crafting": 0
+	"Crafting": 0,
+	"Combat": 0
 }
 
 function addXp(

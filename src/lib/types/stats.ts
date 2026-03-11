@@ -1,42 +1,62 @@
 import { cloneDeep } from "radashi";
 import { computeItemStats, type Equipment, type EquipmentSlot, type Item } from "./item";
+import type { EnemyStats } from "./enemy";
 
 export type StatList = Record<string, Stat>;
 
 export type Stat = {
     amount: number;
-    operation: "additive" | "multiplicative";
+    operation?: "additive" | "multiplicative";
 }
 
-export const Stats: Record<string, { icon: string; color: string }> = {
+export const Stats: Record<string, { icon: string; color: string; name: string; }> = {
     health: {
         icon: "♥",
-        color: "#6cf23f"
+        color: "#6cf23f",
+        name: "Health"
     },
     strength: {
         icon: "δ",
-        color: "#eb4034"
+        color: "#eb4034",
+        name: "Strength"
     },
     defense: {
         icon: "℧",
-        color: "#73c2fa"
+        color: "#73c2fa",
+        name: "Defense"
     },
 
-    "crit chance": {
+    critChance: {
         icon: "✧",
-        color: "#2a67b8"
+        color: "#2a67b8",
+        name: "Crit Chance"
     },
-    "crit damage": {
+    critDamage: {
         icon: "🕱",
-        color: "#2a67b8"
+        color: "#2a67b8",
+        name: "Crit Damage"
     },
     speed: {
         icon: "λ",
-        color: "white"
+        color: "white",
+        name: "Speed"
     },
     damage: {
         icon: "֎",
-        color: "#eb4034"
+        color: "#eb4034",
+        name: "Damage"
+    }
+}
+
+export function enemyStatsToStatList(enemy: EnemyStats): StatList {
+    return {
+        health: { amount: enemy.health },
+        maxHealth: { amount: enemy.maxHealth },
+        strength: { amount: enemy.strength },
+        defense: { amount: enemy.defense },
+        critChance: { amount: enemy.critChance },
+        critDamage: { amount: enemy.critDamage },
+        damage: { amount: enemy.damage }
     }
 }
 

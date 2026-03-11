@@ -9,11 +9,15 @@
 	import { initializeActionRegistry } from '$lib/types/action';
 	import { getUser } from '$lib/remote/auth.remote';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
+	import { initializeEnemyRegistry } from '$lib/types/enemy';
+	import { initializeModifierRegistry } from '$lib/modifiers/modifiersRegistry';
 
 	let { children }: { children: any } = $props();
 
 	initializeItemRegistry();
 	initializeActionRegistry();
+	initializeEnemyRegistry();
+	initializeModifierRegistry();
 </script>
 
 <svelte:boundary>
