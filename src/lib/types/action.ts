@@ -1,9 +1,8 @@
-import type { IconDefinition } from '@fortawesome/free-brands-svg-icons';
-import { faGem, faTools } from '@fortawesome/free-solid-svg-icons';
 import { parse } from 'yaml';
 import type { Skill, SkillKey } from './skills';
 import { cumulativeXPForLevel } from '$lib/utils/skills';
 import { capitalizeFirstLetter } from '$lib/utils/general';
+import { parseYamlToCombatAction, type CombatAction } from './combatAction';
 
 export type ActionInput = {
 	id: string;
@@ -74,6 +73,7 @@ export function parseYamlToAction(yamlString: string): Action {
 }
 
 export type ActionCategory = keyof typeof actionCategories;
+export type CombatCategory = keyof typeof combatActionCategories;
 
 export const actionCategories: Record<string, Array<string>> = {
 	Mining: ['mine_iron_ore', 'mine_gold_ore', 'mine_titanium_ore'],
@@ -81,12 +81,22 @@ export const actionCategories: Record<string, Array<string>> = {
 	Smelting: ['smelt_iron_bar', 'smelt_gold_bar', 'smelt_titanium_bar', 'smelt_hardened_titanium_bar']
 };
 
+export const combatActionCategories: Record<string, Array<string>> = {
+	Forest: ['combat_fight_slime']
+};
+
 export function getAction(id: string): Action | null {
 	if (actionRegistry[id]) return actionRegistry[id];
 	return null;
 }
 
+export function getCombatAction(id: string): CombatAction | null {
+	if (combatActionRegistry[id]) return combatActionRegistry[id];
+	return null;
+}
+
 export const actionRegistry: Record<string, Action> = {};
+export const combatActionRegistry: Record<string, CombatAction> = {};
 
 export function initializeActionRegistry() {
 	if (Object.keys(actionRegistry).length > 0) return;
@@ -99,6 +109,10 @@ export function initializeActionRegistry() {
 			.pop()!
 			.replace(/\.[^/.]+$/, '');
 		let _action = (actions[action] as any).default ?? actions[action];
-		actionRegistry[id] = parseYamlToAction(_action);
+		if (id.includes("combat_")) {
+			combatActionRegistry[id] = parseYamlToCombatAction(_action);
+		} else {
+			actionRegistry[id] = parseYamlToAction(_action);
+		}
 	}
 }

@@ -22,6 +22,7 @@
 	import { enemyStatsToStatList, getModifiedStats } from '$lib/types/stats';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import CombatEndedDialog from './combatEndedDialog.svelte';
+	import CombatActionSelect from './combatActionSelect.svelte';
 
 	type RendererAPI = { spawnDamage: (amount: number, crit?: boolean) => void };
 
@@ -71,7 +72,6 @@
 				if (response.nextTick) {
 					timeUntilNextTick = response.nextTick;
 				}
-				console.log('combat ticking');
 				if (response.state) {
 					if (
 						response.state.updates &&
@@ -95,11 +95,19 @@
 		}
 	});
 
-	onMount(() => {
-		console.log(entities);
+	function startCombat() {
+		loading = true;
+		combatState = null;
+		instanceId = '';
+		currentTick = 0;
+		entityMap = new Map<UUID, RendererAPI>();
+
 		getPlayerInstance().then((response) => {
 			if (response != null) instanceId = response;
-			else return;
+			else {
+				loading = false;
+				return;
+			}
 
 			getInstance(instanceId).then((instanceResponse) => {
 				if (instanceResponse != null) combatState = instanceResponse;
@@ -111,6 +119,10 @@
 			});
 			loading = false;
 		});
+	}
+
+	onMount(() => {
+		startCombat();
 	});
 
 	onDestroy(() => {
@@ -173,22 +185,23 @@
 				a
 			</footer>
 		</div>
-		<CombatEndedDialog ended={endedState} />
+		<CombatEndedDialog
+			ended={endedState}
+			id={instanceId as UUID}
+			modalClose={() => {
+				endedDialogOpen = false;
+				instanceId = '';
+			}}
+		/>
 	</Dialog.Root>
 {/snippet}
 
 {#snippet emptyInstance()}
-	<div class="flex size-full items-center justify-center">
-		<Empty.Root>
-			<Empty.Header>
-				<Empty.Media>
-					<Skull size="64" />
-				</Empty.Media>
-				<Empty.Title class="text-5xl font-black">Not in an instance</Empty.Title>
-				<Empty.Description>Go to the actions tab and queue some combat actions</Empty.Description>
-			</Empty.Header>
-		</Empty.Root>
-	</div>
+	<CombatActionSelect
+		actionSelected={() => {
+			startCombat();
+		}}
+	/>
 {/snippet}
 
 {#snippet loadingScreen()}

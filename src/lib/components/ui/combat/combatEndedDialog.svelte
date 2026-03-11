@@ -1,11 +1,18 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { StackableModifier } from '$lib/modifiers/basicModifiers';
+	import { exitCombatInstance } from '$lib/remote/combat.remote';
 	import type { ICombatEndState } from '$lib/types/combat';
 	import { Inventory } from '$lib/types/item';
+	import type { UUID } from 'node:crypto';
+	import Button from '../button/button.svelte';
 	import ItemHover from '../chat/itemHover.svelte';
 
-	const { ended }: { ended: ICombatEndState | null } = $props();
+	const {
+		ended,
+		id,
+		modalClose
+	}: { ended: ICombatEndState | null; id: UUID; modalClose: () => void } = $props();
 </script>
 
 <Dialog.Content>
@@ -36,4 +43,12 @@
 			{/if}
 		</div>
 	</section>
+	<Dialog.Footer>
+		<Button
+			onclick={() => {
+				void exitCombatInstance(id);
+				modalClose();
+			}}>Exit Combat</Button
+		>
+	</Dialog.Footer>
 </Dialog.Content>

@@ -89,7 +89,6 @@ export async function resolveCombatUpdates(state: ICombatState): Promise<ICombat
             if (targetEntity.stats.health <= 0) {
                 handleResolvedCombat(state).then((s) => {
                     state = s;
-                    console.log(s)
                 });
             }
         } else if (update.action.type === "heal") {

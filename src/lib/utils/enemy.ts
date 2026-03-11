@@ -23,8 +23,6 @@ export function getEnemyData(enemy: Enemy): ITooltipData {
         recordized[name] = val;
 
         if (name === "maxHealth") return;
-        let statThing = Stats[name];
-        console.log(statThing, name);
 
         statString += `<span class="color:${Stats[name].color};">${Stats[name].icon} ${Stats[name].name}: ${val}</span></br>`
     })
