@@ -1,13 +1,14 @@
 import { command, form, getRequestEvent, query } from '$app/server';
-import { getAction, type DBQueueAction } from '$lib/types/action';
-import { getQueueProgress, processQueueUntilNow } from '$lib/utils/action';
+import { getAction, type DBQueueAction, type ActionInput } from '$lib/types/action';
+import { getQueueProgress, processQueueUntilNow, getInventoryCounts } from '$lib/utils/action';
 import { redirect } from '@sveltejs/kit';
 import * as z from 'zod';
 import { getInventory } from './inventory.remote';
 import { Inventory } from '$lib/types/item';
-import { encodeDBItem, tryStackItemInInventory } from '$lib/utils/item';
+import { encodeDBItem, tryStackItemInInventory, loadDbItem } from '$lib/utils/item';
 import type { SkillKey } from '$lib/types/skills';
 import { getSkills } from './skills.remote';
+import { StackableModifier } from '$lib/modifiers/basicModifiers';
 
 
 export const getQueue = query(async () => {
@@ -40,17 +41,15 @@ export const getQueue = query(async () => {
 	const currentStartedAt = data.started_at ? new Date(data.started_at) : new Date(Date.now());
 	const result = processQueueUntilNow(queue, currentStartedAt);
 
-	if (result.completed.length > 0) {
+	if (result.totalOutputs.items.length > 0 || Object.values(result.totalOutputs.xp).some(v => v > 0)) {
 		let updatedInv = await getInventory();
 		let skillData = await getSkills();
 
-		result.completed.forEach((completion) => {
-			completion.outputs.items.forEach(item => {
-				updatedInv = new Inventory(tryStackItemInInventory(item, updatedInv).contents);
-			});
-			Object.entries(completion.outputs.xp).forEach(([skill, value]) => {
-				skillData[skill as SkillKey].xp += value;
-			});
+		result.totalOutputs.items.forEach(item => {
+			updatedInv = new Inventory(tryStackItemInInventory(item, updatedInv).contents);
+		});
+		Object.entries(result.totalOutputs.xp).forEach(([skill, value]) => {
+			skillData[skill as SkillKey].xp += value;
 		});
 
 		await supabase
@@ -86,13 +85,7 @@ export const getQueue = query(async () => {
 	return {
 		queue: result.queue,
 		currentActionStartedAt: result.queue.length > 0 ? result.currentActionStart : null,
-		completed: result.completed.map(completion => ({
-			actionId: completion.id,
-			amount: completion.amount,
-			outputs: {
-				items: completion.outputs.items.map(item => encodeDBItem(item))
-			}
-		})),
+		completed: [],
 		progress: progress.progress,
 		nextPollIn: progress.nextPollIn,
 		estimatedCompletion: progress.estimatedCompletion,
@@ -111,8 +104,44 @@ export const queueAction = form(queueActionSchema, async (data) => {
 	const { user, supabase } = locals;
 
 	if (!user) redirect(307, '/');
-	if (!getAction(data.id)) throw new Error(`Invalid action id: ${data.id}`);
+	const action = getAction(data.id);
+	if (!action) throw new Error(`Invalid action id: ${data.id}`);
+
+	data.amount = Math.floor(data.amount);
 	const id = user.id;
+
+	// Get current inventory
+	let currentInventory = await getInventory();
+
+	// Consume inputs
+	for (const input of action.inputs) {
+		const required = input.amount * data.amount;
+		let remaining = required;
+
+		const matchingItems = currentInventory.contents.filter(i => i.id === input.id);
+		for (const item of matchingItems) {
+			if (remaining <= 0) break;
+			const stackMod = item.modifiers.find(m => m.type === 'Stackable') as StackableModifier;
+			if (stackMod) {
+				const toRemove = Math.min(remaining, stackMod.amount);
+				stackMod.amount -= toRemove;
+				remaining -= toRemove;
+				if (stackMod.amount <= 0) {
+					currentInventory.contents.splice(currentInventory.contents.indexOf(item), 1);
+				}
+			} else {
+				currentInventory.contents.splice(currentInventory.contents.indexOf(item), 1);
+				remaining--;
+			}
+		}
+		if (remaining > 0) throw new Error(`Not enough ${input.id} required: ${required}, available: ${required - remaining}`);
+	}
+
+	// Update inventory in DB
+	await supabase
+		.from("inventories")
+		.update({ inventory_data: currentInventory.serialize() })
+		.eq("player_id", id);
 
 	const { data: currentQueue, error } = await supabase
 		.from('actions')

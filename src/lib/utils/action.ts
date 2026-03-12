@@ -82,19 +82,18 @@ function addXp(
 	}
 }
 
-export function processQueueUntilNow(queue: DBQueueAction[], currentActionStart: Date): { queue: DBQueueAction[]; completed: QueueCompletedData[]; currentActionStart: number } {
+export function processQueueUntilNow(queue: DBQueueAction[], currentActionStart: Date): { queue: DBQueueAction[]; totalOutputs: { items: Item[], xp: Record<SkillKey, number> }; currentActionStart: number } {
 	const now = Date.now();
 	const currentActionTime: number = currentActionStart.getTime();
 	const elapsed = now - currentActionTime;
 
-	let outputs: { items: Item[], xp: Record<SkillKey, number> } = { items: [], xp: cloneDeep(emptyXpOutput) };
+	let totalOutputs: { items: Item[], xp: Record<SkillKey, number> } = { items: [], xp: cloneDeep(emptyXpOutput) };
 	let timeUsed: number = 0;
-	let completed: QueueCompletedData[] = [];
 
 	do {
 		let dbAction = queue[0];
 		let action: Action = getAction(dbAction.id)!;
-
+		console.log(action)
 		const actionTimeMS = action.time * 1000;
 
 		if (timeUsed + actionTimeMS > elapsed) break;
@@ -103,15 +102,13 @@ export function processQueueUntilNow(queue: DBQueueAction[], currentActionStart:
 
 		dbAction.amount--;
 
-		outputs = { items: [...outputs.items, ...completeAction(action).items], xp: { ...outputs.xp, ...completeAction(action).xp } };
-
-		completed.push({
-			...dbAction,
-			outputs
+		let actionOutputs = completeAction(action);
+		actionOutputs.items.forEach(item => {
+			totalOutputs.items = tryStackItemInInventory(item, totalOutputs.items).contents;
 		});
+		addXp(totalOutputs.xp, actionOutputs.xp);
 
 		if (dbAction.amount <= 0) {
-			outputs.items.length = 0;
 			queue.shift();
 		}
 
@@ -119,8 +116,7 @@ export function processQueueUntilNow(queue: DBQueueAction[], currentActionStart:
 
 	const newStartedAt = currentActionTime + timeUsed;
 
-
-	return { queue, completed, currentActionStart: newStartedAt };
+	return { queue, totalOutputs, currentActionStart: newStartedAt };
 }
 
 export function getQueueProgress(
