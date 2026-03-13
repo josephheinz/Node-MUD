@@ -6,7 +6,7 @@
 <div class="grid size-full grid-cols-4 grid-rows-4 gap-2">
 	<svelte:boundary>
 		{#snippet failed(error, reset)}
-			<button onclick={reset}>oops! try again</button>
+			<button onclick={reset}>{error}</button>
 		{/snippet}
 		<Reforger />
 		<Enhancer />

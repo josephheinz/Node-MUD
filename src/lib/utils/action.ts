@@ -93,7 +93,7 @@ export function processQueueUntilNow(queue: DBQueueAction[], currentActionStart:
 	do {
 		let dbAction = queue[0];
 		let action: Action = getAction(dbAction.id)!;
-		console.log(action)
+
 		const actionTimeMS = action.time * 1000;
 
 		if (timeUsed + actionTimeMS > elapsed) break;

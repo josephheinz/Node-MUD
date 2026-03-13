@@ -351,7 +351,6 @@ export function addEnchantments(item: Item, enchants: Enchantment[]): Item {
 	const reforgeGroup: ReforgeGroup | undefined = (
 		item.modifiers.find((m) => m.type === 'Reforgeable') as ReforgeableModifier
 	).group as ReforgeGroup;
-	console.log("Hello Joe");
 
 	const enchantMod: EnchantmentModifier | undefined = item.modifiers.find(
 		(m) => m.type === 'Enchantment'
@@ -444,8 +443,6 @@ export function combineEnchantments(
 			return;
 		}
 	});
-
-	console.log("Get Shrek'd Loser")
 
 	return updatedEnchants;
 }

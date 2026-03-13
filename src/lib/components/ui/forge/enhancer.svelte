@@ -16,6 +16,10 @@
 
 	let enhancer: Item | undefined;
 	let item: Item | undefined;
+	const allItems: Item[] = [
+		...(await getInventory()).contents,
+		...(await getEquipment()).toArray()
+	];
 
 	function reforgeableFilter(item: Item): boolean {
 		if (!selectedItem && !selectedEnhancer) {
@@ -145,7 +149,9 @@
 						</div>
 
 						{#if output}
-							<ItemRenderer item={output} />
+							<div class="col-start-2">
+								<ItemRenderer item={output} />
+							</div>
 						{:else}
 							<div
 								class="col-start-2 flex size-16 items-center justify-center rounded-md border-2 border-border bg-border p-2 text-xs select-none"
@@ -162,7 +168,6 @@
 </Collapsible.Root>
 
 {#if selectMenuOpened}
-	{@const allItems = [...(await getInventory()).contents, ...(await getEquipment()).toArray()]}
 	<ItemSelectMenu
 		items={allItems}
 		x={mouseX}
@@ -187,7 +192,7 @@
 		{/key}
 	{:else}
 		<button
-			class="flex size-16 flex-col items-center justify-center rounded-md border-2 border-border bg-border p-2 text-xs select-none"
+			class="flex size-16 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-border bg-border p-2 text-xs select-none"
 			{onclick}
 		>
 			<span>Select</span>

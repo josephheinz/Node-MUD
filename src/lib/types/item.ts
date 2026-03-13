@@ -345,6 +345,11 @@ export class Equipment {
 			['Hands', this._hands]
 		];
 	}
+
+	public toArray(): Array<Item> {
+		return this.export().map(inner => inner[1])
+			.filter(value => value != null);
+	}
 }
 
 export type DBEquipment = {
