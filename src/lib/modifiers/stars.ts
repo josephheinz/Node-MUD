@@ -24,7 +24,7 @@ export class StarsModifier implements IItemModifier {
 	}
 
 	modifyName(baseName: string): string {
-		const tier = Math.floor((this.stars - 1) / 5); // 0-based tier
+		const tier = Math.floor((this.stars - 1) / 5) - 1; // 0-based tier
 		const inTier = ((this.stars - 1) % 5) + 1; // 1–5 progress
 
 		const currentColor = STAR_COLORS[Math.min(tier + 1, STAR_COLORS.length - 1)];
@@ -37,9 +37,11 @@ export class StarsModifier implements IItemModifier {
 			result += `<span style="color:${currentColor}">✪</span>`;
 		}
 
-		// remaining stars (previous tier)
-		for (let i = inTier; i < 5; i++) {
-			result += `<span style="color:${previousColor}">✪</span>`;
+		if (tier > 0) {
+			// remaining stars (previous tier)
+			for (let i = inTier; i < 5; i++) {
+				result += `<span style="color:${previousColor}">✪</span>`;
+			}
 		}
 
 		if (tier > 4)
