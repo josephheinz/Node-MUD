@@ -78,7 +78,7 @@ export type CombatCategory = keyof typeof combatActionCategories;
 export const actionCategories: Record<string, Array<string>> = {
 	Mining: ['mine_iron_ore', 'mine_gold_ore', 'mine_titanium_ore'],
 	Crafting: ['craft_iron_sword', 'craft_gold_sword', 'craft_titanium_sword', 'craft_iron_shield'],
-	Smelting: ['smelt_iron_bar', 'smelt_gold_bar', 'smelt_titanium_bar', 'smelt_hardened_titanium_bar']
+	Smelting: ['smelt_iron_bar', 'smelt_gold_bar', 'smelt_titanium_bar', 'smelt_hardened_titanium_bar', 'smelt_mithril_bar']
 };
 
 export const combatActionCategories: Record<string, Array<string>> = {

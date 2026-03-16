@@ -1,0 +1,20 @@
+- id: smelt_mithril_bar
+  name: Mithril Bar
+  icon:
+    image: 'images/items/materials/crafting/bars/mithrilBar.png'
+    color: '#bdbdbd'
+  req:
+    skill: 'Crafting'
+    level: 10
+  inputs:
+    - id: mithril_ore
+      amount: 2
+    - id: hardened_titanium_bar
+      amount: 1
+  outputs:
+    - id: mithril_bar
+      min: 1
+      max: 1
+  xp:
+    crafting: 25
+  time: 10

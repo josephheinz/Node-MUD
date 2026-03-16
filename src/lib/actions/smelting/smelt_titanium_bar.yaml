@@ -5,7 +5,7 @@
     color: '#bdbdbd'
   req:
     skill: 'Crafting'
-    level: 10
+    level: 5
   inputs:
     - id: titanium_ore
       amount: 2

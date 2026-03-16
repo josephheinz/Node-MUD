@@ -5,7 +5,7 @@
     color: '#bdbdbd'
   req:
     skill: 'Crafting'
-    level: 15
+    level: 5
   inputs:
     - id: titanium_bar
       amount: 1
