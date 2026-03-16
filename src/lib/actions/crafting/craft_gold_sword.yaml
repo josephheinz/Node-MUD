@@ -1,7 +1,7 @@
 - id: craft_gold_sword
   name: Gold Sword
   icon:
-    image: '/images/actions/swordMold.svg'
+    image: '/images/items/weapons/swords/goldSword.png'
     color: '#bdbdbd'
   req:
     skill: 'Crafting'

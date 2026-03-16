@@ -1,7 +1,7 @@
 - id: craft_titanium_sword
   name: Titanium Sword
   icon:
-    image: '/images/actions/swordMold.svg'
+    image: '/images/items/weapons/swords/titaniumSword.png'
     color: '#bdbdbd'
   req:
     skill: 'Crafting'

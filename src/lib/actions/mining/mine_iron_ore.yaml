@@ -1,7 +1,7 @@
 - id: mine_iron_ore
   name: Iron Ore
   icon:
-    image: "/images/actions/miner.svg"
+    image: "/images/items/materials/crafting/ores/ironOre.png"
     color: "#bdbdbd"
   req:
     skill: "Mining"

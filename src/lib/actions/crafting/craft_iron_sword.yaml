@@ -1,7 +1,7 @@
 - id: craft_iron_sword
   name: Iron Sword
   icon:
-    image: '/images/actions/swordMold.svg'
+    image: '/images/items/weapons/swords/ironSword.png'
     color: '#bdbdbd'
   req:
     skill: 'Crafting'

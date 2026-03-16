@@ -1,7 +1,7 @@
 - id: mine_titanium_ore
   name: Titanium Ore
   icon:
-    image: "/images/actions/miner.svg"
+    image: "/images/items/materials/crafting/ores/titaniumOre.png"
     color: "#bdbdbd"
   req:
     skill: "Mining"

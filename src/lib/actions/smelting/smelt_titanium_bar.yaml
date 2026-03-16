@@ -1,7 +1,7 @@
 - id: smelt_titanium_bar
   name: Titanium Bar
   icon:
-    image: '/images/actions/foundryBucket.svg'
+    image: 'images/items/materials/crafting/bars/titaniumBar.png'
     color: '#bdbdbd'
   req:
     skill: 'Crafting'

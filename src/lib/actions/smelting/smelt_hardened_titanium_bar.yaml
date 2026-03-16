@@ -1,7 +1,7 @@
 - id: smelt_hardened_titanium_bar
   name: Hardened Titanium Bar
   icon:
-    image: '/images/actions/foundryBucket.svg'
+    image: 'images/items/materials/crafting/bars/hardenedTitaniumBar.png'
     color: '#bdbdbd'
   req:
     skill: 'Crafting'

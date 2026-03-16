@@ -1,7 +1,7 @@
 - id: smelt_iron_bar
   name: Iron Bar
   icon:
-    image: '/images/actions/foundryBucket.svg'
+    image: 'images/items/materials/crafting/bars/ironBar.png'
     color: '#bdbdbd'
   req:
     skill: 'Crafting'

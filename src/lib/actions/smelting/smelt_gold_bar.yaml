@@ -1,7 +1,7 @@
 - id: smelt_gold_bar
   name: Gold Bar
   icon:
-    image: '/images/actions/foundryBucket.svg'
+    image: 'images/items/materials/crafting/bars/goldBar.png'
     color: '#bdbdbd'
   req:
     skill: 'Crafting'
