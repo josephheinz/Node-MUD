@@ -1,0 +1,13 @@
+- id: mithril_leggings
+  name: Mithril Leggings
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/mithril/mithrilLeggings.png"
+  rarity: Rare
+  stats:
+    defense: 15
+  modifiers:
+    - type: Equippable
+      slot: legs
+    - type: Reforgeable
+      group: Armor

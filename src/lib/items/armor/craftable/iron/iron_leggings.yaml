@@ -1,0 +1,13 @@
+- id: iron_leggings
+  name: Iron Leggings
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/iron/ironLeggings.png"
+  rarity: Common
+  stats:
+    defense: 5
+  modifiers:
+    - type: Equippable
+      slot: legs
+    - type: Reforgeable
+      group: Armor

@@ -1,0 +1,13 @@
+- id: iron_helmet
+  name: Iron Helmet
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/iron/ironHelmet.png"
+  rarity: Common
+  stats:
+    defense: 5
+  modifiers:
+    - type: Equippable
+      slot: head
+    - type: Reforgeable
+      group: Armor

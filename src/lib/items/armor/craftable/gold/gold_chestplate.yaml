@@ -1,0 +1,13 @@
+- id: gold_chestplate
+  name: Gold Chestplate
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/gold/goldChestplate.png"
+  rarity: Common
+  stats:
+    defense: 12
+  modifiers:
+    - type: Equippable
+      slot: body
+    - type: Reforgeable
+      group: Armor

@@ -1,0 +1,13 @@
+- id: mithril_chestplate
+  name: Mithril Chestplate
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/mithril/mithrilChestplate.png"
+  rarity: Rare
+  stats:
+    defense: 25
+  modifiers:
+    - type: Equippable
+      slot: body
+    - type: Reforgeable
+      group: Armor

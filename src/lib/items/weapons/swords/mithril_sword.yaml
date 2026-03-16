@@ -1,0 +1,13 @@
+- id: mithril_sword
+  name: Mithril Sword
+  icon:
+    ascii: "𐕣"
+    image: "/images/items/weapons/swords/mithrilSword.png"
+  rarity: Rare
+  stats:
+    damage: 40
+  modifiers:
+    - type: Equippable
+      slot: mainhand
+    - type: Reforgeable
+      group: Sword

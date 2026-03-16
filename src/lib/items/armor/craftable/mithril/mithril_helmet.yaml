@@ -1,0 +1,13 @@
+- id: mithril_helmet
+  name: Mithril Helmet
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/mithril/mithrilHelmet.png"
+  rarity: Rare
+  stats:
+    defense: 15
+  modifiers:
+    - type: Equippable
+      slot: head
+    - type: Reforgeable
+      group: Armor

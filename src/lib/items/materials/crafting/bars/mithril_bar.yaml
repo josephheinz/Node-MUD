@@ -1,0 +1,10 @@
+- id: mithril_bar
+  name: Mithril Bar
+  icon:
+    ascii: "="
+    image: "/images/items/materials/crafting/bars/mithrilBar.png"
+  rarity: Rare
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 1000

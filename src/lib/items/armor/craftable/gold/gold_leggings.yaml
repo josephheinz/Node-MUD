@@ -1,0 +1,13 @@
+- id: gold_leggings
+  name: Gold Leggings
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/gold/goldLeggings.png"
+  rarity: Common
+  stats:
+    defense: 8
+  modifiers:
+    - type: Equippable
+      slot: legs
+    - type: Reforgeable
+      group: Armor

@@ -1,0 +1,13 @@
+- id: gold_helmet
+  name: Gold Helmet
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/gold/goldHelmet.png"
+  rarity: Common
+  stats:
+    defense: 8
+  modifiers:
+    - type: Equippable
+      slot: head
+    - type: Reforgeable
+      group: Armor

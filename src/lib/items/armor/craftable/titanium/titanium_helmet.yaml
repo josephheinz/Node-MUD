@@ -1,0 +1,13 @@
+- id: titanium_helmet
+  name: Titanium Helmet
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/titanium/titaniumHelmet.png"
+  rarity: Uncommon
+  stats:
+    defense: 10
+  modifiers:
+    - type: Equippable
+      slot: head
+    - type: Reforgeable
+      group: Armor

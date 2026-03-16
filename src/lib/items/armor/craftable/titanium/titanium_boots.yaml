@@ -1,0 +1,13 @@
+- id: titanium_boots
+  name: Titanium Boots
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/titanium/titaniumBoots.png"
+  rarity: Uncommon
+  stats:
+    defense: 10
+  modifiers:
+    - type: Equippable
+      slot: legs
+    - type: Reforgeable
+      group: Armor

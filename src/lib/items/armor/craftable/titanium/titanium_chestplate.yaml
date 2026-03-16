@@ -1,0 +1,13 @@
+- id: titanium_chestplate
+  name: Titanium Chestplate
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/titanium/titaniumChestplate.png"
+  rarity: Uncommon
+  stats:
+    defense: 15
+  modifiers:
+    - type: Equippable
+      slot: body
+    - type: Reforgeable
+      group: Armor

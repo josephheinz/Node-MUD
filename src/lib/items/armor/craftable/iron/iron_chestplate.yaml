@@ -1,0 +1,13 @@
+- id: iron_chestplate
+  name: Iron Chestplate
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/iron/ironChestplate.png"
+  rarity: Common
+  stats:
+    defense: 10
+  modifiers:
+    - type: Equippable
+      slot: body
+    - type: Reforgeable
+      group: Armor

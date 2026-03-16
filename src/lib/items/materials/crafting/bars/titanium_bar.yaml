@@ -3,7 +3,7 @@
   icon:
     ascii: "="
     image: "/images/items/materials/crafting/bars/titaniumBar.png"
-  rarity: Rare
+  rarity: Uncommon
   modifiers:
     - type: Stackable
       amount: 1

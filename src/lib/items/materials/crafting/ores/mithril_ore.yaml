@@ -1,0 +1,10 @@
+- id: mithril_ore
+  name: Mithril Ore
+  icon:
+    ascii: '🪨'
+    image: '/images/items/materials/crafting/ores/mithrilOre.png'
+  rarity: Uncommon
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000
