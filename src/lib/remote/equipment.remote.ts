@@ -10,7 +10,7 @@ import {
 	type IItemModifier,
 	type Item
 } from '$lib/types/item';
-import { canonicalizeDbItem, determineSlot, loadDbItem } from '$lib/utils/item';
+import { canonicalizeDbItem, compareDbItems, determineSlot, loadDbItem } from '$lib/utils/item';
 import { error, redirect } from '@sveltejs/kit';
 import { isEqual } from 'radashi';
 import * as z from 'zod';
@@ -179,27 +179,17 @@ export const equip = command(equipRequestSchema, async ({ id, dbItem }) => {
 		equipment_data: DBEquipment;
 	};
 
-	const dbItemIndex = inventory_data.findIndex((i) => {
-		const sortedI: DBItem = {
-			...i,
-			modifiers: [...(i.modifiers ?? [])].sort()
-		};
-
-		const sortedDbItem: DBItem = {
-			...dbItem,
-			modifiers: [...(dbItem.modifiers ?? [])].sort()
-		};
-
-		return isEqual(sortedI, sortedDbItem);
-	});
+	const dbItemIndex = inventory_data.findIndex(i => compareDbItems(i, dbItem));
 	if (dbItemIndex === -1) return error(404);
-
-	inventory_data.splice(dbItemIndex, 1);
 
 	const item: Item = loadDbItem(dbItem);
 
 	const slot: EquipmentSlot | undefined = determineSlot(item);
 	if (!slot) return error(404, "Item not equippable");
+
+	const { inventory_data: inv, equipment_data: eq } = await unequip({ id, slot });
+
+	inv.splice(dbItemIndex, 1);
 
 	// Update equipment slot with proper item
 	if (equipment_data[slot]) {
@@ -213,7 +203,7 @@ export const equip = command(equipRequestSchema, async ({ id, dbItem }) => {
 
 	const { error: updateError } = await supabase
 		.from('inventories')
-		.update({ inventory_data, equipment_data })
+		.update({ inventory_data: inv, equipment_data })
 		.eq('player_id', id);
 
 	if (updateError) return error(500, updateError.message);

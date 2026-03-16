@@ -5,8 +5,6 @@
 	import Inventory from '../character/inventory.svelte';
 	import EnemyRenderer from './enemyRenderer.svelte';
 	import PlayerRenderer from './playerRenderer.svelte';
-	import * as Empty from '$lib/components/ui/empty';
-	import { Skull } from '@lucide/svelte';
 	import { getInstance, getPlayerInstance, tickCombatInstance } from '$lib/remote/combat.remote';
 	import { getCombatEnemy } from '$lib/utils/enemy';
 	import Spinner from '../spinner/spinner.svelte';
