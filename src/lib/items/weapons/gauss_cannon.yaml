@@ -1,0 +1,16 @@
+- id: gauss_cannon
+  name: Gauss Cannon
+  icon:
+    ascii: 'g'
+    image: '/images/items/weapons/gaussCannon.png'
+  rarity: Legendary
+  stats:
+    damage: 250
+    critDamage: 200
+    critChance: 25
+    strength: 50
+  modifiers:
+    - type: Equippable
+      slot: mainhand
+    - type: Reforgeable
+      group: Sword
