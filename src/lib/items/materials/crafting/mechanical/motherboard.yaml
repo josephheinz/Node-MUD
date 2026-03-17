@@ -1,0 +1,10 @@
+- id: motherboard
+  name: Motherboard
+  icon:
+    ascii: '🪨'
+    image: '/images/items/materials/crafting/mechanical/motherboard.png'
+  rarity: Epic
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 500

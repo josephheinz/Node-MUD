@@ -1,0 +1,10 @@
+- id: spring
+  name: Spring
+  icon:
+    ascii: '🪨'
+    image: '/images/items/materials/crafting/mechanical/spring.png'
+  rarity: Common
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000

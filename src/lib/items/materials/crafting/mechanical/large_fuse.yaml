@@ -1,0 +1,10 @@
+- id: large_fuse
+  name: Large Fuse
+  icon:
+    ascii: '🪨'
+    image: '/images/items/materials/crafting/mechanical/largeFuse.png'
+  rarity: Rare
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 1000

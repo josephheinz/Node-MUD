@@ -94,7 +94,8 @@ export const Reforges: Record<string, IReforge> = {
 export const ReforgeGroups: Record<string, IReforge[]> = {
 	Sword: [Reforges.Sharp, Reforges.Heroic],
 	Armor: [Reforges.Hardened],
-	Jewelry: []
+	Jewelry: [],
+	Material: []
 };
 
 export function rollReforge(group: ReforgeGroup): IReforge {

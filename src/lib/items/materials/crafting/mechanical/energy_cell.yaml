@@ -1,0 +1,10 @@
+- id: energy_cell
+  name: Energy Cell
+  icon:
+    ascii: '⚡'
+    image: '/images/items/materials/crafting/mechanical/energyCell.png'
+  rarity: Legendary
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 100

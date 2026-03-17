@@ -1,0 +1,10 @@
+- id: infrared_sensor
+  name: Infrared Sensor
+  icon:
+    ascii: '🪨'
+    image: '/images/items/materials/crafting/mechanical/infraredSensor.png'
+  rarity: Epic
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 500

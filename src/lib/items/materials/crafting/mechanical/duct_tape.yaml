@@ -1,0 +1,10 @@
+- id: duct_tape
+  name: Duct Tape
+  icon:
+    ascii: 'δ'
+    image: '/images/items/materials/crafting/mechanical/ductTape.png'
+  rarity: Uncommon
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000

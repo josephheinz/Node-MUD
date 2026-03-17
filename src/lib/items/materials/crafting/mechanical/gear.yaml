@@ -1,0 +1,10 @@
+- id: gear
+  name: Gear
+  icon:
+    ascii: '⚙️'
+    image: '/images/items/materials/crafting/mechanical/gear.png'
+  rarity: Common
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000

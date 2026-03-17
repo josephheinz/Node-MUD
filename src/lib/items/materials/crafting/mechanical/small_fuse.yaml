@@ -1,0 +1,10 @@
+- id: small_fuse
+  name: Small Fuse
+  icon:
+    ascii: '🪨'
+    image: '/images/items/materials/crafting/mechanical/smallFuse.png'
+  rarity: Common
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000

@@ -1,0 +1,10 @@
+- id: large_battery
+  name: Large Battery
+  icon:
+    ascii: '🪨'
+    image: '/images/items/materials/crafting/mechanical/largeBattery.png'
+  rarity: Epic
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 500

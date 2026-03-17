@@ -1,0 +1,10 @@
+- id: heat_sink
+  name: Heat Sink
+  icon:
+    ascii: '🪨'
+    image: '/images/items/materials/crafting/mechanical/heatSink.png'
+  rarity: Rare
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 5000

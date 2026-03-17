@@ -1,0 +1,10 @@
+- id: mechanical_eye
+  name: Mechanical Eye
+  icon:
+    ascii: '.'
+    image: '/images/items/materials/crafting/mechanical/mechanicalEye.png'
+  rarity: Legendary
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 50
