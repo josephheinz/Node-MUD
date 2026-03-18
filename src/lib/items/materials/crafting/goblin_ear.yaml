@@ -1,0 +1,10 @@
+- id: goblin_ear
+  name: Goblin Ear
+  icon:
+    ascii: '>'
+    image: '/images/items/materials/crafting/goblinEar.png'
+  rarity: Uncommon
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000

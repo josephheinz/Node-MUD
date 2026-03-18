@@ -1,0 +1,14 @@
+- id: hide_leggings
+  name: Hide Leggings
+  icon:
+    ascii: '𓂻'
+    image: '/images/items/armor/un-craftable/hideLeggings.png'
+  rarity: Uncommon
+  stats:
+    defense: 10
+    strength: 5
+  modifiers:
+    - type: Equippable
+      slot: legs
+    - type: Reforgeable
+      group: Armor

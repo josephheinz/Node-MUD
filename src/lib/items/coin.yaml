@@ -1,0 +1,10 @@
+- id: coin
+  name: Coin
+  icon:
+    ascii: "o"
+    image: "/images/items/coin.png"
+  rarity: Common
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 1000000000

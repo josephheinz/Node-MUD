@@ -1,0 +1,9 @@
+- id: combat_fight_goblin
+  name: Fight Goblin
+  icon: '/images/enemies/goblin.png'
+  req:
+    skill: 'Combat'
+    level: 2
+  enemies:
+    - id: goblin
+      amount: 1

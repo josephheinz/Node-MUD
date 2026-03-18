@@ -4,6 +4,9 @@
   icon: '/images/enemies/slime.png'
   size: 'Small'
   drops:
+    - id: coin
+      min: 1
+      max: 5
     - id: slimeball
       min: 2
       max: 7

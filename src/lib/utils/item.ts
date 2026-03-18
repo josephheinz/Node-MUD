@@ -20,6 +20,7 @@ import type { ITooltipData } from '$lib/components/tooltip';
 import type { StarsModifier } from '$lib/modifiers/stars';
 import type { ReforgeableModifier, ReforgeGroup, ReforgeModifier } from '$lib/modifiers/reforges';
 import { EnchantmentModifier, type Enchantment } from '$lib/modifiers/enchantments';
+import { Stats } from '$lib/types/stats';
 
 export async function Equip(
 	item: Item,
@@ -111,7 +112,7 @@ export function getItemData(item: Item, equippable: boolean = false): ITooltipDa
 		if (s.base || s.added > 0) {
 			//${Stats[key] ? `<span style="color:${Stats[key].color};">${Stats[key].icon} </span>` : ""}
 			//style="color:oklch(90.5% 0.182 98.111);"
-			statsString += `${capitalizeFirstLetter(key)}: ${s.base + s.added}<span class="text-muted-foreground">${s.added > 0 ? ` (+${s.added})` : ''}</span><br/>`;
+			statsString += `${capitalizeFirstLetter(Stats[key]?.name ?? key)}: ${s.base + s.added}<span class="text-muted-foreground">${s.added > 0 ? ` (+${s.added})` : ''}</span><br/>`;
 		}
 	}
 

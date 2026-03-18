@@ -1,0 +1,30 @@
+- id: goblin
+  name: Goblin
+  level: 2
+  icon: '/images/enemies/goblin.png'
+  size: 'Small'
+  drops:
+    - id: coin
+      min: 5
+      max: 10
+    - id: goblin_dagger
+      min: 1
+      max: 1
+      chance: 20
+    - id: goblin_ear
+      min: 1
+      max: 2
+      chance: 15
+    - id: hide_leggings
+      min: 1
+      max: 1
+      chance: 10
+  xp:
+    combat: 75
+  stats:
+    health: 15
+    strength: 5
+    damage: 5
+    defense: 5
+    critChance: 5
+    critDamage: 25

@@ -2,7 +2,7 @@
   name: Cool Hat
   icon:
     ascii: "⌓"
-    image: "/images/items/armor/un-craftable/coolHat.svg"
+    image: "/images/items/armor/un-craftable/coolHat.png"
   rarity: Divine
   modifiers:
     - type: Equippable

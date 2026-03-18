@@ -25,7 +25,13 @@ export function getEnemyData(enemy: Enemy): ITooltipData {
         if (name === "maxHealth") return;
 
         statString += `<span class="color:${Stats[name].color};">${Stats[name].icon} ${Stats[name].name}: ${val}</span></br>`
+    });
+
+    let dropsString = "";
+    Object.entries(enemy.drops).forEach(([name, drop]) => {
+        
     })
+
     return {
         title: `Lv.${enemy.level} ${enemy.name}`,
         body: statString

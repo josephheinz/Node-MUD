@@ -1,0 +1,15 @@
+- id: goblin_dagger
+  name: Goblin Dagger
+  icon:
+    ascii: "𐕣"
+    image: "/images/items/weapons/swords/goblinDagger.png"
+  rarity: Common
+  stats:
+    damage: 5
+    critChance: 5
+    critDamage: 20
+  modifiers:
+    - type: Equippable
+      value: mainhand
+    - type: Reforgeable
+      group: Sword
