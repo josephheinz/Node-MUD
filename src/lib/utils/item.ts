@@ -104,7 +104,7 @@ export function getItemData(item: Item, equippable: boolean = false): ITooltipDa
 	let stackString = '';
 
 	if (stackableModifier != undefined) {
-		stackString = `Stack: ${formatNumber(stackableModifier.amount)} / ${formatNumber(stackableModifier.stack)}</br>`;
+		stackString = `Stack: ${formatNumber(stackableModifier.amount)} / ${formatNumber(stackableModifier.stack, stackableModifier.stack > 1_000_000 ? "short" : "long")}</br>`;
 	}
 
 	for (const key in stats) {

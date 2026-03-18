@@ -25,7 +25,6 @@
 		action.enemies.forEach((e) => {
 			const enemy = getEnemy(e.id)!;
 			drops.push(enemy.drops);
-			console.log(JSON.stringify(drops));
 		});
 		return drops;
 	});
