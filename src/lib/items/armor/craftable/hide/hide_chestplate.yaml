@@ -1,0 +1,14 @@
+- id: hide_chestplate
+  name: Hide Chestplate
+  icon:
+    ascii: 'U'
+    image: '/images/items/armor/craftable/hide/hideChestplate.png'
+  rarity: Uncommon
+  stats:
+    defense: 15
+    strength: 5
+  modifiers:
+    - type: Equippable
+      slot: body
+    - type: Reforgeable
+      group: Armor

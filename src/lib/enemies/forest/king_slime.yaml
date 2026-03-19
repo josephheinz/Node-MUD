@@ -15,7 +15,7 @@
       max: 1
       chance: 100
   xp:
-    combat: 100
+    combat: 150
   stats:
     health: 50
     strength: 5

@@ -88,7 +88,8 @@ export const Reforges: Record<string, IReforge> = {
 	Sharp: { name: 'Sharp', stats: { damage: { amount: 1.1, operation: "multiplicative" } } },
 	Heroic: { name: 'Heroic', stats: { damage: { amount: 20, operation: "additive" }, strength: { amount: 15, operation: "additive" } } },
 	Hardened: { name: 'Hardened', stats: { defense: { amount: 20, operation: "additive" } } },
-	Crystalized: { name: 'Crystalized', stats: { damage: { amount: 20, operation: "additive" }, defense: { amount: 20, operation: "additive" } } }
+	Crystalized: { name: 'Crystalized', stats: { damage: { amount: 20, operation: "additive" }, defense: { amount: 20, operation: "additive" } } },
+	Zombified: { name: "Zombified", stats: { defense: { amount: 10, operation: "additive" } } }
 };
 
 export const ReforgeGroups: Record<string, IReforge[]> = {

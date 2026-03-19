@@ -1,0 +1,14 @@
+- id: hide_helmet
+  name: Hide Helmet
+  icon:
+    ascii: 'h'
+    image: '/images/items/armor/craftable/hide/hideHelmet.png'
+  rarity: Uncommon
+  stats:
+    defense: 10
+    strength: 5
+  modifiers:
+    - type: Equippable
+      slot: head
+    - type: Reforgeable
+      group: Armor

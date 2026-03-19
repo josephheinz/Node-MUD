@@ -133,14 +133,14 @@ export const getEquipmentById = query(z.uuidv4(), async (id) => {
 })
 
 const DBEquipmentSchema = z.object({
-	Head: DBItemSchema.nullable(),
-	Body: DBItemSchema.nullable(),
-	Legs: DBItemSchema.nullable(),
-	Offhand: DBItemSchema.nullable(),
-	Mainhand: DBItemSchema.nullable(),
-	Necklace: DBItemSchema.nullable(),
-	Ring: DBItemSchema.nullable(),
-	Hands: DBItemSchema.nullable()
+	head: DBItemSchema.nullable(),
+	body: DBItemSchema.nullable(),
+	legs: DBItemSchema.nullable(),
+	offhand: DBItemSchema.nullable(),
+	mainhand: DBItemSchema.nullable(),
+	necklace: DBItemSchema.nullable(),
+	ring: DBItemSchema.nullable(),
+	hands: DBItemSchema.nullable()
 });
 
 const equipRequestSchema = z.object({
@@ -187,16 +187,14 @@ export const equip = command(equipRequestSchema, async ({ id, dbItem }) => {
 	const slot: EquipmentSlot | undefined = determineSlot(item);
 	if (!slot) return error(404, "Item not equippable");
 
-	const { inventory_data: inv, equipment_data: eq } = await unequip({ id, slot });
+	let inv = inventory_data;
 
 	inv.splice(dbItemIndex, 1);
 
 	// Update equipment slot with proper item
 	if (equipment_data[slot]) {
-		let equippedItem: DBItem = equipment_data[slot];
-
-		equippedItem = canonicalizeDbItem(equippedItem);
-		inventory_data.push(equippedItem);
+		const { inventory_data: inv_, equipment_data: eq } = await unequip({ id, slot });
+		inv = inv_;
 	}
 
 	equipment_data[slot.toLowerCase() as EquipmentSlot] = dbItem;

@@ -2,7 +2,7 @@
   name: Hide Leggings
   icon:
     ascii: '𓂻'
-    image: '/images/items/armor/un-craftable/hideLeggings.png'
+    image: '/images/items/armor/craftable/hide/hideLeggings.png'
   rarity: Uncommon
   stats:
     defense: 10

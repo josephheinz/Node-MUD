@@ -1,0 +1,10 @@
+- id: hide
+  name: Hide
+  icon:
+    ascii: 'H'
+    image: '/images/items/materials/crafting/hide.png'
+  rarity: Uncommon
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000

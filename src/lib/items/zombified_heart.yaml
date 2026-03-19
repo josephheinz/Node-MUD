@@ -1,0 +1,13 @@
+- id: zombified_heart
+  name: Zombified Heart
+  icon:
+    ascii: "o"
+    image: "/images/items/zombifiedHeart.png"
+  rarity: Uncommon
+  modifiers:
+    - type: Enhancer
+      enhances:
+        - Armor
+      enhancements:
+        - type: Reforge
+          reforge: Zombified

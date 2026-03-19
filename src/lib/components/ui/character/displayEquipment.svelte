@@ -8,14 +8,14 @@
 	const { equipment, display = false }: { equipment: Equipment; display?: boolean } = $props();
 
 	const slotGridSpots: Record<EquipmentSlot, string> = {
-		Head: 'col-start-3 row-start-1',
-		Body: 'col-start-3 row-start-2',
-		Legs: 'col-start-3 row-start-3',
-		Offhand: 'col-start-4 row-start-2',
-		Mainhand: 'col-start-2 row-start-2',
-		Necklace: 'col-start-4 row-start-1',
-		Ring: 'col-start-2 row-start-1',
-		Hands: 'col-start-2 row-start-3'
+		head: 'col-start-3 row-start-1',
+		body: 'col-start-3 row-start-2',
+		legs: 'col-start-3 row-start-3',
+		offhand: 'col-start-4 row-start-2',
+		mainhand: 'col-start-2 row-start-2',
+		necklace: 'col-start-4 row-start-1',
+		ring: 'col-start-2 row-start-1',
+		hands: 'col-start-2 row-start-3'
 	};
 </script>
 

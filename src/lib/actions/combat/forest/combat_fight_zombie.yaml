@@ -1,0 +1,9 @@
+- id: combat_fight_zombie
+  name: Fight Zombie
+  icon: '/images/enemies/zombie.png'
+  req:
+    skill: 'Combat'
+    level: 3
+  enemies:
+    - id: zombie
+      amount: 1

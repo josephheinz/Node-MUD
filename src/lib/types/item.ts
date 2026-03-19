@@ -193,14 +193,14 @@ export class Inventory {
 }
 
 export type EquipmentSlot =
-	| 'Head'
-	| 'Body'
-	| 'Legs'
-	| 'Offhand'
-	| 'Mainhand'
-	| 'Necklace'
-	| 'Ring'
-	| 'Hands';
+	| 'head'
+	| 'body'
+	| 'legs'
+	| 'offhand'
+	| 'mainhand'
+	| 'necklace'
+	| 'ring'
+	| 'hands';
 
 export class Equipment {
 	private _head: Item | null = null;
@@ -234,59 +234,59 @@ export class Equipment {
 		this._hands = initValues.Hands ? initValues.Hands : null;
 	}
 
-	get Head() {
+	get head() {
 		return this._head;
 	}
-	private set Head(v: Item | null) {
+	private set head(v: Item | null) {
 		this._head = v;
 	}
 
-	get Body() {
+	get body() {
 		return this._body;
 	}
-	private set Body(v: Item | null) {
+	private set body(v: Item | null) {
 		this._body = v;
 	}
 
-	get Legs() {
+	get legs() {
 		return this._legs;
 	}
-	private set Legs(v: Item | null) {
+	private set legs(v: Item | null) {
 		this._legs = v;
 	}
 
-	get Offhand() {
+	get offhand() {
 		return this._offhand;
 	}
-	private set Offhand(v: Item | null) {
+	private set offhand(v: Item | null) {
 		this._offhand = v;
 	}
 
-	get Mainhand() {
+	get mainhand() {
 		return this._mainhand;
 	}
-	private set Mainhand(v: Item | null) {
+	private set mainhand(v: Item | null) {
 		this._mainhand = v;
 	}
 
-	get Necklace() {
+	get necklace() {
 		return this._necklace;
 	}
-	private set Necklace(v: Item | null) {
+	private set necklace(v: Item | null) {
 		this._necklace = v;
 	}
 
-	get Ring() {
+	get ring() {
 		return this._ring;
 	}
-	private set Ring(v: Item | null) {
+	private set ring(v: Item | null) {
 		this._ring = v;
 	}
 
-	get Hands() {
+	get hands() {
 		return this._hands;
 	}
-	private set Hands(v: Item | null) {
+	private set hands(v: Item | null) {
 		this._hands = v;
 	}
 
@@ -306,14 +306,14 @@ export class Equipment {
 
 	public serialize(): DBEquipment {
 		return {
-			Head: this._head ? encodeDBItem(this._head) : null,
-			Body: this._body ? encodeDBItem(this._body) : null,
-			Legs: this._legs ? encodeDBItem(this._legs) : null,
-			Offhand: this._offhand ? encodeDBItem(this._offhand) : null,
-			Mainhand: this._mainhand ? encodeDBItem(this._mainhand) : null,
-			Necklace: this._necklace ? encodeDBItem(this._necklace) : null,
-			Ring: this._ring ? encodeDBItem(this._ring) : null,
-			Hands: this._hands ? encodeDBItem(this._hands) : null
+			head: this._head ? encodeDBItem(this._head) : null,
+			body: this._body ? encodeDBItem(this._body) : null,
+			legs: this._legs ? encodeDBItem(this._legs) : null,
+			offhand: this._offhand ? encodeDBItem(this._offhand) : null,
+			mainhand: this._mainhand ? encodeDBItem(this._mainhand) : null,
+			necklace: this._necklace ? encodeDBItem(this._necklace) : null,
+			ring: this._ring ? encodeDBItem(this._ring) : null,
+			hands: this._hands ? encodeDBItem(this._hands) : null
 		};
 	}
 
@@ -335,14 +335,14 @@ export class Equipment {
 
 	public export(): Array<[EquipmentSlot, Item | null]> {
 		return [
-			['Head', this._head],
-			['Body', this._body],
-			['Legs', this._legs],
-			['Offhand', this._offhand],
-			['Mainhand', this._mainhand],
-			['Necklace', this._necklace],
-			['Ring', this._ring],
-			['Hands', this._hands]
+			['head', this._head],
+			['body', this._body],
+			['legs', this._legs],
+			['offhand', this._offhand],
+			['mainhand', this._mainhand],
+			['necklace', this._necklace],
+			['ring', this._ring],
+			['hands', this._hands]
 		];
 	}
 
@@ -353,25 +353,25 @@ export class Equipment {
 }
 
 export type DBEquipment = {
-	Head: DBItem | null;
-	Body: DBItem | null;
-	Legs: DBItem | null;
-	Offhand: DBItem | null;
-	Mainhand: DBItem | null;
-	Necklace: DBItem | null;
-	Ring: DBItem | null;
-	Hands: DBItem | null;
+	head: DBItem | null;
+	body: DBItem | null;
+	legs: DBItem | null;
+	offhand: DBItem | null;
+	mainhand: DBItem | null;
+	necklace: DBItem | null;
+	ring: DBItem | null;
+	hands: DBItem | null;
 };
 
 export const EmptyEquipment: DBEquipment = {
-	Head: null,
-	Body: null,
-	Legs: null,
-	Offhand: null,
-	Mainhand: null,
-	Necklace: null,
-	Ring: null,
-	Hands: null
+	head: null,
+	body: null,
+	legs: null,
+	offhand: null,
+	mainhand: null,
+	necklace: null,
+	ring: null,
+	hands: null
 };
 
 // i know functions should be in here but it makes things cyclical if its in utils/item
