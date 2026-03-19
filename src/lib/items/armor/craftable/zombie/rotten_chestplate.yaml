@@ -1,0 +1,15 @@
+- id: rotten_chestplate
+  name: Rotten Chestplate
+  icon:
+    ascii: '⬓'
+    image: '/images/items/armor/craftable/zombie/rottenChestplate.png'
+  rarity: Rare
+  stats:
+    defense: 15
+    strength: 10
+    critDamage: 20
+  modifiers:
+    - type: Equippable
+      slot: body
+    - type: Reforgeable
+      group: Armor

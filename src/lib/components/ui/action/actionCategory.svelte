@@ -15,7 +15,7 @@
 	let skills: Record<SkillKey, Skill> = await getSkills();
 </script>
 
-<div class="grid h-full grid-cols-6 grid-rows-6 gap-4">
+<div class="grid h-full grid-cols-6 grid-rows-6 gap-4 overflow-y-scroll">
 	<Dialog.Root>
 		{#each actions as action}
 			{#if action !== null}
