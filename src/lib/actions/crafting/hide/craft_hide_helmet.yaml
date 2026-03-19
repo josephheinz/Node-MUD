@@ -1,0 +1,18 @@
+- id: craft_hide_helmet
+  name: Hide Helmet
+  icon:
+    image: '/images/items/armor/craftable/hide/hideHelmet.png'
+    color: '#bdbdbd'
+  req:
+    skill: 'Crafting'
+    level: 3
+  inputs:
+    - id: hide
+      amount: 15
+  outputs:
+    - id: hide_Helmet
+      min: 1
+      max: 1
+  xp:
+    crafting: 20
+  time: 10

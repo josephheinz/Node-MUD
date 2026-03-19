@@ -1,0 +1,18 @@
+- id: craft_mithril_sword
+  name: Mithril Sword
+  icon:
+    image: '/images/items/weapons/swords/mithrilSword.png'
+    color: '#bdbdbd'
+  req:
+    skill: 'Crafting'
+    level: 10
+  inputs:
+    - id: mithril_bar
+      amount: 5
+  outputs:
+    - id: mithril_sword
+      min: 1
+      max: 1
+  xp:
+    crafting: 75
+  time: 10

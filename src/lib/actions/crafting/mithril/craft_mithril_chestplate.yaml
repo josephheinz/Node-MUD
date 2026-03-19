@@ -1,0 +1,18 @@
+- id: craft_mithril_chestplate
+  name: Mithril Chestplate
+  icon:
+    image: '/images/items/armor/craftable/mithril/mithrilChestplate.png'
+    color: '#bdbdbd'
+  req:
+    skill: 'Crafting'
+    level: 10
+  inputs:
+    - id: mithril_bar
+      amount: 20
+  outputs:
+    - id: mithril_chestplate
+      min: 1
+      max: 1
+  xp:
+    crafting: 75
+  time: 10

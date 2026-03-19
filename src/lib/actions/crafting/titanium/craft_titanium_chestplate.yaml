@@ -1,0 +1,18 @@
+- id: craft_titanium_chestplate
+  name: Titanium Chestplate
+  icon:
+    image: '/images/items/armor/craftable/titanium/titaniumChestplate.png'
+    color: '#bdbdbd'
+  req:
+    skill: 'Crafting'
+    level: 5
+  inputs:
+    - id: titanium_bar
+      amount: 20
+  outputs:
+    - id: titanium_chestplate
+      min: 1
+      max: 1
+  xp:
+    crafting: 40
+  time: 10

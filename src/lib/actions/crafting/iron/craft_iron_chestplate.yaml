@@ -1,0 +1,18 @@
+- id: craft_iron_chestplate
+  name: Iron Chestplate
+  icon:
+    image: '/images/items/armor/craftable/iron/ironChestplate.png'
+    color: '#bdbdbd'
+  req:
+    skill: 'Crafting'
+    level: 1
+  inputs:
+    - id: iron_bar
+      amount: 20
+  outputs:
+    - id: iron_chestplate
+      min: 1
+      max: 1
+  xp:
+    crafting: 20
+  time: 10

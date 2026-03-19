@@ -1,0 +1,18 @@
+- id: craft_mithril_helmet
+  name: Mithril Helmet
+  icon:
+    image: '/images/items/armor/craftable/mithril/mithrilHelmet.png'
+    color: '#bdbdbd'
+  req:
+    skill: 'Crafting'
+    level: 10
+  inputs:
+    - id: mithril_bar
+      amount: 15
+  outputs:
+    - id: mithril_Helmet
+      min: 1
+      max: 1
+  xp:
+    crafting: 75
+  time: 10

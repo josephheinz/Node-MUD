@@ -1,0 +1,15 @@
+- id: mine_mithril_ore
+  name: Mithril Ore
+  icon:
+    image: '/images/items/materials/crafting/ores/mithrilOre.png'
+    color: '#bdbdbd'
+  req:
+    skill: 'Mining'
+    level: 10
+  outputs:
+    - id: mithril_ore
+      min: 3
+      max: 5
+  xp:
+    mining: 40
+  time: 10

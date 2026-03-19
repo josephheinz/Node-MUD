@@ -1,0 +1,18 @@
+- id: craft_gold_leggings
+  name: Gold Leggings
+  icon:
+    image: '/images/items/armor/craftable/gold/goldLeggings.png'
+    color: '#bdbdbd'
+  req:
+    skill: 'Crafting'
+    level: 2
+  inputs:
+    - id: gold_bar
+      amount: 15
+  outputs:
+    - id: gold_leggings
+      min: 1
+      max: 1
+  xp:
+    crafting: 20
+  time: 10
