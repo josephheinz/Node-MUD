@@ -1,0 +1,13 @@
+- id: chlorophite_helmet
+  name: Chlorophite Helmet
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/chlorophite/chlorophiteHelmet.png"
+  rarity: Rare
+  stats:
+    defense: 25
+  modifiers:
+    - type: Equippable
+      slot: head
+    - type: Reforgeable
+      group: Armor

@@ -1,0 +1,18 @@
+- id: smelt_chlorophite_bar
+  name: Chlorophite Bar
+  icon:
+    image: 'images/items/materials/crafting/bars/chlorophiteBar.png'
+    color: '#bdbdbd'
+  req:
+    skill: 'Crafting'
+    level: 20
+  inputs:
+    - id: chlorophite_ore
+      amount: 2
+  outputs:
+    - id: chlorophite_bar
+      min: 1
+      max: 1
+  xp:
+    crafting: 75
+  time: 15

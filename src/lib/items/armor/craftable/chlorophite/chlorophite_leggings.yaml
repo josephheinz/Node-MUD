@@ -1,0 +1,13 @@
+- id: chlorophite_leggings
+  name: Chlorophite Leggings
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/chlorophite/chlorophiteLeggings.png"
+  rarity: Rare
+  stats:
+    defense: 30
+  modifiers:
+    - type: Equippable
+      slot: legs
+    - type: Reforgeable
+      group: Armor

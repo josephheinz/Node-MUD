@@ -1,0 +1,15 @@
+- id: mine_chlorophite_ore
+  name: Chlorophite Ore
+  icon:
+    image: '/images/items/materials/crafting/ores/chlorophiteOre.png'
+    color: '#bdbdbd'
+  req:
+    skill: 'Mining'
+    level: 20
+  outputs:
+    - id: chlorophite_ore
+      min: 3
+      max: 5
+  xp:
+    mining: 75
+  time: 10

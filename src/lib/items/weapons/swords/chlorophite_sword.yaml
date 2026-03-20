@@ -1,0 +1,13 @@
+- id: chlorophite_sword
+  name: Chlorophite Sword
+  icon:
+    ascii: "𐕣"
+    image: "/images/items/weapons/swords/chlorophiteSword.png"
+  rarity: Rare
+  stats:
+    damage: 50
+  modifiers:
+    - type: Equippable
+      slot: mainhand
+    - type: Reforgeable
+      group: Sword

@@ -1,0 +1,13 @@
+- id: chlorophite_chestplate
+  name: Chlorophite Chestplate
+  icon:
+    ascii: "⬓"
+    image: "/images/items/armor/craftable/chlorophite/chlorophiteChestplate.png"
+  rarity: Rare
+  stats:
+    defense: 25
+  modifiers:
+    - type: Equippable
+      slot: body
+    - type: Reforgeable
+      group: Armor

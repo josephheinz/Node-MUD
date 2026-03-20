@@ -54,3 +54,4 @@ export function canonicalizeSkills(skills: Record<SkillKey, Skill>): Record<Skil
 }
 
 export const XP_TABLE = buildXPTable(120);
+console.log(XP_TABLE);

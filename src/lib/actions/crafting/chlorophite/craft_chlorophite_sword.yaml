@@ -1,0 +1,18 @@
+- id: craft_chlorophite_sword
+  name: Chlorophite Sword
+  icon:
+    image: '/images/items/weapons/swords/chlorophiteSword.png'
+    color: '#bdbdbd'
+  req:
+    skill: 'Crafting'
+    level: 20
+  inputs:
+    - id: chlorophite_bar
+      amount: 5
+  outputs:
+    - id: chlorophite_sword
+      min: 1
+      max: 1
+  xp:
+    crafting: 100
+  time: 15

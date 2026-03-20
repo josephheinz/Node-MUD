@@ -26,8 +26,8 @@
 	});
 </script>
 
-<div class="flex size-full flex-col gap-6">
-	<Tabs.Root value="actions" class="grow">
+<div class="flex size-full min-h-0 flex-col gap-6">
+	<Tabs.Root value="actions" class="min-h-0 grow">
 		<Tabs.List>
 			{#each categories as cat}
 				{@render ActionTab(cat)}
@@ -57,7 +57,7 @@
 {/snippet}
 
 {#snippet ActionCat(category: string)}
-	<Tabs.Content value={category} class="h-full grow">
+	<Tabs.Content value={category} class="h-full min-h-0 grow">
 		<ActionCategory {category} />
 	</Tabs.Content>
 {/snippet}

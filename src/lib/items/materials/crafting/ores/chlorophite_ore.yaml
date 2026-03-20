@@ -1,0 +1,10 @@
+- id: chlorophite_ore
+  name: Chlorophite Ore
+  icon:
+    ascii: '🪨'
+    image: '/images/items/materials/crafting/ores/chlorophiteOre.png'
+  rarity: Uncommon
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000

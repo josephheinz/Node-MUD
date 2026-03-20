@@ -76,9 +76,9 @@ export type ActionCategory = keyof typeof actionCategories;
 export type CombatCategory = keyof typeof combatActionCategories;
 
 export const actionCategories: Record<string, Array<string>> = {
-	Mining: ['mine_iron_ore', 'mine_gold_ore', 'mine_titanium_ore', 'mine_mithril_ore'],
-	Crafting: ['craft_iron_sword', 'craft_iron_shield', 'craft_iron_helmet', 'craft_iron_chestplate', 'craft_iron_leggings', 'craft_gold_sword', 'craft_gold_helmet', 'craft_gold_chestplate', 'craft_gold_leggings', 'craft_hide_helmet', 'craft_hide_chestplate', 'craft_hide_leggings', 'craft_rotten_chestplate', 'craft_titanium_sword', 'craft_titanium_helmet', 'craft_titanium_chestplate', 'craft_titanium_boots', 'craft_mithril_sword', 'craft_mithril_helmet', 'craft_mithril_chestplate', 'craft_mithril_leggings', 'craft_deconstruct_mechanical_eye'],
-	Smelting: ['smelt_iron_bar', 'smelt_gold_bar', 'smelt_titanium_bar', 'smelt_hardened_titanium_bar', 'smelt_mithril_bar']
+	Mining: ['mine_iron_ore', 'mine_gold_ore', 'mine_titanium_ore', 'mine_mithril_ore', 'mine_chlorophite_ore'],
+	Crafting: ['craft_iron_sword', 'craft_iron_shield', 'craft_iron_helmet', 'craft_iron_chestplate', 'craft_iron_leggings', 'craft_gold_sword', 'craft_gold_helmet', 'craft_gold_chestplate', 'craft_gold_leggings', 'craft_hide_helmet', 'craft_hide_chestplate', 'craft_hide_leggings', 'craft_rotten_chestplate', 'craft_titanium_sword', 'craft_titanium_helmet', 'craft_titanium_chestplate', 'craft_titanium_boots', 'craft_mithril_sword', 'craft_mithril_helmet', 'craft_mithril_chestplate', 'craft_mithril_leggings', 'craft_chlorophite_sword', 'craft_chlorophite_helmet', 'craft_chlorophite_chestplate', 'craft_chlorophite_leggings', 'craft_deconstruct_mechanical_eye'],
+	Smelting: ['smelt_iron_bar', 'smelt_gold_bar', 'smelt_titanium_bar', 'smelt_hardened_titanium_bar', 'smelt_mithril_bar', 'smelt_chlorophite_bar']
 };
 
 export const combatActionCategories: Record<string, Array<string>> = {
