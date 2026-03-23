@@ -1,7 +1,7 @@
 - id: goblin
   name: Goblin
   level: 2
-  icon: '/images/enemies/goblin.png'
+  icon: '/images/enemies/forest/goblin.png'
   size: 'Small'
   drops:
     - id: coin

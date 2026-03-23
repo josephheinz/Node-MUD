@@ -1,0 +1,18 @@
+- id: gelatinous_cube
+  name: Gelatinous Cube
+  level: 8
+  icon: '/images/enemies/dungeon/gelatinousCube.png'
+  size: 'Large'
+  drops:
+    - id: coin
+      min: 10
+      max: 15
+  xp:
+    combat: 350
+  stats:
+    health: 80
+    strength: 5
+    damage: 5
+    defense: 15
+    critChance: 5
+    critDamage: 25

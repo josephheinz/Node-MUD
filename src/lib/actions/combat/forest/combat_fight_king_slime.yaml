@@ -1,6 +1,6 @@
 - id: combat_fight_king_slime
   name: Fight King Slime
-  icon: '/images/enemies/kingSlime.png'
+  icon: '/images/enemies/forest/kingSlime.png'
   req:
     skill: 'Combat'
     level: 1

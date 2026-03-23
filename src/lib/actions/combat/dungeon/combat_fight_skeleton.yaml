@@ -1,0 +1,9 @@
+- id: combat_fight_skeleton
+  name: Fight Skeleton
+  icon: '/images/enemies/dungeon/skeleton.png'
+  req:
+    skill: 'Combat'
+    level: 6
+  enemies:
+    - id: skeleton
+      amount: 1

@@ -1,7 +1,7 @@
 - id: slime
   name: Slime
   level: 1
-  icon: '/images/enemies/slime.png'
+  icon: '/images/enemies/forest/slime.png'
   size: 'Small'
   drops:
     - id: coin

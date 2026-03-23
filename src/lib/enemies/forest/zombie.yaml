@@ -1,7 +1,7 @@
 - id: zombie
   name: Zombie
   level: 3
-  icon: '/images/enemies/zombie.png'
+  icon: '/images/enemies/forest/zombie.png'
   size: 'Small'
   drops:
     - id: coin

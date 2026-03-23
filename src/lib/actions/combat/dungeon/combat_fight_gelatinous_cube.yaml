@@ -1,0 +1,9 @@
+- id: combat_fight_gelatinous_cube
+  name: Fight Gelatinous Cube
+  icon: '/images/enemies/dungeon/gelatinousCube.png'
+  req:
+    skill: 'Combat'
+    level: 8
+  enemies:
+    - id: gelatinous_cube
+      amount: 1

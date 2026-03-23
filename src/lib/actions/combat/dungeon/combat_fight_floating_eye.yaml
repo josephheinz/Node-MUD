@@ -1,0 +1,9 @@
+- id: combat_fight_floating_eye
+  name: Fight Floating Eye
+  icon: '/images/enemies/dungeon/floatingEye.png'
+  req:
+    skill: 'Combat'
+    level: 7
+  enemies:
+    - id: floating_eye
+      amount: 1

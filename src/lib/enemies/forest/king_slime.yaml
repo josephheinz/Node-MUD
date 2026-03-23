@@ -1,7 +1,7 @@
 - id: king_slime
   name: King Slime
   level: 10
-  icon: '/images/enemies/kingSlime.png'
+  icon: '/images/enemies/forest/kingSlime.png'
   size: 'Large'
   drops:
     - id: coin

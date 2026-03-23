@@ -1,6 +1,6 @@
 - id: combat_fight_goblin
   name: Fight Goblin
-  icon: '/images/enemies/goblin.png'
+  icon: '/images/enemies/forest/goblin.png'
   req:
     skill: 'Combat'
     level: 2

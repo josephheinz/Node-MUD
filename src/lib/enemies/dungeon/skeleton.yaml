@@ -1,0 +1,18 @@
+- id: skeleton
+  name: Skeleton
+  level: 6
+  icon: '/images/enemies/dungeon/skeleton.png'
+  size: 'Small'
+  drops:
+    - id: coin
+      min: 10
+      max: 15
+  xp:
+    combat: 250
+  stats:
+    health: 40
+    strength: 10
+    damage: 10
+    defense: 10
+    critChance: 10
+    critDamage: 25
