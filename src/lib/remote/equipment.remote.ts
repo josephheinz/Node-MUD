@@ -189,15 +189,15 @@ export const equip = command(equipRequestSchema, async ({ id, dbItem }) => {
 
 	let inv = inventory_data;
 
-	inv.splice(dbItemIndex, 1);
-
 	// Update equipment slot with proper item
 	if (equipment_data[slot]) {
 		const { inventory_data: inv_, equipment_data: eq } = await unequip({ id, slot });
 		inv = inv_;
 	}
 
-	equipment_data[slot.toLowerCase() as EquipmentSlot] = dbItem;
+	inv.splice(dbItemIndex, 1);
+
+	equipment_data[slot] = dbItem;
 
 	const { error: updateError } = await supabase
 		.from('inventories')
