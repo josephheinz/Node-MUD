@@ -5,8 +5,15 @@
   size: 'Large'
   drops:
     - id: coin
-      min: 10
-      max: 15
+      min: 100
+      max: 150
+    - id: slimeball
+      min: 40
+      max: 75
+    - id: mithril_sword
+      min: 1
+      max: 1
+      chance: 100
   xp:
     combat: 350
   stats:

@@ -5,8 +5,11 @@
   size: 'Small'
   drops:
     - id: coin
-      min: 10
-      max: 15
+      min: 30
+      max: 45
+    - id: bone
+      min: 15
+      max: 25
   xp:
     combat: 250
   stats:

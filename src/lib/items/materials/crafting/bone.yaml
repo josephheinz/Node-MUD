@@ -1,0 +1,10 @@
+- id: bone
+  name: Bone
+  icon:
+    ascii: 'I'
+    image: '/images/items/materials/crafting/bone.png'
+  rarity: Uncommon
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000

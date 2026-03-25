@@ -1,0 +1,9 @@
+- id: combat_fight_rat_king
+  name: Fight Rat King
+  icon: '/images/enemies/dungeon/ratKing.png'
+  req:
+    skill: 'Combat'
+    level: 10
+  enemies:
+    - id: rat_king
+      amount: 1

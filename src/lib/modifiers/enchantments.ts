@@ -8,7 +8,7 @@ export class EnchantmentModifier implements IItemModifier {
 	type = 'Enchantment';
 	priority = 5;
 
-	constructor(public enchantments: Enchantment[]) {}
+	constructor(public enchantments: Enchantment[]) { }
 
 	modifyDescription(baseDesc: string): string {
 		let base = '';
@@ -88,7 +88,7 @@ export class EnchantmentModifier implements IItemModifier {
 }
 
 export const Enchantments: Record<string, Enchantment> = {
-	Sharp: { name: 'Sharp', level: 1, maxLevel: 7, applies: ['Sword'], statChanges: { damage: 10 } }
+	Sharp: { name: 'Sharp', level: 1, maxLevel: 7, applies: ['Sword'], statChanges: { damage: { amount: 10, operation: "additive" } } }
 };
 
 export type Enchantment = {

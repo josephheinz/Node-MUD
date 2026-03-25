@@ -1,0 +1,16 @@
+- id: demon_eye
+  name: Demon Eye
+  icon:
+    ascii: 'o'
+    image: '/images/items/materials/crafting/demonEye.png'
+  rarity: Uncommon
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 5000
+    - type: Enhancer
+      enhances:
+        - Sword
+      enhancements:
+        - type: Reforge
+          reforge: Blighted
