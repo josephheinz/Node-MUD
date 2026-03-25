@@ -1,0 +1,9 @@
+- id: combat_fight_sapphire_golem
+  name: Fight Sapphire Golem
+  icon: '/images/enemies/mines/sapphireGolem.png'
+  req:
+    skill: 'Combat'
+    level: 17
+  enemies:
+    - id: sapphire_golem
+      amount: 1

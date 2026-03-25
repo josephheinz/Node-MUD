@@ -1,0 +1,10 @@
+- id: rough_topaz
+  name: Rough Topaz
+  icon:
+    ascii: 't'
+    image: '/images/items/materials/crafting/gemstones/roughTopaz.png'
+  rarity: Uncommon
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000

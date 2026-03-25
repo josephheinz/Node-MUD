@@ -25,6 +25,8 @@ export interface IItemModifier {
 	priority: number;
 	statChanges?: StatList;
 
+	canApply?(item: Item): boolean;
+
 	modifyName?(baseName: string): string;
 	modifyDescription?(baseDesc: string): string;
 

@@ -1,0 +1,10 @@
+- id: ruby
+  name: Ruby
+  icon:
+    ascii: 'r'
+    image: '/images/items/materials/crafting/gemstones/ruby.png'
+  rarity: Rare
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 1000

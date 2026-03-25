@@ -1,0 +1,10 @@
+- id: rough_ruby
+  name: Rough Ruby
+  icon:
+    ascii: 't'
+    image: '/images/items/materials/crafting/gemstones/roughRuby.png'
+  rarity: Uncommon
+  modifiers:
+    - type: Stackable
+      amount: 1
+      stack: 10000

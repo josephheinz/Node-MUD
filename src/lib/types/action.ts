@@ -83,7 +83,8 @@ export const actionCategories: Record<string, Array<string>> = {
 
 export const combatActionCategories: Record<string, Array<string>> = {
 	Forest: ['combat_fight_slime', 'combat_fight_goblin', 'combat_fight_zombie', 'combat_fight_king_slime'],
-	Dungeon: ['combat_fight_skeleton','combat_fight_floating_eye','combat_fight_gelatinous_cube','combat_fight_rat_king']
+	Dungeon: ['combat_fight_skeleton', 'combat_fight_floating_eye', 'combat_fight_gelatinous_cube', 'combat_fight_rat_king'],
+	Mines: ['combat_fight_ruby_golem', 'combat_fight_topaz_golem', 'combat_fight_sapphire_golem']
 };
 
 export function getAction(id: string): Action | null {

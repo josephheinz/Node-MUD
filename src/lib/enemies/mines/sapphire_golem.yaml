@@ -1,0 +1,25 @@
+- id: sapphire_golem
+  name: Sapphire Golem
+  level: 17
+  icon: '/images/enemies/mines/sapphireGolem.png'
+  size: 'Large'
+  drops:
+    - id: coin
+      min: 250
+      max: 350
+    - id: rough_sapphire
+      min: 0
+      max: 10
+    - id: sapphire
+      min: 1
+      max: 1
+      chance: 100
+  xp:
+    combat: 800
+  stats:
+    health: 200
+    strength: 15
+    damage: 20
+    defense: 100
+    critChance: 5
+    critDamage: 50

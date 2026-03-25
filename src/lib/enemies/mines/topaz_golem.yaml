@@ -1,0 +1,25 @@
+- id: topaz_golem
+  name: Topaz Golem
+  level: 17
+  icon: '/images/enemies/mines/topazGolem.png'
+  size: 'Large'
+  drops:
+    - id: coin
+      min: 250
+      max: 350
+    - id: rough_topaz
+      min: 0
+      max: 10
+    - id: topaz
+      min: 1
+      max: 1
+      chance: 100
+  xp:
+    combat: 800
+  stats:
+    health: 200
+    strength: 15
+    damage: 20
+    defense: 100
+    critChance: 5
+    critDamage: 50

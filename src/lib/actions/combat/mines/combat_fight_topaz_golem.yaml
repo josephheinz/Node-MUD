@@ -1,0 +1,9 @@
+- id: combat_fight_topaz_golem
+  name: Fight Topaz Golem
+  icon: '/images/enemies/mines/topazGolem.png'
+  req:
+    skill: 'Combat'
+    level: 17
+  enemies:
+    - id: topaz_golem
+      amount: 1

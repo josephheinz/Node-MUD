@@ -1,0 +1,9 @@
+- id: combat_fight_ruby_golem
+  name: Fight Ruby Golem
+  icon: '/images/enemies/mines/rubyGolem.png'
+  req:
+    skill: 'Combat'
+    level: 17
+  enemies:
+    - id: ruby_golem
+      amount: 1
