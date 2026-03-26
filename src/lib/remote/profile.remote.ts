@@ -1,4 +1,4 @@
-import { getRequestEvent, prerender, query } from "$app/server"
+import { form, getRequestEvent, prerender, query } from "$app/server"
 import type { Profile } from "$lib/store.svelte";
 import type { Equipment, Inventory } from "$lib/types/item";
 import * as z from "zod"
@@ -6,6 +6,7 @@ import { getInventory, getInventoryById } from "./inventory.remote";
 import { getEquipment, getEquipmentById } from "./equipment.remote";
 import type { Skill, SkillKey } from "$lib/types/skills";
 import { getSkills, getSkillsById } from "./skills.remote";
+import { redirect } from "@sveltejs/kit";
 
 export interface IApiSettings {
     profile_id: string;
@@ -63,3 +64,22 @@ export const getProfilePage = prerender(z.string(), async (username) => {
 
     return { profile, apiSettings, inventory, equipment, skills, isUser: false }
 })
+
+export const updateProfileSettings = form(z.object({
+    display_name: z.string(),
+    profile_picture: z.url(),
+    banner_picture: z.url()
+}), async (settings) => {
+    const { locals: { supabase, user } } = getRequestEvent();
+
+    if (!user) {
+        redirect(307, "/");
+    }
+
+    const { error } = await supabase
+        .from("profile")
+        .update({ profile_picture: settings.profile_picture, banner_picture: settings.banner_picture, display_name: settings.display_name })
+        .eq("id", user.id);
+
+    if (error) throw new Error(error.message);
+});

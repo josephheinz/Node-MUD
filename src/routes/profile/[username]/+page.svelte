@@ -43,7 +43,7 @@
 	<title>{profile?.display_name ?? `@${profile?.username}`}'s Profile</title>
 
 	{#if profile}
-		<ProfileHeader {profile} />
+		<ProfileHeader {profile} owner={user} />
 		<ProfileBody {data} />
 	{:else}
 		<Empty.Root>
