@@ -14,7 +14,7 @@ export interface IApiSettings {
     equipment_api: boolean;
 }
 
-export const getProfilePage = prerender(z.string(), async (username) => {
+export const getProfilePage = query(z.string(), async (username) => {
     const { locals: { supabase, user } } = getRequestEvent();
 
     let apiSettings: IApiSettings | undefined;
@@ -76,10 +76,15 @@ export const updateProfileSettings = form(z.object({
         redirect(307, "/");
     }
 
-    const { error } = await supabase
-        .from("profile")
+    console.log(settings)
+
+    const { data, error } = await supabase
+        .from("profiles")
         .update({ profile_picture: settings.profile_picture, banner_picture: settings.banner_picture, display_name: settings.display_name })
-        .eq("id", user.id);
+        .eq("id", user.id)
+        .select("username");
 
     if (error) throw new Error(error.message);
+
+    await getProfilePage(data[0].username).refresh(); 
 });

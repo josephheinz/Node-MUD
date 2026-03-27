@@ -1,33 +1,19 @@
 <script lang="ts">
-	import type { Profile } from '$lib/store.svelte';
-	import type { IApiSettings } from './+layout.server';
 	import * as Empty from '$lib/components/ui/empty';
 	import ProfileHeader from '$lib/components/ui/profile/profileHeader.svelte';
 	import ProfileBody from '$lib/components/ui/profile/profileBody.svelte';
 	import { page } from '$app/state';
 	import Spinner from '$lib/components/ui/spinner/spinner.svelte';
-	import type { Equipment, Inventory } from '$lib/types/item';
-	import type { Skill, SkillKey } from '$lib/types/skills';
 	import { Skull } from '@lucide/svelte';
+	import { getProfilePage } from '$lib/remote/profile.remote';
 
-	const {
-		data
-	}: {
-		data: {
-			profile: Profile | undefined;
-			apiSettings: IApiSettings | undefined;
-			equipment: Equipment | undefined;
-			inventory: Inventory | undefined;
-			isUser: boolean;
-			skills: Record<SkillKey, Skill> | undefined;
-		};
-	} = $props();
+	let data = await getProfilePage(page.params.username!);
 
-	let profile = data.profile;
-	let apiSettings = data.apiSettings;
-	let equipment = data.equipment;
-	let inventory = data.inventory;
-	let user = data.isUser;
+	let profile = $derived(data.profile);
+	let apiSettings = $derived(data.apiSettings);
+	let equipment = $derived(data.equipment);
+	let inventory = $derived(data.inventory);
+	let user = $derived(data.isUser);
 
 	let username: string = $derived(page.params.username ?? '');
 </script>
