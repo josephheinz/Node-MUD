@@ -12,6 +12,7 @@ export interface IApiSettings {
     profile_id: string;
     inventory_api: boolean;
     equipment_api: boolean;
+    skills_api: boolean;
 }
 
 export const getProfilePage = query(z.string(), async (username) => {
@@ -76,8 +77,6 @@ export const updateProfileSettings = form(z.object({
         redirect(307, "/");
     }
 
-    console.log(settings)
-
     const { data, error } = await supabase
         .from("profiles")
         .update({ profile_picture: settings.profile_picture, banner_picture: settings.banner_picture, display_name: settings.display_name })
@@ -86,5 +85,25 @@ export const updateProfileSettings = form(z.object({
 
     if (error) throw new Error(error.message);
 
-    await getProfilePage(data[0].username).refresh(); 
+    await getProfilePage(data[0].username).refresh();
+});
+
+export const updateApiSettings = form(z.object({
+    inventory_api: z.boolean(),
+    equipment_api: z.boolean(),
+    skills_api: z.boolean()
+}), async (settings) => {
+    const { locals: { supabase, user } } = getRequestEvent();
+
+    if (!user) {
+        redirect(307, "/");
+    }
+
+    const { error } = await supabase
+        .from("profile_settings")
+        .update({ inventory_api: settings.inventory_api, equipment_api: settings.equipment_api, skills_api: settings.skills_api })
+        .eq("profile_id", user.id)
+
+    if (error) throw new Error(error.message);
+
 });

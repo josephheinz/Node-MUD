@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Profile } from '$lib/store.svelte';
 	import { Equipment as TEquipment, Inventory as TInventory } from '$lib/types/item';
-	import type { IApiSettings } from '../../../../routes/profile/[username]/+layout.server';
 	import Spinner from '../spinner/spinner.svelte';
 	import DisplayInventory from '../character/displayInventory.svelte';
 	import DisplayEquipment from '../character/displayEquipment.svelte';
@@ -11,6 +10,7 @@
 	import { Cog, Settings } from '@lucide/svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import ApiDialog from './apiDialog.svelte';
+	import type { IApiSettings } from '$lib/remote/profile.remote';
 
 	const {
 		data
