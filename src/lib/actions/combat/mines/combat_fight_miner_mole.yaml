@@ -1,0 +1,9 @@
+- id: combat_fight_miner_mole
+  name: Fight Miner Mole
+  icon: '/images/enemies/mines/minerMole.jpg'
+  req:
+    skill: 'Combat'
+    level: 19
+  enemies:
+    - id: miner_mole
+      amount: 1

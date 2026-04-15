@@ -1,0 +1,18 @@
+- id: craft_sapphire
+  name: Craft Sapphire
+  icon:
+    image: '/images/items/materials/crafting/gemstones/sapphire.png'
+    color: '#bdbdbd'
+  req:
+    skill: 'Crafting'
+    level: 15
+  inputs:
+    - id: rough_sapphire
+      amount: 100
+  outputs:
+    - id: sapphire
+      min: 1
+      max: 1
+  xp:
+    crafting: 200
+  time: 30

@@ -1,0 +1,41 @@
+- id: miner_mole
+  name: Miner Mole
+  level: 19
+  icon: '/images/enemies/mines/minerMole.jpg'
+  size: 'Small'
+  drops:
+    - id: coin
+      min: 250
+      max: 350
+    - id: hide
+      min: 20
+      max: 50
+    - id: iron_ore
+      min: 0
+      max: 10
+      chance: 10
+    - id: gold_ore
+      min: 0
+      max: 10
+      chance: 10
+    - id: titanium_ore
+      min: 0
+      max: 10
+      chance: 10
+    - id: mithril_ore
+      min: 0
+      max: 10
+      chance: 10
+    - id: chlorophite_ore
+      min: 0
+      max: 10
+      chance: 10
+  xp:
+    combat: 800
+  stats:
+    health: 250
+    strength: 15
+    damage: 20
+    defense: 50
+    critChance: 5
+    critDamage: 50
