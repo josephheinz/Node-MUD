@@ -1,0 +1,9 @@
+- id: combat_fight_dynamite_skeleton
+  name: Fight Dynamite Skeleton
+  icon: '/images/enemies/mines/dynamiteSkeleton.webp'
+  req:
+    skill: 'Combat'
+    level: 20
+  enemies:
+    - id: dynamite_skeleton
+      amount: 1

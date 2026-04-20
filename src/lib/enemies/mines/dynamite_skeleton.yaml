@@ -1,0 +1,21 @@
+- id: dynamite_skeleton
+  name: Dynamite Skeleton
+  level: 20
+  icon: '/images/enemies/mines/dynamiteSkeleton.webp'
+  size: 'Medium'
+  drops:
+    - id: coin
+      min: 400
+      max: 500
+    - id: bone
+      min: 30
+      max: 50
+  xp:
+    combat: 1200
+  stats:
+    health: 300
+    strength: 15
+    damage: 45
+    defense: 20
+    critChance: 5
+    critDamage: 100
